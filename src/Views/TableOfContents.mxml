@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="500" height="600"  contentBackgroundColor="#1B2630">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:BorderContainer x="0" y="0" width="500" height="600" backgroundColor="#566473">
+		<s:BorderContainer borderVisible="false" width="340" height="600" backgroundColor="#1B2630" >
+			
+		
+		<s:VGroup x="0" y="41" width="340" height="600" id="chapterArea" gap="1"
+				  chromeColor="#1B2630">
+		</s:VGroup>
+		</s:BorderContainer>
+
+	</s:BorderContainer>
+	<s:BorderContainer x="0" y="0" width="340" height="40" backgroundColor="#1B2630"
+					   borderColor="#1B2630">
+		<s:Label x="126" y="10" color="#FFFFFF" fontSize="21" text="İçindekiler"/>
+	</s:BorderContainer>
+	<s:Scroller x="340" width="160" height="600"  >
+			<s:VGroup width="160"   height="600" id="thumbnailArea">
+			</s:VGroup>
+	</s:Scroller>
+</s:Group>

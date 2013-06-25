@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="339" height="40" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Events.ChapterViewClickEvent;
+			public var title:String;
+			public var page:Number;
+			
+			
+			public function selected(){
+				this.chapterArea.setStyle("backgroundColor","#566473");
+				this.changePageToTableOfContents();
+			}
+			
+			public function unSelect(){
+				this.chapterArea.setStyle("backgroundColor","#1b2630");
+			}
+			
+			
+			public function changePageToTableOfContents(){
+				dispatchEvent(new ChapterViewClickEvent(ChapterViewClickEvent.CHAPTER_CLICKED,this.page));
+			}
+			
+			
+		]]>
+	</fx:Script>
+
+	
+	<s:BorderContainer width="339" height="40" id="chapterArea" backgroundColor="#1b2630" click="selected()" borderVisible="false">
+		<s:Label x="5" y="10" width="324" height="20" color="#FFFFFF" fontSize="14"
+				 text="{this.title}">
+			
+		</s:Label>
+		
+	</s:BorderContainer>
+	<mx:HRule x="0" y="40" width="339" height="1" chromeColor="#566473"/>
+</s:Group>

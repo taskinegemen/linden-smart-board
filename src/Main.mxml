@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   initialize="init()" 
+					   applicationComplete="applicationCompleted()"
+					   showStatusBar="false"
+					   
+					
+					   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import Basic.Api;
+			
+			import Events.*;
+			
+			import Views.BookView;
+			import Views.ChapterView;
+			
+			import flash.display.Stage;
+			
+			import mx.controls.Alert;
+			public var display:DisplayStack;
+			public var api:Api;
+			public var currentBook:String;
+			public var currentPage:Number;
+			public var currentThumbnails:Array;
+
+			
+			private function applicationCompleted(){
+				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+				this.display = new DisplayStack();
+				this.addEventListener(BookClickEvent.BOOK_CLICKED,changeToBookStack);
+				this.display.FullHeight = this.stage.height;
+				this.display.FullWidth = this.stage.width;
+				this.addElement(this.display);
+				this.display.addEventListener(LoginButtonClickEvent.LOGIN_BUTTON_CLICK,authorizeUser);
+			}
+			
+			
+			
+			private function changeToBookStack(e:BookClickEvent){
+					this.display.mainStack.selectedIndex = 2;
+					//todo get last page state of book
+					this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
+					this.currentBook = e.bookId;
+					this.currentPage = 1
+					this.api.getPage(e.bookId,this.currentPage,this.display.FullWidth-20);
+					this.api.addEventListener(GetThumbnailsResultEvent.GET_THUMBNAILS_SUCCESS,thumbnailsInitialized);
+					this.api.getThumbnailsOfBook(this.currentBook);
+					
+			}
+			
+			private function thumbnailsInitialized(ev:GetThumbnailsResultEvent){
+				this.currentThumbnails = ev.thumbnails;
+				this.display.totalThumbnails = ev.thumbnails.length;
+			}
+			
+			
+			private function backwardPage(ev:Event){
+				
+				if(this.currentPage > 1){
+					this.currentPage--;
+					this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
+					this.api.getPage(this.currentBook,this.currentPage,this.display.FullWidth-20);
+				}
+			}
+			
+			public function changePage(ev:MouseEvent){
+				this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
+				this.api.getPage(this.currentBook,ev.currentTarget.id,this.display.FullWidth-20);
+			}
+			
+			private function showOutline(ev:Event){
+				this.api.addEventListener(GetBookResultEvent.GET_BOOK_SUCCESS,bookDataInited);
+				this.api.getBook(this.currentBook);
+				this.display.showTableOfContents();
+			}
+			
+			
+			private function bookDataInited(ev:GetBookResultEvent){
+				this.display.addChapters(ev.chapters);
+			}
+			
+			private function pageDataInited(ev:GetPageResultEvent){
+				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.LEFT_CLICKED,backwardPage);
+				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED,forwardPage);
+				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED,showOutline);
+				this.display.setPage(ev.pageUrl);
+				this.api.removeEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
+				
+			}
+			
+			private function forwardPage(ev:Event){
+				this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
+				this.currentPage++;
+				this.api.getPage(this.currentBook,this.currentPage,this.display.FullWidth-20);
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			private function authorizeUser(ev:LoginButtonClickEvent){
+				this.api = new Api(ev.email,ev.password);
+				api.getToken();
+				this.api = api;
+				this.api.addEventListener(LoginResultEvent.LOGIN_SUCCESS,loginSucess);
+				this.api.addEventListener(LoginResultEvent.LOGIN_FAIL,loginFail);
+			}
+			
+			
+			private function loginSucess(ev:LoginResultEvent){
+				this.display.mainStack.selectedIndex = 1;
+				this.api.getLibrary();
+				this.api.addEventListener(GetLibraryResultEvent.GET_LIBRARY_SUCCESS,fillLibrary);
+			}
+			
+			
+			private function fillLibrary(ev:GetLibraryResultEvent){
+				for each (var book:Object in ev.books) {
+					var bookView:BookView = new BookView();
+					bookView.bookId = book.ID;
+					bookView.imageSource = book.cover;
+					bookView.title = book.title;
+					this.display.booksArea.addElement(bookView);
+				}
+			}
+			
+			
+			private function loginFail(ev:LoginResultEvent){
+//				this.api.getLibrary();
+			}
+			
+			
+			private function init(){
+				
+			}
+		]]>
+		
+		
+		
+	</fx:Script>
+
+</s:WindowedApplication>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="360" height="428" click="bookClicked(event)">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		
+		@font-face {
+			src:url("/Assets/DroidSans.ttf"); 
+			fontFamily: DroidSans;
+			embedAsCFF: true;
+		}
+
+		
+	</fx:Style>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import Events.BookClickEvent;
+			
+			import mx.core.FlexGlobals;
+			[Bindable] public var title:String;
+			public var bookId:String;
+			[Bindable] public var imageSource:String;
+			
+			protected function bookClicked(e:Event){
+				FlexGlobals.topLevelApplication.dispatchEvent(new BookClickEvent(BookClickEvent.BOOK_CLICKED,this.bookId));	
+			}
+		]]>
+	</fx:Script>
+	<mx:ViewStack >
+		<mx:Canvas id="fullBook">
+			<s:BorderContainer width="360" height="395" borderWeight="6" borderColor="#3498db">
+				<s:Image enableLoadingState="true" x="0" y="0" maxWidth="348" id="coverImage" height="385"  scaleMode="stretch" source="{this.imageSource}"/>
+				<s:Label x="34" y="388" width="285" height="19" color="#5d6666"
+						 fontFamily="DroidSans" fontSize="18" text="{this.title}"/>
+			</s:BorderContainer>
+		</mx:Canvas>
+	</mx:ViewStack>
+	
+</s:Group>
