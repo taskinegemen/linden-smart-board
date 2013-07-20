@@ -88,7 +88,7 @@ package Basic
 		public function getPageResult(ev:Event){
 			var res:Object = com.adobe.serialization.json.JSON.decode(ev.target.data);
 			if(res.hasOwnProperty("success") && res.success == true){
-				dispatchEvent(new GetPageResultEvent(GetPageResultEvent.GET_PAGE_SUCCESS,res.page,res["page-image-url"]));
+				dispatchEvent(new GetPageResultEvent(GetPageResultEvent.GET_PAGE_SUCCESS,res.page,res["page-image-url"],res.items));
 			}
 		}
 		
@@ -171,7 +171,11 @@ package Basic
 		}
 		
 		
-		
+		public function getItemUrl(itemId:String){
+			//http://api.linden.pro/item/1?token=2de582978c9417fd459228126a4936156ce8f15a-135b55c6ad38b675c0704dba3598dc80-5940609b9b35ad1db5db
+			//http://api.linden.pro//item/2?token=eb8dc7929f42b06e655b3ecf2f88abdd7c5e5d82-fadcbfa4a0a27b48718c91482dd049f6-a2e7afcc06e94f0eede4
+			return domain+"item/"+itemId+"?token="+this.token;
+		}
 		
 		
 		

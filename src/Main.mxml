@@ -5,8 +5,6 @@
 					   initialize="init()" 
 					   applicationComplete="applicationCompleted()"
 					   showStatusBar="false"
-					   
-					
 					   >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -24,24 +22,25 @@
 			import flash.display.Stage;
 			
 			import mx.controls.Alert;
+			
+			// variables
 			public var display:DisplayStack;
 			public var api:Api;
 			public var currentBook:String;
 			public var currentPage:Number;
 			public var currentThumbnails:Array;
 
-			
 			private function applicationCompleted(){
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+				
 				this.display = new DisplayStack();
-				this.addEventListener(BookClickEvent.BOOK_CLICKED,changeToBookStack);
+				
+				this.addEventListener(BookClickEvent.BOOK_CLICKED, changeToBookStack);
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
 				this.addElement(this.display);
 				this.display.addEventListener(LoginButtonClickEvent.LOGIN_BUTTON_CLICK,authorizeUser);
 			}
-			
-			
 			
 			private function changeToBookStack(e:BookClickEvent){
 					this.display.mainStack.selectedIndex = 2;
@@ -59,7 +58,7 @@
 				this.currentThumbnails = ev.thumbnails;
 				this.display.totalThumbnails = ev.thumbnails.length;
 			}
-			
+
 			
 			private function backwardPage(ev:Event){
 				
@@ -91,6 +90,7 @@
 				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED,forwardPage);
 				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED,showOutline);
 				this.display.setPage(ev.pageUrl);
+				this.display.addItems(ev.items);
 				this.api.removeEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
 				
 			}
@@ -100,14 +100,6 @@
 				this.currentPage++;
 				this.api.getPage(this.currentBook,this.currentPage,this.display.FullWidth-20);
 			}
-			
-			
-			
-			
-			
-			
-			
-			
 			
 			private function authorizeUser(ev:LoginButtonClickEvent){
 				this.api = new Api(ev.email,ev.password);
@@ -139,7 +131,6 @@
 			private function loginFail(ev:LoginResultEvent){
 //				this.api.getLibrary();
 			}
-			
 			
 			private function init(){
 				

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" initialize="init()" xmlns:imagecropper="com.flexblocks.imagecropper.*" xmlns:Views="Views.*">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" initialize="init()" xmlns:imagecropper="com.flexblocks.imagecropper.*" xmlns:Views="Views.*" xmlns:containers="com.acj.containers.*"
+
+		 >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -11,13 +13,17 @@
 			import Events.ChangeViewToBitmapEvent;
 			import Events.ChapterViewClickEvent;
 			import Events.LoginButtonClickEvent;
+			import Events.SwfClickEvent;
 			
 			import Views.ChapterView;
+			import Views.SwfView;
 			
 			import flash.utils.setTimeout;
 			
 			import mx.controls.Alert;
+			import mx.controls.SWFLoader;
 			import mx.core.FlexGlobals;
+			import mx.core.IUIComponent;
 			import mx.events.FlexEvent;
 			[Embed(source="/Assets/background_login.png")]
 			[Bindable]
@@ -63,7 +69,6 @@
 					}else{
 						this.up = false;
 					}
-					
 			}
 			
 			
@@ -160,19 +165,100 @@
 				setTimeout(setCroppedImage,1500,ev.bitmapData);
 			}
 			
+			
+			
 			public function setCroppedImage(im:BitmapData){
-				var canvas:GraffitiCanvas = new GraffitiCanvas(400, 340, 10);
-				var img:Image = new Image();
-				img.source = im;
-				canvas.addChild(img);
-				cropp.addChild(canvas);
-				var brush:BrushTool = new BrushTool(8, 0xFF0000, 1, 0, BrushType.DIAMOND);
-				canvas.activeTool = brush;
+				
+				
 			}
 			
-			import com.nocircleno.graffiti.GraffitiCanvas;
-			import com.nocircleno.graffiti.tools.BrushTool;
-			import com.nocircleno.graffiti.tools.BrushType;
+			
+			public var oldPoint:Point = new Point();
+			public var upDrawing:Boolean = false;
+			
+			protected function onMouseDownDrawing(e:MouseEvent){
+				this.oldPoint = new Point(e.stageX,e.stageY);
+				this.drawLine();
+			}
+			
+			protected function onMouseUpDrawing(e:MouseEvent){
+				this.upDrawing = true;
+			}
+			
+			protected function drawLine(){
+				if(!upDrawing){
+					this.drawingArea.graphics.lineStyle(2, 0x990000,1);
+					this.drawingArea.graphics.beginFill(0x00FF00);
+					this.drawingArea.graphics.moveTo(this.oldPoint.x, this.oldPoint.y);
+					this.oldPoint.x = this.contentMouseX;
+					this.oldPoint.y = this.contentMouseY;
+					this.drawingArea.graphics.lineTo(this.oldPoint.x, this.oldPoint.y);
+					setTimeout(drawLine,10);
+				}else{
+					this.upDrawing = false;
+				}
+				
+			}
+			
+			
+			
+			public function addItems(items:Array){
+				for each (var item:Object in items) {
+					var swf:SwfView = new SwfView();
+					swf.x = item.luX;
+					swf.y = item.luY;
+					swf.itemId = item.ID;
+					swf.itemHeight = item.height;
+					swf.itemWidth = item.width;
+					swf.addEventListener(SwfClickEvent.SWF_CLICKED,itemClicked);
+					this.scrollerBar.addElement(swf);
+				}
+			}
+			
+			
+			public function itemClicked(ev:SwfClickEvent){
+				Alert.show(FlexGlobals.topLevelApplication.api.getItemUrl(ev.swf.itemId));
+				var source:String = FlexGlobals.topLevelApplication.api.getItemUrl(ev.swf.itemId);
+				this.openTitleWindow(source,ev.swf.itemWidth,ev.swf.itemHeight);
+					
+			}
+			
+			
+			protected function drawingArea_initializeHandler(event:FlexEvent):void
+			{
+				this.drawingArea.width = this.FullWidth/2;
+				this.drawingArea.height = this.FullHeight/2;
+				this.drawingArea.setStyle("borderStyle","solid");
+				this.drawingArea.setStyle("borderColor","#000000");
+				this.drawingArea.setStyle("borderThickness","5");
+				
+			}
+			import mx.events.CloseEvent;
+			import mx.controls.Label;
+			import mx.events.FlexEvent;
+			import mx.containers.TitleWindow;
+			import mx.managers.PopUpManager;
+			
+			
+			private function openTitleWindow(source:String,width:Number,height:Number):void {
+
+				var tw:TitleWindow = new TitleWindow();
+				tw.showCloseButton = true;
+				tw.addEventListener(Event.CLOSE, closeTitleWindow);
+				var swf:SWFLoader = new SWFLoader();
+				swf.source = source;
+				swf.width = height;
+				swf.height = width;
+				tw.addChild(swf);
+				PopUpManager.addPopUp(tw, this, true);
+				PopUpManager.centerPopUp(tw);
+			}
+			
+			
+			private function closeTitleWindow(evt:CloseEvent):void {
+				PopUpManager.removePopUp(TitleWindow(evt.target));
+			}
+			
 			
 			
 			
@@ -213,15 +299,12 @@
 				
 			</mx:Tile>	
 		</mx:Canvas>
-		<mx:Canvas id="page">
+		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off">
 			<s:Scroller id="bar"  width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}"  >
 			<s:Group  id="scrollerBar">
-				
-			
-			<s:Image  id="pageView"  enableLoadingState="true"  mouseUp="onMouseUp(event)" click="unShowTableOfContentsAndBottomMenu(event)" mouseDown="onMouseDown(event)"    >
-			
-			</s:Image>
-
+				<s:Image  id="pageView" x="0" y="0" enableLoadingState="true"  mouseUp="onMouseUp(event)" click="unShowTableOfContentsAndBottomMenu(event)" mouseDown="onMouseDown(event)"    >
+					
+				</s:Image>
 				
 			</s:Group>
 			</s:Scroller>
@@ -246,7 +329,13 @@
 				</mx:Canvas>
 			</s:Group>
 		</mx:Canvas>
-		<mx:Canvas id= "cropp" >
+		<mx:Canvas id="drawing" >
+
+				
+			
+			<mx:Canvas id="drawingArea" x="0" y="0" initialize="drawingArea_initializeHandler(event)"  mouseDown="onMouseDownDrawing(event)" mouseUp="onMouseUpDrawing(event)" >
+
+			</mx:Canvas>
 
 
 
