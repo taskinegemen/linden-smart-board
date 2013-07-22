@@ -23,22 +23,26 @@
 		<![CDATA[
 			import Events.BookClickEvent;
 			
+			import entities.Book;
+			
 			import mx.core.FlexGlobals;
 			[Bindable] public var title:String;
 			public var bookId:String;
 			[Bindable] public var imageSource:String;
 			
+			[Bindable]public var book: Book;
+			
 			protected function bookClicked(e:Event){
-				FlexGlobals.topLevelApplication.dispatchEvent(new BookClickEvent(BookClickEvent.BOOK_CLICKED,this.bookId));	
+				FlexGlobals.topLevelApplication.dispatchEvent(new BookClickEvent(BookClickEvent.BOOK_CLICKED, this.book.ID));	
 			}
 		]]>
 	</fx:Script>
 	<mx:ViewStack >
 		<mx:Canvas id="fullBook">
 			<s:BorderContainer width="360" height="395" borderWeight="6" borderColor="#3498db">
-				<s:Image enableLoadingState="true" x="0" y="0" maxWidth="348" id="coverImage" height="385"  scaleMode="stretch" source="{this.imageSource}"/>
+				<s:Image enableLoadingState="true" x="0" y="0" maxWidth="348" id="coverImage" height="385"  scaleMode="stretch" source="{this.book.image}"/>
 				<s:Label x="34" y="388" width="285" height="19" color="#5d6666"
-						 fontFamily="DroidSans" fontSize="18" text="{this.title}"/>
+						 fontFamily="DroidSans" fontSize="18" text="{this.book.title}"/>
 			</s:BorderContainer>
 		</mx:Canvas>
 	</mx:ViewStack>

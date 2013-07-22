@@ -19,36 +19,71 @@
 			import Views.BookView;
 			import Views.ChapterView;
 			
+			import com.nocircleno.graffiti.tools.FillBucketTool;
+			
+			import entities.Book;
+			import entities.DisplayStackConstants;
+			import entities.Library;
+			
 			import flash.display.Stage;
+			import flash.utils.*;
 			
 			import mx.controls.Alert;
 			
 			// variables
 			public var display:DisplayStack;
 			public var api:Api;
+			public var library: Library;
 			public var currentBook:String;
 			public var currentPage:Number;
 			public var currentThumbnails:Array;
+			
+			public var books: Array;
 
 			private function applicationCompleted(){
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				
 				this.display = new DisplayStack();
+				this.api = new Api();
+				this.library = new Library();
 				
+				// add event handlers
+				//this.addEventListener("book-reading-finished", fillLibrary);
 				this.addEventListener(BookClickEvent.BOOK_CLICKED, changeToBookStack);
+				this.addEventListener("close clicked", closeApplication);
+				this.addEventListener("search-view clicked", showSearchView);
+				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
+				
 				this.addElement(this.display);
-				this.display.addEventListener(LoginButtonClickEvent.LOGIN_BUTTON_CLICK,authorizeUser);
+				
+				// get library
+				this.library.readBooks();
+				
+				this.books = new Array(this.library.getBookCount());
+				this.books = this.library.getBooks();
+				
+				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
+				this.addEventListener("library-ready", fillLibrary);
+			}
+			
+			// close application
+			private function closeApplication(e:Event): void {
+				this.exit();
+			}
+			
+			private function showSearchView(e: Event): void {
+				this.display.mainStack.selectedIndex = DisplayStackConstants.SEARCH_VIEW_INDEX;
 			}
 			
 			private function changeToBookStack(e:BookClickEvent){
-					this.display.mainStack.selectedIndex = 2;
+					this.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
 					//todo get last page state of book
 					this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
-					this.currentBook = e.bookId;
+					this.currentBook = e.bookId.toString();
 					this.currentPage = 1
-					this.api.getPage(e.bookId,this.currentPage,this.display.FullWidth-20);
+					this.api.getPage(e.bookId.toString(),this.currentPage,this.display.FullWidth-20);
 					this.api.addEventListener(GetThumbnailsResultEvent.GET_THUMBNAILS_SUCCESS,thumbnailsInitialized);
 					this.api.getThumbnailsOfBook(this.currentBook);
 					
@@ -80,12 +115,11 @@
 				this.display.showTableOfContents();
 			}
 			
-			
-			private function bookDataInited(ev:GetBookResultEvent){
+			private function bookDataInited(ev:GetBookResultEvent): void{
 				this.display.addChapters(ev.chapters);
 			}
 			
-			private function pageDataInited(ev:GetPageResultEvent){
+			private function pageDataInited(ev:GetPageResultEvent): void{
 				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.LEFT_CLICKED,backwardPage);
 				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED,forwardPage);
 				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED,showOutline);
@@ -95,44 +129,54 @@
 				
 			}
 			
-			private function forwardPage(ev:Event){
+			private function forwardPage(ev:Event): void{
 				this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
 				this.currentPage++;
 				this.api.getPage(this.currentBook,this.currentPage,this.display.FullWidth-20);
 			}
 			
-			private function authorizeUser(ev:LoginButtonClickEvent){
-				this.api = new Api(ev.email,ev.password);
+			private function authorizeUser(ev:LoginButtonClickEvent): void{
+				//this.api = new Api(ev.email,ev.password);
+				this.api = new Api();
 				api.getToken();
 				this.api = api;
-				this.api.addEventListener(LoginResultEvent.LOGIN_SUCCESS,loginSucess);
-				this.api.addEventListener(LoginResultEvent.LOGIN_FAIL,loginFail);
+//				this.api.addEventListener(LoginResultEvent.LOGIN_SUCCESS,loginSucess);
+//				this.api.addEventListener(LoginResultEvent.LOGIN_FAIL,loginFail);
 			}
+
 			
+//			private function loginSucess(ev:LoginResultEvent){
+//				this.display.mainStack.selectedIndex = ;
+//				this.api.getLibrary();
+//				this.api.addEventListener(GetLibraryResultEvent.GET_LIBRARY_SUCCESS,fillLibrary);
+//			}
 			
-			private function loginSucess(ev:LoginResultEvent){
-				this.display.mainStack.selectedIndex = 1;
-				this.api.getLibrary();
-				this.api.addEventListener(GetLibraryResultEvent.GET_LIBRARY_SUCCESS,fillLibrary);
-			}
-			
-			
-			private function fillLibrary(ev:GetLibraryResultEvent){
-				for each (var book:Object in ev.books) {
-					var bookView:BookView = new BookView();
-					bookView.bookId = book.ID;
-					bookView.imageSource = book.cover;
-					bookView.title = book.title;
+			private function fillLibrary(ev:Event): void{
+				//this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
+				
+				for each(var book: Book in this.books) {
+					var bookView: BookView = new BookView();
+					book.title = "book-title";
+					//book.image = "C:\\docs\\covers\\1.jpg";
+					bookView.book = book;
+					
 					this.display.booksArea.addElement(bookView);
 				}
+				
+//				for each (var book:Object in ev.books) {
+//					var bookView:BookView = new BookView();
+//					bookView.bookId = book.ID;
+//					bookView.imageSource = book.cover;
+//					bookView.title = book.title;
+//					this.display.booksArea.addElement(bookView);
+//				}
 			}
 			
-			
-			private function loginFail(ev:LoginResultEvent){
+			private function loginFail(ev:LoginResultEvent): void{
 //				this.api.getLibrary();
 			}
 			
-			private function init(){
+			private function init(): void{
 				
 			}
 		]]>

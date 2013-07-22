@@ -1,13 +1,12 @@
-package entities
-{
-	public class Book
-	{
-		public function Book()
-		{
-		}
+package entities {
+	public class Book {
+		public var ID: Number;
+		public var publisherID: Number;
+		public var title: String;
+		public var image: String;
 		
-		public ID: Number;
-		public publisherID: Number;
+		public function Book() {
+		}
 		
 		// attributes will be added soon.
 		

@@ -18,6 +18,8 @@
 			import Views.ChapterView;
 			import Views.SwfView;
 			
+			import entities.DisplayStackConstants;
+			
 			import flash.utils.setTimeout;
 			
 			import mx.controls.Alert;
@@ -34,19 +36,16 @@
 			[Bindable]public var paddingTop;
 			[Bindable]public var totalThumbnails;
 			
-			public function dispachLoginButtonClickEvent(){
-				var ev:LoginButtonClickEvent = new LoginButtonClickEvent(LoginButtonClickEvent.LOGIN_BUTTON_CLICK,this.email.text,this.pass.text);
-				dispatchEvent(ev);
-			}
+			public var aaa: Number = 0;
 			
 			public function init(){
 				this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
 				this.gapSize = 90;
 				this.paddingTop = 50;
-				this.addEventListener(ChangeViewToBitmapEvent.IMAGE_CROPPED,changeStackToCrop);
+				this.addEventListener(ChangeViewToBitmapEvent.IMAGE_CROPPED, changeStackToCrop);
+				
+				this.mainStack.selectedIndex = DisplayStackConstants.LOADING_VIEW_INDEX;
 			}
-			
-
 			
 			protected var up:Boolean = false;
 			protected var sPosY:Number;
@@ -70,25 +69,16 @@
 						this.up = false;
 					}
 			}
-			
-			
-				
 
-			
-		
 			protected function initBottomMenu(ev:MouseEvent){
 				bottomMenu.x = ev.stageX-100;
 				bottomMenu.visible = true;
 			}
 		
-		
-			
 			public function setPage(url:String){
 				this.pageView.source = url;
 			}
-			
-			
-			
+				
 			public function addChapters(chapters:Array){
 				for each (var chapter:Object in chapters) {
 					var chapterView:ChapterView = new ChapterView();
@@ -98,12 +88,10 @@
 					this.addChapter(chapterView);
 				}	
 			}
-			
-			
+				
 			public function changeTableOfContentPage(ev:ChapterViewClickEvent){
 				this.tableOfContents.thumbnailArea.verticalScrollPosition = ev.page * 200;
 			}
-			
 			
 			public function showTableOfContents(){
 				this.tableOfContents.visible = true;
@@ -120,16 +108,9 @@
 				
 			}
 			
-			
-
-			
-			
 			public function addChapter(chapter:ChapterView){
 				this.tableOfContents.chapterArea.addElement(chapter);
 			}
-			
-			
-			
 			
 			public function unShowTableOfContentsAndBottomMenu(ev:MouseEvent){
 				if(cropping){
@@ -149,8 +130,7 @@
 				this.tableOfContents.visible = false;
 				this.bottomMenu.visible = false;
 			}
-			
-			
+					
 			public var cropping:Boolean = false;
 			public var isFirstClicked:Boolean = false;
 			public var secondCoordinate:Point;
@@ -161,17 +141,14 @@
 			}
 			
 			public function changeStackToCrop(ev:ChangeViewToBitmapEvent){
-				this.mainStack.selectedIndex = 3;
+				this.mainStack.selectedIndex = DisplayStackConstants.DRAWING_VIEW_INDEX;
 				setTimeout(setCroppedImage,1500,ev.bitmapData);
 			}
-			
-			
 			
 			public function setCroppedImage(im:BitmapData){
 				
 				
 			}
-			
 			
 			public var oldPoint:Point = new Point();
 			public var upDrawing:Boolean = false;
@@ -199,8 +176,7 @@
 				}
 				
 			}
-			
-			
+
 			
 			public function addItems(items:Array){
 				for each (var item:Object in items) {
@@ -239,7 +215,6 @@
 			import mx.containers.TitleWindow;
 			import mx.managers.PopUpManager;
 			
-			
 			private function openTitleWindow(source:String,width:Number,height:Number):void {
 
 				var tw:TitleWindow = new TitleWindow();
@@ -253,14 +228,31 @@
 				PopUpManager.addPopUp(tw, this, true);
 				PopUpManager.centerPopUp(tw);
 			}
-			
+
 			
 			private function closeTitleWindow(evt:CloseEvent):void {
 				PopUpManager.removePopUp(TitleWindow(evt.target));
 			}
 			
+			// dispatch close event
+			public function onCloseClick(e: Event): void{
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("close clicked"));
+			}
 			
+			// dispatch search event
+			public function onSearchClick(e: Event): void{
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("search-view clicked"));
+			}
 			
+			// return to library
+			public function onBackLibrary(e: Event): void {
+				this.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
+			}
+			
+			// library ready
+			public function onLibraryReady(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("library-ready"));
+			}
 			
 		]]>
 	</fx:Script>
@@ -273,30 +265,26 @@
 			fontFamily: DroidSans;
 			embedAsCFF: true;
 		}
-		
-
 	</fx:Style>
 	
 	<mx:ViewStack id="mainStack"  width="{this.FullWidth}" height="{this.FullHeight}">
-		<mx:Canvas id="login" width="{this.FullWidth}" height="{this.FullHeight}" >
-			<s:BorderContainer  width="{this.FullWidth}" height="{this.FullHeight}" backgroundImage="{backgroundLogin}" backgroundImageFillMode="scale" >
-				<s:Group x="{(stage.width/2) -(stage.width/10)}" y="{stage.height*0.40}">
-					<s:TextInput borderVisible="false" width="384" id="email" text="burak@linden-tech.com" height="60" fontFamily="DroidSans" fontSize="19" />		
-					<s:TextInput borderVisible="false" width="384" id="pass" displayAsPassword="true" y="90"  text="123456"   height="60" fontFamily="DroidSans" fontSize="19" />
-					<s:Image width="384" height="70" y="180" source="/Assets/login_button.png" click="this.dispachLoginButtonClickEvent()" >	
-					</s:Image>
-				</s:Group>
-			</s:BorderContainer>
+		<mx:Canvas id="loading" width="{this.FullWidth}" height="{this.FullHeight}" x="0" y="0">
+			
 		</mx:Canvas>
-		<mx:Canvas id="library" width="{this.FullWidth}" height="{this.FullHeight}" backgroundColor="#d6d8d8" >
-			<s:BorderContainer width="{this.FullWidth}" height="60" borderVisible="false" backgroundColor="#1b2630"     >
-				<s:Image source="/Assets/logo.png" id="logo" x="{(this.FullWidth-this.logo.width)/2}" >
+		<mx:Canvas id="library" width="{this.FullWidth}" height="{this.FullHeight}" backgroundColor="#d6d8d8" creationComplete="onLibraryReady(event)">
+			<s:BorderContainer width="{this.FullWidth}" height="40" borderVisible="false" backgroundColor="#1b2630"     >
+				<s:Image source="/Assets/seviye-ust-logo.png" id="logo" x="{(this.FullWidth-this.logo.width)/2}" >
+					
+				</s:Image>
+				<s:Image source="/Assets/close.png" id="closeImage" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
+					
+				</s:Image>
+				<s:Image source="/Assets/search.png" id="searchImage" x="10" click="onSearchClick(event)">
 					
 				</s:Image>
 			</s:BorderContainer>
 			<mx:Tile id="booksArea" y="60" paddingTop="{this.paddingTop}"  paddingLeft="{this.gapSize}" paddingRight="{this.gapSize}"  
 					 horizontalGap="{this.gapSize}"    minHeight="1" maxWidth="{this.FullWidth}" width="{this.FullWidth}" height="{this.FullHeight-60}">
-				
 			</mx:Tile>	
 		</mx:Canvas>
 		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off">
@@ -305,7 +293,6 @@
 				<s:Image  id="pageView" x="0" y="0" enableLoadingState="true"  mouseUp="onMouseUp(event)" click="unShowTableOfContentsAndBottomMenu(event)" mouseDown="onMouseDown(event)"    >
 					
 				</s:Image>
-				
 			</s:Group>
 			</s:Scroller>
 			<s:Button click="startCropping()">
@@ -329,16 +316,22 @@
 				</mx:Canvas>
 			</s:Group>
 		</mx:Canvas>
-		<mx:Canvas id="drawing" >
-
-				
-			
+		<mx:Canvas id="drawing">
 			<mx:Canvas id="drawingArea" x="0" y="0" initialize="drawingArea_initializeHandler(event)"  mouseDown="onMouseDownDrawing(event)" mouseUp="onMouseUpDrawing(event)" >
-
 			</mx:Canvas>
-
-
-
+		</mx:Canvas>
+		<mx:Canvas id="searchView">
+			<s:BorderContainer width="{this.FullWidth}" height="40" borderVisible="false" backgroundColor="#1b2630">
+				<s:Image source="/Assets/seviye-ust-logo.png" x="{(this.FullWidth-this.logo.width) / 2}" >
+					
+				</s:Image>
+				<s:Image source="/Assets/close.png" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
+					
+				</s:Image>
+				<s:Image source="/Assets/mybooks.png" x="10" click="onBackLibrary(event)">
+					
+				</s:Image>
+			</s:BorderContainer>
 		</mx:Canvas>
 	</mx:ViewStack>
 	

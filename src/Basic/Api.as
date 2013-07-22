@@ -22,6 +22,7 @@ package Basic
 	import flash.net.URLVariables;
 	import flash.utils.ByteArray;
 	
+	import mx.collections.ArrayList;
 	import mx.controls.Alert;
 
 	public class Api extends EventDispatcher
@@ -35,31 +36,31 @@ package Basic
 		public var email:String;
 		public var password:String;
 		
-		public function Api(email:String,password:String) 
-		{
-			this.email = email;
-			this.password = password;
+//		public function Api(email:String,password:String) 
+//		{
+//			this.email = email;
+//			this.password = password;
+//		}
+		
+		public function Api() {
+	
 		}
-		
-		
-		
-		
 		
 		public static function getInstance(){
 			return Api.api;
 		}
 		
 		public function getLibrary(){
-			var urlLoader:URLLoader = new URLLoader();
-			var urlString:String = domain+"book?token="+this.token;
-			var urlRequest:URLRequest = new URLRequest(urlString);
-			urlRequest.method = URLRequestMethod.GET;
-			urlLoader.addEventListener(Event.COMPLETE,getLibraryResult);
-			urlLoader.load(urlRequest); 
+			//var urlLoader:URLLoader = new URLLoader();
+			//var urlString:String = domain+"book?token="+this.token;
+			//var urlRequest:URLRequest = new URLRequest(urlString);
+			//urlRequest.method = URLRequestMethod.GET;
+			//urlLoader.addEventListener(Event.COMPLETE,getLibraryResult);
+			//urlLoader.load(urlRequest);		
 			
+			// read books;
+
 		}
-		
-		
 		
 		public function getLibraryResult(ev:Event){
 			var result:Object = com.adobe.serialization.json.JSON.decode(ev.target.data);
@@ -71,8 +72,6 @@ package Basic
 			dispatchEvent(eve);
 		}
 		
-		
-		
 		public function getPage(book:String,page:Number,resolution:Number){
 			var urlLoader:URLLoader = new URLLoader();
 			//http://api.linden.pro/book-page/5/2?width=1200&add_book_page_items=1&add_book_page_words=1&token=asf
@@ -82,8 +81,6 @@ package Basic
 			urlLoader.addEventListener(Event.COMPLETE,getPageResult);
 			urlLoader.load(urlRequest); 
 		}
-		
-		
 		
 		public function getPageResult(ev:Event){
 			var res:Object = com.adobe.serialization.json.JSON.decode(ev.target.data);
@@ -100,7 +97,6 @@ package Basic
 			urlLoader.addEventListener(Event.COMPLETE,getTokenResult);
 			urlLoader.load(urlRequest); 
 		}
-		
 		
 		public function getTokenResult(e:Event){
 			var data:Object = com.adobe.serialization.json.JSON.decode(e.target.data);
@@ -124,8 +120,6 @@ package Basic
 			urlLoader.load(urlRequest); 
 		}
 		
-		
-		
 		public function getBookResult(ev:Event){
 			var res:Object = com.adobe.serialization.json.JSON.decode(ev.target.data);
 			if(res.hasOwnProperty("isActive") && res.isActive == 1){
@@ -146,7 +140,6 @@ package Basic
 			urlLoader.addEventListener(Event.COMPLETE,getBookThumnbnailsResult);
 			urlLoader.load(urlRequest); 
 		}
-		
 		
 		import flash.utils.IDataInput;
 		import nochump.util.zip.*;
@@ -170,14 +163,11 @@ package Basic
 			dispatchEvent(new GetThumbnailsResultEvent(GetThumbnailsResultEvent.GET_THUMBNAILS_SUCCESS,this.currentBook,thumbnails));
 		}
 		
-		
 		public function getItemUrl(itemId:String){
 			//http://api.linden.pro/item/1?token=2de582978c9417fd459228126a4936156ce8f15a-135b55c6ad38b675c0704dba3598dc80-5940609b9b35ad1db5db
 			//http://api.linden.pro//item/2?token=eb8dc7929f42b06e655b3ecf2f88abdd7c5e5d82-fadcbfa4a0a27b48718c91482dd049f6-a2e7afcc06e94f0eede4
 			return domain+"item/"+itemId+"?token="+this.token;
 		}
-		
-		
 		
 	}
 }
