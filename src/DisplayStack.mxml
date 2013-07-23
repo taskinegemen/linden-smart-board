@@ -16,6 +16,7 @@
 			import Events.SwfClickEvent;
 			
 			import Views.ChapterView;
+			import Views.PageMenu;
 			import Views.SwfView;
 			
 			import entities.DisplayStackConstants;
@@ -32,13 +33,14 @@
 			public var backgroundLogin:Class;
 			[Bindable]public var FullWidth:Number;
 			[Bindable]public var FullHeight:Number;
-			[Bindable]public var gapSize;
-			[Bindable]public var paddingTop;
-			[Bindable]public var totalThumbnails;
+			[Bindable]public var gapSize: Number;
+			[Bindable]public var paddingTop: Number;
+			[Bindable]public var totalThumbnails: Number;
 			
-			public var aaa: Number = 0;
+			protected var up:Boolean = false;
+			protected var sPosY:Number;
 			
-			public function init(){
+			public function init(): void{
 				this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
 				this.gapSize = 90;
 				this.paddingTop = 50;
@@ -47,20 +49,16 @@
 				this.mainStack.selectedIndex = DisplayStackConstants.LOADING_VIEW_INDEX;
 			}
 			
-			protected var up:Boolean = false;
-			protected var sPosY:Number;
-
-			
-			protected function onMouseDown(e:MouseEvent){
+			protected function onMouseDown(e:MouseEvent): void{
 				this.sPosY = this.contentMouseY;
 				this.startToScroll();
 			}
 			
-			protected function onMouseUp(e:MouseEvent){
+			protected function onMouseUp(e:MouseEvent): void{
 				this.up = true;
 			}
 			
-			protected function startToScroll(){
+			protected function startToScroll(): void {
 					if(!up){
 						var direction:Number  =  ((this.sPosY - this.contentMouseY)/this.FullHeight) * 250.0;
 						this.scrollerBar.verticalScrollPosition += direction;
@@ -70,16 +68,16 @@
 					}
 			}
 
-			protected function initBottomMenu(ev:MouseEvent){
-				bottomMenu.x = ev.stageX-100;
+			protected function initBottomMenu(ev:MouseEvent): void{
+				bottomMenu.x = ev.stageX - 100;
 				bottomMenu.visible = true;
 			}
 		
-			public function setPage(url:String){
+			public function setPage(url:String): void {
 				this.pageView.source = url;
 			}
 				
-			public function addChapters(chapters:Array){
+			public function addChapters(chapters:Array): void {
 				for each (var chapter:Object in chapters) {
 					var chapterView:ChapterView = new ChapterView();
 					chapterView.title = chapter.title;
@@ -89,30 +87,29 @@
 				}	
 			}
 				
-			public function changeTableOfContentPage(ev:ChapterViewClickEvent){
+			public function changeTableOfContentPage(ev:ChapterViewClickEvent): void{
 				this.tableOfContents.thumbnailArea.verticalScrollPosition = ev.page * 200;
 			}
 			
-			public function showTableOfContents(){
+			public function showTableOfContents(): void{
 				this.tableOfContents.visible = true;
 				this.tableOfContents.x = this.bottomMenu.x+20;
 				this.tableOfContents.chapterArea.removeAllElements();
 				this.tableOfContents.thumbnailArea.removeAllElements();
-				for (var i=0 ; i<this.totalThumbnails ; i++ ){
+				for (var i: Number = 0 ; i<this.totalThumbnails ; i++ ){
 					var im:Image = new Image();
 					im.source = FlexGlobals.topLevelApplication.currentThumbnails[i];
-					im.id = i;
+					im.id = i.toString();
 					im.addEventListener(MouseEvent.CLICK,FlexGlobals.topLevelApplication.changePage);
 					this.tableOfContents.thumbnailArea.addElement(im);
 				}
-				
 			}
 			
-			public function addChapter(chapter:ChapterView){
+			public function addChapter(chapter:ChapterView): void {
 				this.tableOfContents.chapterArea.addElement(chapter);
 			}
 			
-			public function unShowTableOfContentsAndBottomMenu(ev:MouseEvent){
+			public function unShowTableOfContentsAndBottomMenu(ev:MouseEvent): void{
 				if(cropping){
 					if(isFirstClicked){
 						secondCoordinate = new Point(ev.stageX, ev.stageY);
@@ -136,16 +133,16 @@
 			public var secondCoordinate:Point;
 			public var firstCoordinate:Point;
 			
-			public function startCropping(){
+			public function startCropping(): void{
 				this.cropping = true;	
 			}
 			
-			public function changeStackToCrop(ev:ChangeViewToBitmapEvent){
+			public function changeStackToCrop(ev:ChangeViewToBitmapEvent): void {
 				this.mainStack.selectedIndex = DisplayStackConstants.DRAWING_VIEW_INDEX;
 				setTimeout(setCroppedImage,1500,ev.bitmapData);
 			}
 			
-			public function setCroppedImage(im:BitmapData){
+			public function setCroppedImage(im:BitmapData): void{
 				
 				
 			}
@@ -153,16 +150,16 @@
 			public var oldPoint:Point = new Point();
 			public var upDrawing:Boolean = false;
 			
-			protected function onMouseDownDrawing(e:MouseEvent){
+			protected function onMouseDownDrawing(e:MouseEvent): void{
 				this.oldPoint = new Point(e.stageX,e.stageY);
 				this.drawLine();
 			}
 			
-			protected function onMouseUpDrawing(e:MouseEvent){
+			protected function onMouseUpDrawing(e:MouseEvent): void{
 				this.upDrawing = true;
 			}
 			
-			protected function drawLine(){
+			protected function drawLine(): void{
 				if(!upDrawing){
 					this.drawingArea.graphics.lineStyle(2, 0x990000,1);
 					this.drawingArea.graphics.beginFill(0x00FF00);
@@ -177,8 +174,7 @@
 				
 			}
 
-			
-			public function addItems(items:Array){
+			public function addItems(items:Array): void{
 				for each (var item:Object in items) {
 					var swf:SwfView = new SwfView();
 					swf.x = item.luX;
@@ -191,8 +187,7 @@
 				}
 			}
 			
-			
-			public function itemClicked(ev:SwfClickEvent){
+			public function itemClicked(ev:SwfClickEvent): void{
 				Alert.show(FlexGlobals.topLevelApplication.api.getItemUrl(ev.swf.itemId));
 				var source:String = FlexGlobals.topLevelApplication.api.getItemUrl(ev.swf.itemId);
 				this.openTitleWindow(source,ev.swf.itemWidth,ev.swf.itemHeight);
@@ -229,7 +224,6 @@
 				PopUpManager.centerPopUp(tw);
 			}
 
-			
 			private function closeTitleWindow(evt:CloseEvent):void {
 				PopUpManager.removePopUp(TitleWindow(evt.target));
 			}
@@ -254,6 +248,29 @@
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("library-ready"));
 			}
 			
+			// show circular menu on page
+			public function onPageDoubleClick(e: MouseEvent): void {
+				var pageMenu: PageMenu = new PageMenu();
+				pageMenu._x = e.stageX;
+				pageMenu._y = e.stageY;
+				pageMenu._parent = this;
+				this.addElement(pageMenu);
+				
+			}
+			
+			// on page click
+			public function onPageClick(e: MouseEvent): void {
+				Alert.show("click");
+			}
+			
+			public function onBookViewInit(e: Event): void {
+				Alert.show("on book view Init");
+			}
+			
+			public function onPageViewReady(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("page-view-ready"));
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Style>
@@ -269,35 +286,34 @@
 	
 	<mx:ViewStack id="mainStack"  width="{this.FullWidth}" height="{this.FullHeight}">
 		<mx:Canvas id="loading" width="{this.FullWidth}" height="{this.FullHeight}" x="0" y="0">
-			
+			<s:Image id="loadingImage" source="/Assets/loading.png" x="{(this.FullWidth -  this.loadingImage.width) / 2}">
+				
+			</s:Image>
 		</mx:Canvas>
 		<mx:Canvas id="library" width="{this.FullWidth}" height="{this.FullHeight}" backgroundColor="#d6d8d8" creationComplete="onLibraryReady(event)">
-			<s:BorderContainer width="{this.FullWidth}" height="40" borderVisible="false" backgroundColor="#1b2630"     >
-				<s:Image source="/Assets/seviye-ust-logo.png" id="logo" x="{(this.FullWidth-this.logo.width)/2}" >
+			<mx:Tile id="booksArea" y="0" paddingTop="{this.paddingTop}"  paddingLeft="{this.gapSize}" paddingRight="{this.gapSize}"  
+					 horizontalGap="{this.gapSize}"    minHeight="1" maxWidth="{this.FullWidth}" width="{this.FullWidth}" height="{this.FullHeight-41}">
+			</mx:Tile>	
+			<s:BorderContainer id="bottomLine" width="{this.FullWidth}" height="41" borderVisible="false" backgroundColor="#1b2630" y="{this.FullHeight - this.bottomLine.height}">
+				<s:Image source="/Assets/logoseviye.png" id="logo" x="{(this.FullWidth - this.logo.width)/2}">
 					
 				</s:Image>
 				<s:Image source="/Assets/close.png" id="closeImage" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
 					
 				</s:Image>
-				<s:Image source="/Assets/search.png" id="searchImage" x="10" click="onSearchClick(event)">
+				<s:Image source="/Assets/search.png" id="searchImage" x="0" click="onSearchClick(event)">
 					
 				</s:Image>
 			</s:BorderContainer>
-			<mx:Tile id="booksArea" y="60" paddingTop="{this.paddingTop}"  paddingLeft="{this.gapSize}" paddingRight="{this.gapSize}"  
-					 horizontalGap="{this.gapSize}"    minHeight="1" maxWidth="{this.FullWidth}" width="{this.FullWidth}" height="{this.FullHeight-60}">
-			</mx:Tile>	
 		</mx:Canvas>
-		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off">
-			<s:Scroller id="bar"  width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}"  >
-			<s:Group  id="scrollerBar">
-				<s:Image  id="pageView" x="0" y="0" enableLoadingState="true"  mouseUp="onMouseUp(event)" click="unShowTableOfContentsAndBottomMenu(event)" mouseDown="onMouseDown(event)"    >
-					
-				</s:Image>
-			</s:Group>
+		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="onPageViewReady(event)">
+			<s:Scroller doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" id="bar"  width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}">
+				<s:Group  id="scrollerBar">
+					<s:Image source="asdsad" id="pageView" x="0" y="0" width="{this.FullWidth}" height="{this.FullHeight}" enableLoadingState="true">
+						
+					</s:Image>
+				</s:Group>
 			</s:Scroller>
-			<s:Button click="startCropping()">
-				
-			</s:Button>
 			<s:BorderContainer width="{this.FullWidth}" height="50" y="{this.FullHeight- 50}" id="bottomArea" borderVisible="false" click="initBottomMenu(event)"  >
 				
 			</s:BorderContainer>

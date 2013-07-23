@@ -8,21 +8,19 @@
 	<fx:Script>
 		<![CDATA[
 			import Events.ChapterViewClickEvent;
-			public var title:String;
+			[Bindable]public var title:String;
 			public var page:Number;
 			
-			
-			public function selected(){
+			public function selected(): void{
 				this.chapterArea.setStyle("backgroundColor","#566473");
 				this.changePageToTableOfContents();
 			}
 			
-			public function unSelect(){
+			public function unSelect(): void{
 				this.chapterArea.setStyle("backgroundColor","#1b2630");
 			}
 			
-			
-			public function changePageToTableOfContents(){
+			public function changePageToTableOfContents(): void{
 				dispatchEvent(new ChapterViewClickEvent(ChapterViewClickEvent.CHAPTER_CLICKED,this.page));
 			}
 			

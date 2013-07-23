@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="146" height="146" x="{this._x}" y="{this._y}">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			
+			[Bindable]public var _x: Number = 0;
+			[Bindable]public var _y: Number = 0;
+			
+			public var _parent: Group;
+			
+			private var zoominX: Number = 109;
+			private var zoominY: Number = 44;
+			
+			private var zoomoutX: Number = 109;
+			private var zoomoutY: Number = 100;
+			
+			private var penX: Number = 47;
+			private var penY: Number = 114;
+			
+			private var libraryX: Number = 23;
+			private var libraryY: Number = 70;
+			
+			private var drawingX: Number = 59;
+			private var drawingY: Number = 26;
+			
+			private var distance: Number = 25;
+			
+			// on click page menü close
+			public function onPageMenuClick(e: MouseEvent): void {
+				var x1: Number = e.stageX - this._x;
+				var y1: Number = e.stageY - this._y;
+				
+				if(this.getDistance(x1, penX, y1, penY) <= this.distance) {
+					this.doPaint();
+				}else if(this.getDistance(x1, drawingX, y1, drawingY) <= this.distance) {
+					this.doDrawing();
+				}else if(this.getDistance(x1, libraryX, y1, libraryY) <= this.distance) {
+					this.doLibrary();
+				}else if(this.getDistance(x1, zoominX, y1, zoominY) <= this.distance) {
+					this.doZoomin();
+				}else if(this.getDistance(x1, zoomoutX, y1, zoomoutY) <= this.distance) {
+					this.doZoomout();
+				}
+				
+				this._parent.removeElement(this);
+			}
+			
+			private function getDistance(x1: Number, x2: Number, y1: Number, y2: Number): Number {
+				var dist: Number = 0;
+				
+				dist = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+				//Alert.show("x2: " + x2.toString() + ", x1: " + x1.toString()+ ", y2: " + y2.toString() + ", y1: " + y1.toString());
+				return dist;
+			}
+			
+			public function doPaint(): void {
+				
+			}
+			
+			public function doDrawing(): void {
+				
+			}
+			
+			public function doLibrary(): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("back-to-library"));
+			}
+			
+			public function doZoomin(): void {
+				
+			}
+			
+			public function doZoomout(): void {
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:BorderContainer borderVisible="false" backgroundAlpha="0" backgroundColor="#000000">
+		<s:Image source="/Assets/pagemenu.png" click="onPageMenuClick(event)">
+			
+		</s:Image>
+	</s:BorderContainer>
+</s:Group>

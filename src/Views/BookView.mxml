@@ -26,23 +26,25 @@
 			import entities.Book;
 			
 			import mx.core.FlexGlobals;
-			[Bindable] public var title:String;
-			public var bookId:String;
-			[Bindable] public var imageSource:String;
+			import mx.controls.Alert;
+			
+			//[Bindable] public var title:String;
+			//public var bookId:String;
+			//[Bindable] public var imageSource:String;
 			
 			[Bindable]public var book: Book;
 			
-			protected function bookClicked(e:Event){
-				FlexGlobals.topLevelApplication.dispatchEvent(new BookClickEvent(BookClickEvent.BOOK_CLICKED, this.book.ID));	
+			protected function bookClicked(e:Event): void{
+				FlexGlobals.topLevelApplication.dispatchEvent(new BookClickEvent(BookClickEvent.BOOK_CLICKED, this.book));	
 			}
 		]]>
 	</fx:Script>
 	<mx:ViewStack >
 		<mx:Canvas id="fullBook">
-			<s:BorderContainer width="360" height="395" borderWeight="6" borderColor="#3498db">
-				<s:Image enableLoadingState="true" x="0" y="0" maxWidth="348" id="coverImage" height="385"  scaleMode="stretch" source="{this.book.image}"/>
-				<s:Label x="34" y="388" width="285" height="19" color="#5d6666"
-						 fontFamily="DroidSans" fontSize="18" text="{this.book.title}"/>
+			<s:BorderContainer width="150" height="210" borderWeight="6" borderColor="#3498db">
+				<s:Image enableLoadingState="true" x="0" y="0" maxWidth="138" id="coverImage" height="198"  scaleMode="stretch" source="{this.book.image}"/>
+				<s:Label x="0" y="210" width="150" height="20" color="#5d6666"
+						 fontFamily="DroidSans" fontSize="12" text="{this.book.title}" visible="true"/>
 			</s:BorderContainer>
 		</mx:Canvas>
 	</mx:ViewStack>
