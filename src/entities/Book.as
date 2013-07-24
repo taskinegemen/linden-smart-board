@@ -5,6 +5,7 @@ package entities {
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	
+	import mx.controls.Alert;
 	
 	public class Book {
 		
@@ -50,11 +51,18 @@ package entities {
 			if(this.pages == null){
 				this.readPages();
 			}
+			
 			return this.pages;
 		}
 		
 		public function getPage(pageNumber: Number): Page {
-			return null;
+			if(pageNumber < 1){
+				pageNumber = 1;
+			}else if(pageNumber > this.totalPageNumber){
+				pageNumber = this.totalPageNumber;
+			}
+			this.pages[pageNumber - 1].image = "C:\\docs\\pages\\" + this.ID.toString() + "\\" + pageNumber.toString() + ".jpg";
+			return this.pages[pageNumber - 1];
 		}
 		
 		// fill pages of the book

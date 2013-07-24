@@ -68,9 +68,9 @@
 					}
 			}
 
-			protected function initBottomMenu(ev:MouseEvent): void{
+			protected function initBottomMenu(ev:MouseEvent): void {
 				bottomMenu.x = ev.stageX - 100;
-				bottomMenu.visible = true;
+				bottomMenu.visible = !bottomMenu.visible;
 			}
 		
 			public function setPage(url:String): void {
@@ -309,7 +309,7 @@
 		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="onPageViewReady(event)">
 			<s:Scroller doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" id="bar"  width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}">
 				<s:Group  id="scrollerBar">
-					<s:Image source="asdsad" id="pageView" x="0" y="0" width="{this.FullWidth}" height="{this.FullHeight}" enableLoadingState="true">
+					<s:Image id="pageView" x="0" y="0" width="{this.FullWidth}" height="{this.FullHeight}" enableLoadingState="true">
 						
 					</s:Image>
 				</s:Group>
@@ -317,7 +317,7 @@
 			<s:BorderContainer width="{this.FullWidth}" height="50" y="{this.FullHeight- 50}" id="bottomArea" borderVisible="false" click="initBottomMenu(event)"  >
 				
 			</s:BorderContainer>
-			<Views:PagePalette y="{this.bottomArea.y+2}" id="bottomMenu" visible="false"  >
+			<Views:PagePalette y="{this.bottomArea.y+2}" id="bottomMenu" visible="false">
 				
 			</Views:PagePalette>
 			<Views:TableOfContents visible="false" id="tableOfContents" x="{(this.FullWidth-500)/2}" y="300">

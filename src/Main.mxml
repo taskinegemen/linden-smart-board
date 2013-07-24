@@ -82,12 +82,13 @@
 			
 			private function showBookView(e: BookClickEvent): void {
 				this.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
+				
 				this.page = null;
 				this.bindBookPages(e.book);
 				if(this.display.pageView == null) {
 					this.addEventListener("page-view-ready", this.pageViewReady);
-				}else{
-					this.setPage();
+				} else {
+					this.setFirstPage();
 				}
 			}			
 			
@@ -96,16 +97,35 @@
 			}
 			
 			private function pageViewReady(e: Event): void {
-				this.setPage();
+				
+				// bind event handlers, these handlers for bottom menu
+				
+				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
+				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
+				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED, this.bookOutline);
+				
+				this.setFirstPage();
 			}
 			
-			private function setPage(_page: Page = null): void{
-				if(_page == null){
-					this.page = this.book.getFirstPage();
-				}else{
-					this.page = this.book.getPage(_page.pageNo);
-				}
+			private function setFirstPage(): void{
+				this.page = this.book.getFirstPage();
 				this.display.pageView.source = this.page.image;
+			}
+			
+			private function nextPage(e: Event): void {
+				var nextPageNumber: Number = this.page.pageNo + 1;
+				this.page = this.book.getPage( nextPageNumber );
+				this.display.pageView.source = this.page.image;
+			}
+			
+			private function previousPage(e: Event): void {
+				var previousPageNumber: Number = this.page.pageNo - 1;
+				this.page = this.book.getPage( previousPageNumber );
+				this.display.pageView.source = this.page.image;
+			}
+			
+			private function bookOutline(e: Event): void {
+				
 			}
 			
 //			private function changeToBookStack(e:BookClickEvent){
@@ -151,9 +171,7 @@
 			}
 			
 			private function pageDataInited(ev:GetPageResultEvent): void{
-				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.LEFT_CLICKED,backwardPage);
-				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED,forwardPage);
-				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED,showOutline);
+				
 				this.display.setPage(ev.pageUrl);
 				this.display.addItems(ev.items);
 				this.api.removeEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);

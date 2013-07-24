@@ -8,16 +8,18 @@
 	<fx:Script>
 		<![CDATA[
 			import Events.PagePaletteClickEvent;
-			protected function backPageClicked(e:MouseEvent){
+			import mx.controls.Alert;
+			
+			protected function backPageClicked(e:MouseEvent): void {
 				dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
 			}
 			
 			
-			protected function outLineClicked(e:MouseEvent){
+			protected function outLineClicked(e:MouseEvent): void {
 				dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.OUTLINE_CLICKED));
 			}
 			
-			protected function frontPageClicked(e:MouseEvent){
+			protected function frontPageClicked(e:MouseEvent): void {
 				dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
 			}
 			
