@@ -30,6 +30,10 @@
 			
 			import mx.controls.Alert;
 			
+			import spark.components.Image;
+			import spark.components.Label;
+			import spark.skins.spark.ImageSkin;
+			
 			// variables
 			public var display:DisplayStack;
 			public var api:Api;
@@ -41,6 +45,7 @@
 			public var books: Array;
 			public var book: Book;
 			public var page: Page;
+			public var outlines: Array;
 
 			private function applicationCompleted(): void{
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
@@ -85,6 +90,13 @@
 				
 				this.page = null;
 				this.bindBookPages(e.book);
+				if(this.display.tableOfContents == null){
+					this.addEventListener("tableofcontents-ready", this.bindBookOutlines);
+				}else{
+					this.bindBookOutlines(null);
+				}
+				
+				
 				if(this.display.pageView == null) {
 					this.addEventListener("page-view-ready", this.pageViewReady);
 				} else {
@@ -94,6 +106,32 @@
 			
 			private function bindBookPages(book: Book): void {
 				this.book = book;
+			}
+			
+			private function bindBookOutlines(e: Event): void {
+				this.outlines = this.book.outlines;
+				if(this.outlines == null){
+					this.outlines = new Array();
+				}
+				
+				this.display.tableOfContents.chapterArea.removeAllElements();
+				
+				for each(var outline: Outline in this.outlines) {
+					var label: Label = new spark.components.Label();
+					
+					label.text = outline.title;
+					label.setStyle("color", "#FFFFFF");
+					label.setStyle("fontSize", 20);
+					label.height = 30;
+					label.setStyle("paddingTop", 10);
+					label.setStyle("paddingLeft", 10);
+					label.id = "outline-" + outline.ID;
+					
+					
+					label.addEventListener(MouseEvent.CLICK, this.outlineClicked);
+					
+					this.display.tableOfContents.chapterArea.addElement(label);
+				}
 			}
 			
 			private function pageViewReady(e: Event): void {
@@ -125,7 +163,65 @@
 			}
 			
 			private function bookOutline(e: Event): void {
+				this.display.tableOfContents._parent = this.display;
+				this.display.tableOfContents.mainHeight = this.display.FullHeight;
+				this.display.tableOfContents.mainWidth = this.display.FullWidth;
+				this.display.tableOfContents.visible = true;
+			}
+			
+			private function outlineClicked(e: MouseEvent): void {
+				var label: Label = e.target as Label;
 				
+				var children: Number = this.display.tableOfContents.chapterArea.numChildren;
+				for(var i: Number = 0; i < children; i++) {
+					var _label:Label = this.display.tableOfContents.chapterArea.getElementAt(i) as Label;
+					_label.setStyle("backgroundColor", "#1B2630");
+				}
+				
+				label.setStyle("backgroundColor", "#FF00FF");
+				
+				var id: Number = label.id.split('-')[1];
+				
+				this.setOutlinePages(id);
+			}
+			
+			private function setOutlinePages(outlineId: Number): void {
+				var arr: Array = this.book.getOutlinePages(outlineId);
+				
+				this.display.tableOfContents.thumbnailArea.removeAllElements();
+				
+				for each(var page: Object in arr) {
+					var img: Image = new Image();
+					
+					img.source = page.image;
+					
+					img.height = 210;
+					img.width = 150;
+					
+					img.setStyle("paddingTop", 2);
+					img.setStyle("paddingBottom", 2);
+					
+					img.id = "outline-page-" + page.pageNo;
+					img.addEventListener(MouseEvent.CLICK, this.outlinePageClicked);
+					
+					this.display.tableOfContents.thumbnailArea.addElement(img);
+				}
+				
+			}
+			
+			private function outlinePageClicked(e: MouseEvent): void {
+				var image: Image = e.target as Image;
+				var imageSkin: ImageSkin = e.target as ImageSkin;
+				
+				if(image == null){
+					image = imageSkin.parent as Image;
+				}
+				
+				var pageNo: Number = image.id.split('-')[2];
+				this.page = this.book.getPage(pageNo);
+				this.display.pageView.source = this.page.image;
+				
+				this.display.tableOfContents.visible = false;
 			}
 			
 //			private function changeToBookStack(e:BookClickEvent){

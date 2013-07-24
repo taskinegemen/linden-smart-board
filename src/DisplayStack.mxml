@@ -320,7 +320,7 @@
 			<Views:PagePalette y="{this.bottomArea.y+2}" id="bottomMenu" visible="false">
 				
 			</Views:PagePalette>
-			<Views:TableOfContents visible="false" id="tableOfContents" x="{(this.FullWidth-500)/2}" y="300">
+			<Views:TableOfContents visible="false" id="tableOfContents" x="0" y="0" height="{this.FullHeight}">
 				
 			</Views:TableOfContents>
 			<s:Group x="20">

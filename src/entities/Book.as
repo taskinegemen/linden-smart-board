@@ -32,6 +32,11 @@ package entities {
 			this.totalPageNumber 	= obj.totalPageNumber;
 			
 			this.image = "C:\\docs\\covers\\" + this.ID + ".jpg";
+			
+			for each(var outlineObj: Object in obj.outlines){
+				var outline: Outline = new Outline(outlineObj);
+				this.addOutline(outline);
+			}
 		}
 	
 		public function getFirstPage(): Page {
@@ -101,6 +106,30 @@ package entities {
 				return 0;
 			}
 			return this.pages.length;
+		}
+		
+		public function getOutlinePages(outlineId: Number): Array {
+			var arr: Array = new Array();
+			
+			// this code snippet will be changed
+			var ran: Number = Math.ceil(Math.random() * 8);
+			
+			for(var i: Number = 0; i < ran; i++) {
+				var obj: Object = new Object();
+				
+				obj.bookID = this.ID;
+				obj.pageNo = (i + 1);
+				obj.image = "C:\\docs\\pages\\" + this.ID.toString() + "\\" + (i + 1).toString() + ".jpg";
+				
+				arr[i] = obj;
+			}
+			
+			// until the end of this comment
+			return arr;
+		}
+		
+		private function addOutline(outline: Outline): void {
+			this.outlines[ this.outlines.length ] = outline;
 		}
 	}
 }
