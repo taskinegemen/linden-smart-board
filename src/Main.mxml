@@ -30,6 +30,7 @@
 			
 			import mx.controls.Alert;
 			
+			import spark.components.BorderContainer;
 			import spark.components.Image;
 			import spark.components.Label;
 			import spark.skins.spark.ImageSkin;
@@ -191,6 +192,8 @@
 				this.display.tableOfContents.thumbnailArea.removeAllElements();
 				
 				for each(var page: Object in arr) {
+					var border: BorderContainer = new BorderContainer();
+					
 					var img: Image = new Image();
 					
 					img.source = page.image;
@@ -202,9 +205,28 @@
 					img.setStyle("paddingBottom", 2);
 					
 					img.id = "outline-page-" + page.pageNo;
+					
 					img.addEventListener(MouseEvent.CLICK, this.outlinePageClicked);
 					
-					this.display.tableOfContents.thumbnailArea.addElement(img);
+					border.addElement(img);
+					
+					var label: Label = new Label();
+					
+					label.x = img.width - 40;
+					label.y = img.height - 20;
+					label.height = 20;
+					label.width = 40;
+					label.text = page.pageNo;
+					
+					label.setStyle("backgroundColor", "#1b2630");
+					label.setStyle("color", "#FFFFFF");
+					label.setStyle("paddingLeft", 5);
+					label.setStyle("paddingTop", 5);
+					label.setStyle("textAlign", "center");
+					
+					border.addElement(label);
+					
+					this.display.tableOfContents.thumbnailArea.addElement(border);
 				}
 				
 			}

@@ -28,6 +28,7 @@
 			import mx.core.FlexGlobals;
 			import mx.core.IUIComponent;
 			import mx.events.FlexEvent;
+			
 			[Embed(source="/Assets/background_login.png")]
 			[Bindable]
 			public var backgroundLogin:Class;
@@ -39,6 +40,8 @@
 			
 			protected var up:Boolean = false;
 			protected var sPosY:Number;
+			
+			private var _pageMenu: PageMenu = null;
 			
 			public function init(): void{
 				this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
@@ -250,12 +253,15 @@
 			
 			// show circular menu on page
 			public function onPageDoubleClick(e: MouseEvent): void {
-				var pageMenu: PageMenu = new PageMenu();
-				pageMenu._x = e.stageX;
-				pageMenu._y = e.stageY;
-				pageMenu._parent = this;
-				this.addElement(pageMenu);
+				if(this._pageMenu == null){
 				
+					this._pageMenu = new PageMenu();
+				}
+				
+				this._pageMenu._x = e.stageX - (this._pageMenu.width / 2);
+				this._pageMenu._y = e.stageY - (this._pageMenu.height / 2);
+				this._pageMenu._parent = this;
+				this.addElement(this._pageMenu);
 			}
 			
 			// on page click

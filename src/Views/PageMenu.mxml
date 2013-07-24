@@ -16,22 +16,25 @@
 			
 			public var _parent: Group;
 			
-			private var zoominX: Number = 109;
-			private var zoominY: Number = 44;
+			private var zoominX: Number 	= 109;
+			private var zoominY: Number 	= 44;
 			
-			private var zoomoutX: Number = 109;
-			private var zoomoutY: Number = 100;
+			private var zoomoutX: Number 	= 109;
+			private var zoomoutY: Number 	= 100;
 			
-			private var penX: Number = 47;
-			private var penY: Number = 114;
+			private var penX: Number 		= 47;
+			private var penY: Number 		= 114;
 			
-			private var libraryX: Number = 23;
-			private var libraryY: Number = 70;
+			private var libraryX: Number 	= 23;
+			private var libraryY: Number 	= 70;
 			
-			private var drawingX: Number = 59;
-			private var drawingY: Number = 26;
+			private var drawingX: Number 	= 59;
+			private var drawingY: Number 	= 26;
 			
-			private var distance: Number = 25;
+			private var closeX: Number 		= 73;
+			private var closeY: Number 		= 73;
+			
+			private var distance: Number 	= 25;
 			
 			// on click page menü close
 			public function onPageMenuClick(e: MouseEvent): void {
@@ -41,7 +44,7 @@
 				if(this.getDistance(x1, penX, y1, penY) <= this.distance) {
 					this.doPaint();
 				}else if(this.getDistance(x1, drawingX, y1, drawingY) <= this.distance) {
-					this.doDrawing();
+					this.doDrawings();
 				}else if(this.getDistance(x1, libraryX, y1, libraryY) <= this.distance) {
 					this.doLibrary();
 				}else if(this.getDistance(x1, zoominX, y1, zoominY) <= this.distance) {
@@ -62,10 +65,10 @@
 			}
 			
 			public function doPaint(): void {
-				
+				Alert.show("çizim mi yapacan len sen kerata?");
 			}
 			
-			public function doDrawing(): void {
+			public function doDrawings(): void {
 				
 			}
 			
