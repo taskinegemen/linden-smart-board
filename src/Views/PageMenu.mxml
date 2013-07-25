@@ -65,7 +65,7 @@
 			}
 			
 			public function doPaint(): void {
-				Alert.show("çizim mi yapacan len sen kerata?");
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("paint-click"));
 			}
 			
 			public function doDrawings(): void {

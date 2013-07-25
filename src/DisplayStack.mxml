@@ -260,11 +260,7 @@
 				this.timer.removeEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
 				if(this.timer.running){
 					this.timer.stop();
-				}
-				
-				//if(this._pageMenu != null) {
-				//	this.removeElement(this._pageMenu);
-				//}
+				}				
 				
 				var children: Number = this.numChildren;
 				var skip: Boolean = false;

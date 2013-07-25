@@ -18,6 +18,7 @@
 			
 			import Views.BookView;
 			import Views.ChapterView;
+			import Views.CropView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -61,6 +62,8 @@
 				this.addEventListener("close clicked", closeApplication);
 				this.addEventListener("search-view clicked", showSearchView);
 				this.addEventListener("back-to-library", backToLibrary);
+				
+				this.addEventListener("paint-click", initializePaintView);
 				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
@@ -339,6 +342,34 @@
 			public function backToLibrary(e: Event): void {
 				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
 			}
+			
+			public var cropView: CropView;
+			public function initializePaintView(e: Event): void {
+				this.addEventListener("paint-view-ready", this.paintReady);
+				this.cropView = new CropView();
+				
+				this.cropView._width = this.display.pageView.sourceWidth;
+				this.cropView._height = this.display.pageView.sourceHeight;
+				
+				this.cropView.x = 
+					Math.ceil((this.display.pageView.width - this.display.pageView.sourceWidth) / 2);
+				
+				this.addElement(this.cropView);
+			}
+			
+			public function paintReady(e: Event): void {
+				this.cropView.paintCanvasElement.setStyle("backgroundColor", "#FFFFFF");
+				this.cropView.paintCanvasElement.setStyle("backgroundAlpha", "0");
+				
+				this.addEventListener(CropRectangleEvent.CROP_FINISHED, this.cropFinished);
+			}
+			
+			public function cropFinished(e: CropRectangleEvent): void {
+				//Alert.show("x1: " + e.pointStart.x.toString() + ", y1: " + e.pointStart.y.toString() + ", x2: " + e.pointEnd.x.toString() + ", y2: " + e.pointEnd.y.toString());
+				this.removeElement(this.cropView);
+			}
+			
+			
 		]]>
 		
 		

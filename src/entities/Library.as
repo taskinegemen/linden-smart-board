@@ -36,6 +36,8 @@ package entities
 					//this.books = obj.books;
 					
 					var i: Number = 0;
+					for(var repeat: Number = 0; repeat < 20; repeat++) {
+					// **********************
 					for each(var objBook: Object in obj.books){
 						
 						file = file.resolvePath("C:\\docs\\books\\" + objBook.bookID + ".json");
@@ -50,6 +52,8 @@ package entities
 						
 						this.books[i] = book;
 						i++;
+					}
+					//	**************************
 					}
 				}
 			}
