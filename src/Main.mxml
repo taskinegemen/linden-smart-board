@@ -19,6 +19,7 @@
 			import Views.BookView;
 			import Views.ChapterView;
 			import Views.CropView;
+			import Views.DrawingView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -364,12 +365,33 @@
 				this.addEventListener(CropRectangleEvent.CROP_FINISHED, this.cropFinished);
 			}
 			
+			
+			public var drawingView: DrawingView;
 			public function cropFinished(e: CropRectangleEvent): void {
-				//Alert.show("x1: " + e.pointStart.x.toString() + ", y1: " + e.pointStart.y.toString() + ", x2: " + e.pointEnd.x.toString() + ", y2: " + e.pointEnd.y.toString());
 				this.removeElement(this.cropView);
+				
+				this.addEventListener("drawing-view-ready", this.drawingViewReady);
+				
+				this.drawingView = new DrawingView();
+				
+				this.drawingView._width = this.display.FullWidth;
+				this.drawingView._height = this.display.FullHeight;
+				
+				this.drawingView.croppedImageWidth = e.pointEnd.x - e.pointStart.x;
+				this.drawingView.croppedImageHeight = e.pointEnd.y - e.pointStart.y;
+				
+				this.addElement(this.drawingView);
 			}
 			
+			public function drawingViewReady(e: Event): void {
+				this.addEventListener("drawing-view-close", this.drawingViewClose);
+				
+				Alert.show("drawing view ready");
+			}
 			
+			public function drawingViewClose(e: Event): void {
+				this.removeElement(this.drawingView);
+			}
 		]]>
 		
 		
