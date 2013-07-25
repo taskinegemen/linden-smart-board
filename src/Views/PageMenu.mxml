@@ -36,7 +36,7 @@
 			
 			private var distance: Number 	= 25;
 			
-			// on click page menü close
+			// on click page menu close
 			public function onPageMenuClick(e: MouseEvent): void {
 				var x1: Number = e.stageX - this._x;
 				var y1: Number = e.stageY - this._y;

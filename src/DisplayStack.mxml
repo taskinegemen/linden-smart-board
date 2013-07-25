@@ -29,6 +29,9 @@
 			import mx.core.IUIComponent;
 			import mx.events.FlexEvent;
 			
+			import org.osmf.events.TimeEvent;
+			
+			
 			[Embed(source="/Assets/background_login.png")]
 			[Bindable]
 			public var backgroundLogin:Class;
@@ -42,6 +45,7 @@
 			protected var sPosY:Number;
 			
 			private var _pageMenu: PageMenu = null;
+			public var timer: Timer;
 			
 			public function init(): void{
 				this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
@@ -252,21 +256,43 @@
 			}
 			
 			// show circular menu on page
-			public function onPageDoubleClick(e: MouseEvent): void {
-				if(this._pageMenu == null){
+			protected function onPageDoubleClick(e: MouseEvent): void {
+				this.timer.removeEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
+				if(this.timer.running){
+					this.timer.stop();
+				}
 				
+				if(this._pageMenu == null){
 					this._pageMenu = new PageMenu();
 				}
 				
 				this._pageMenu._x = e.stageX - (this._pageMenu.width / 2);
 				this._pageMenu._y = e.stageY - (this._pageMenu.height / 2);
+				
 				this._pageMenu._parent = this;
+				
 				this.addElement(this._pageMenu);
+				
+				this.pageViewScroller.doubleClickEnabled = false;
 			}
 			
 			// on page click
-			public function onPageClick(e: MouseEvent): void {
-				Alert.show("click");
+			protected function onPageClick(e: MouseEvent): void {
+				this.timer = new Timer(150, 1);
+				this.timer.addEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
+				this.timer.start();
+				
+			}
+			
+			protected function singleClick(e: TimerEvent): void {
+				this.timer.removeEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
+				
+				if(this._pageMenu != null) {
+					this.removeElement(this._pageMenu);
+					this._pageMenu = null;
+				}
+				this.pageViewScroller.doubleClickEnabled = true;
+				
 			}
 			
 			public function onBookViewInit(e: Event): void {
@@ -313,7 +339,7 @@
 			</s:BorderContainer>
 		</mx:Canvas>
 		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="onPageViewReady(event)">
-			<s:Scroller doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" id="bar"  width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}">
+			<s:Scroller id="pageViewScroller" doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}">
 				<s:Group  id="scrollerBar">
 					<s:Image id="pageView" x="0" y="0" width="{this.FullWidth}" height="{this.FullHeight}" enableLoadingState="true">
 						
