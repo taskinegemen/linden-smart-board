@@ -262,8 +262,19 @@
 					this.timer.stop();
 				}
 				
-				if(this._pageMenu == null){
-					this._pageMenu = new PageMenu();
+				//if(this._pageMenu != null) {
+				//	this.removeElement(this._pageMenu);
+				//}
+				
+				var children: Number = this.numChildren;
+				var skip: Boolean = false;
+				for(var i: Number = 0; i < children; i++){
+					if( this.getElementAt(i) is PageMenu ){
+						skip = true;
+					}
+				}
+				if(!skip){
+					this._pageMenu = new PageMenu();	
 				}
 				
 				this._pageMenu._x = e.stageX - (this._pageMenu.width / 2);
@@ -273,12 +284,11 @@
 				
 				this.addElement(this._pageMenu);
 				
-				this.pageViewScroller.doubleClickEnabled = false;
 			}
 			
 			// on page click
 			protected function onPageClick(e: MouseEvent): void {
-				this.timer = new Timer(150, 1);
+				this.timer = new Timer(200, 1);
 				this.timer.addEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
 				this.timer.start();
 				
@@ -287,12 +297,17 @@
 			protected function singleClick(e: TimerEvent): void {
 				this.timer.removeEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
 				
-				if(this._pageMenu != null) {
-					this.removeElement(this._pageMenu);
-					this._pageMenu = null;
-				}
-				this.pageViewScroller.doubleClickEnabled = true;
+				var children: Number = this.numChildren;
 				
+				for(var i: Number = 0; i < children; i++){
+					if( this.getElementAt(i) is PageMenu ){
+						this.removeElement( this._pageMenu );
+					}
+				}
+				
+				//this.removeElement(this._pageMenu);
+				
+				this.bottomMenu.visible = false;
 			}
 			
 			public function onBookViewInit(e: Event): void {
