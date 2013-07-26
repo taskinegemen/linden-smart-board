@@ -28,6 +28,7 @@
 			import mx.core.FlexGlobals;
 			import mx.core.IUIComponent;
 			import mx.events.FlexEvent;
+			import mx.events.ScrollEvent;
 			
 			import org.osmf.events.TimeEvent;
 			
@@ -283,11 +284,13 @@
 			}
 			
 			// on page click
+			public var clickPoint: Point;
 			protected function onPageClick(e: MouseEvent): void {
 				this.timer = new Timer(200, 1);
 				this.timer.addEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
 				this.timer.start();
 				
+				this.clickPoint = new Point(this.contentMouseX, this.contentMouseY);
 			}
 			
 			protected function singleClick(e: TimerEvent): void {
@@ -304,7 +307,14 @@
 				//this.removeElement(this._pageMenu);
 				
 				this.bottomMenu.visible = false;
+				
+				if( this.page.height - this.clickPoint.y <= 50 ){
+					this.bottomMenu.y = this.page.height + this.page.verticalScrollPosition - 50;
+					this.bottomMenu.x = this.clickPoint.x;
+					this.bottomMenu.visible = true;
+				}
 			}
+
 			
 			public function onBookViewInit(e: Event): void {
 				Alert.show("on book view Init");
@@ -312,6 +322,10 @@
 			
 			public function onPageViewReady(e: Event): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("page-view-ready"));
+			}
+			
+			public function onScrollChange(e: ScrollEvent): void {
+				this.bottomMenu.visible = false;
 			}
 			
 		]]>
@@ -349,31 +363,20 @@
 				</s:Image>
 			</s:BorderContainer>
 		</mx:Canvas>
-		<mx:Canvas id="page" horizontalScrollPolicy="off" verticalScrollPolicy="off" creationComplete="onPageViewReady(event)">
-			<s:Scroller id="pageViewScroller" doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="{this.FullHeight}">
+		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)">
+			<s:Scroller id="pageViewScroller" doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" height="{this.pageView.height}">
 				<s:Group  id="scrollerBar">
-					<s:Image id="pageView" x="0" y="0" width="{this.FullWidth}" height="{this.FullHeight}" enableLoadingState="true">
+					<s:Image id="pageView" x="0" y="0" enableLoadingState="true">
 						
 					</s:Image>
 				</s:Group>
 			</s:Scroller>
-			<s:BorderContainer width="{this.FullWidth}" height="50" y="{this.FullHeight- 50}" id="bottomArea" borderVisible="false" click="initBottomMenu(event)"  >
-				
-			</s:BorderContainer>
-			<Views:PagePalette y="{this.bottomArea.y+2}" id="bottomMenu" visible="false">
+			<Views:PagePalette id="bottomMenu" visible="false">
 				
 			</Views:PagePalette>
 			<Views:TableOfContents visible="false" id="tableOfContents" x="0" y="0" height="{this.FullHeight}">
 				
 			</Views:TableOfContents>
-			<s:Group x="20">
-				
-			
-			<s:BitmapImage  id="cropped"/>
-				<mx:Canvas id="test">
-					
-				</mx:Canvas>
-			</s:Group>
 		</mx:Canvas>
 		<mx:Canvas id="drawing">
 			<mx:Canvas id="drawingArea" x="0" y="0" initialize="drawingArea_initializeHandler(event)"  mouseDown="onMouseDownDrawing(event)" mouseUp="onMouseUpDrawing(event)" >

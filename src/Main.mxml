@@ -64,7 +64,7 @@
 				this.addEventListener("search-view clicked", showSearchView);
 				this.addEventListener("back-to-library", backToLibrary);
 				
-				this.addEventListener("paint-click", initializePaintView);
+				this.addEventListener("crop-click", initializeCropView);
 				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
@@ -153,18 +153,28 @@
 			private function setFirstPage(): void{
 				this.page = this.book.getFirstPage();
 				this.display.pageView.source = this.page.image;
+				
+				this.display.pageView.height = this.page.height;
+				this.display.pageView.width = this.display.FullWidth;
+				
 			}
 			
 			private function nextPage(e: Event): void {
 				var nextPageNumber: Number = this.page.pageNo + 1;
 				this.page = this.book.getPage( nextPageNumber );
 				this.display.pageView.source = this.page.image;
+				
+				this.display.pageView.height = this.page.height;
+				this.display.pageView.width = this.display.FullWidth;
 			}
 			
 			private function previousPage(e: Event): void {
 				var previousPageNumber: Number = this.page.pageNo - 1;
 				this.page = this.book.getPage( previousPageNumber );
 				this.display.pageView.source = this.page.image;
+				
+				this.display.pageView.height = this.page.height;
+				this.display.pageView.width = this.display.FullWidth;
 			}
 			
 			private function bookOutline(e: Event): void {
@@ -345,8 +355,8 @@
 			}
 			
 			public var cropView: CropView;
-			public function initializePaintView(e: Event): void {
-				this.addEventListener("paint-view-ready", this.paintReady);
+			public function initializeCropView(e: Event): void {
+				this.addEventListener("crop-view-ready", this.cropViewReady);
 				this.cropView = new CropView();
 				
 				this.cropView._width = this.display.pageView.sourceWidth;
@@ -358,17 +368,28 @@
 				this.addElement(this.cropView);
 			}
 			
-			public function paintReady(e: Event): void {
-				this.cropView.paintCanvasElement.setStyle("backgroundColor", "#FFFFFF");
-				this.cropView.paintCanvasElement.setStyle("backgroundAlpha", "0");
+			public function cropViewReady(e: Event): void {
+				this.cropView.cropCanvasElement.setStyle("backgroundColor", "#FFFFFF");
+				this.cropView.cropCanvasElement.setStyle("backgroundAlpha", "0");
 				
 				this.addEventListener(CropRectangleEvent.CROP_FINISHED, this.cropFinished);
 			}
 			
 			
 			public var drawingView: DrawingView;
+			public var croppedImage: BitmapData;
 			public function cropFinished(e: CropRectangleEvent): void {
 				this.removeElement(this.cropView);
+				
+				// crop image
+				var pageScrollPositionX: Number = this.display.page.horizontalScrollPosition;
+				var pageScrollPositionY: Number = this.display.page.verticalScrollPosition;
+				
+				var sourceRect: Rectangle = 
+					new Rectangle(e.pointStart.x + pageScrollPositionX, e.pointStart.y + pageScrollPositionY, e.pointEnd.x - e.pointStart.x, e.pointEnd.y - e.pointStart.y);
+				this.croppedImage = new BitmapData(sourceRect.width, sourceRect.height, true);
+				
+				this.croppedImage.copyPixels(this.display.pageView.bitmapData, sourceRect, new Point(0, 0));
 				
 				this.addEventListener("drawing-view-ready", this.drawingViewReady);
 				
@@ -377,16 +398,16 @@
 				this.drawingView._width = this.display.FullWidth;
 				this.drawingView._height = this.display.FullHeight;
 				
-				this.drawingView.croppedImageWidth = e.pointEnd.x - e.pointStart.x;
-				this.drawingView.croppedImageHeight = e.pointEnd.y - e.pointStart.y;
+				this.drawingView.croppedImageWidth = sourceRect.width;
+				this.drawingView.croppedImageHeight = sourceRect.height;
 				
 				this.addElement(this.drawingView);
 			}
 			
 			public function drawingViewReady(e: Event): void {
 				this.addEventListener("drawing-view-close", this.drawingViewClose);
-				
-				Alert.show("drawing view ready");
+				this.drawingView.croppedImage.source = this.croppedImage;
+				//Alert.show("drawing view ready");
 			}
 			
 			public function drawingViewClose(e: Event): void {

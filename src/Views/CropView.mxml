@@ -19,8 +19,8 @@
 			public var pointStart: Point;
 			public var pointEnd: Point;
 			
-			public function onPaintViewReady(e: Event): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("paint-view-ready"));
+			public function onCropViewReady(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("crop-view-ready"));
 			}
 			
 			public function onCanvasClick(e: MouseEvent): void {
@@ -29,14 +29,16 @@
 			
 			public function onMouseMove(e: MouseEvent): void {
 				if(e.buttonDown){
-					this.paintCanvasElement.graphics.clear();
-					this.paintCanvasElement.graphics.lineStyle(2, 0x990000, 1);
+					this.cropCanvasElement.graphics.clear();
+					this.cropCanvasElement.graphics.lineStyle(2, 0x990000, 1);
 					
-					this.paintCanvasElement.graphics
+					this.pointEnd = new Point(this.contentMouseX, this.contentMouseY);
+					
+					this.cropCanvasElement.graphics
 						.drawRect(this.pointStart.x, 
 							this.pointStart.y, 
-							this.contentMouseX - this.pointStart.x, 
-							this.contentMouseY - this.pointStart.y);
+							this.pointEnd.x - this.pointStart.x, 
+							this.pointEnd.y - this.pointStart.y);
 					
 				}
 			}
@@ -46,7 +48,7 @@
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {
-				this.pointEnd = new Point(this.contentMouseX, this.contentMouseY);
+				//this.pointEnd = new Point(this.contentMouseX, this.contentMouseY);
 				var event: CropRectangleEvent = 
 					new CropRectangleEvent(CropRectangleEvent.CROP_FINISHED, this.pointStart, this.pointEnd);
 				FlexGlobals.topLevelApplication.dispatchEvent(event);
@@ -55,8 +57,8 @@
 		]]>
 	</fx:Script>
 	
-	<s:BorderContainer width="{this._width}" borderVisible="false" height="{this._height}" backgroundColor="#000000" backgroundAlpha="0" creationComplete="onPaintViewReady(event)">
-		<mx:Canvas id="paintCanvasElement" width="{this._width}" height="{this._height}" mouseMove="onMouseMove(event)" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)">
+	<s:BorderContainer width="{this._width}" borderVisible="false" height="{this._height}" backgroundColor="#000000" backgroundAlpha="0" creationComplete="onCropViewReady(event)">
+		<mx:Canvas id="cropCanvasElement" width="{this._width}" height="{this._height}" mouseMove="onMouseMove(event)" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)">
 			
 		</mx:Canvas>
 	</s:BorderContainer>

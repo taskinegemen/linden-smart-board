@@ -28,7 +28,7 @@
 	</fx:Script>
 	
 	<s:BorderContainer width="{this._width}" height="{this._height}" x="0" y="0">
-		<s:Image x="10" y="10" width="{this.croppedImageWidth}" height="{this.croppedImageHeight}" backgroundColor="#FF0000">
+		<s:Image id="croppedImage" x="10" y="10" width="{this.croppedImageWidth}" height="{this.croppedImageHeight}">
 			
 		</s:Image>
 		

@@ -65,7 +65,7 @@
 			}
 			
 			public function doPaint(): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("paint-click"));
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("crop-click"));
 			}
 			
 			public function doDrawings(): void {
