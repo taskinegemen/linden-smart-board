@@ -311,6 +311,12 @@
 				if( this.page.height - this.clickPoint.y <= 50 ){
 					this.bottomMenu.y = this.page.height + this.page.verticalScrollPosition - 50;
 					this.bottomMenu.x = this.clickPoint.x;
+					
+					if( this.clickPoint.x + this.bottomMenu.width > this.page.width) {
+						
+						this.bottomMenu.x = this.clickPoint.x - this.bottomMenu.width;
+					}
+					
 					this.bottomMenu.visible = true;
 				}
 			}
@@ -325,6 +331,7 @@
 			}
 			
 			public function onScrollChange(e: ScrollEvent): void {
+				
 				this.bottomMenu.visible = false;
 			}
 			
@@ -371,7 +378,7 @@
 					</s:Image>
 				</s:Group>
 			</s:Scroller>
-			<Views:PagePalette id="bottomMenu" visible="false">
+			<Views:PagePalette id="bottomMenu" width="{76+76+36}" visible="false">
 				
 			</Views:PagePalette>
 			<Views:TableOfContents visible="false" id="tableOfContents" x="0" y="0" height="{this.FullHeight}">

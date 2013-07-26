@@ -181,6 +181,9 @@
 				this.display.tableOfContents._parent = this.display;
 				this.display.tableOfContents.mainHeight = this.display.FullHeight;
 				this.display.tableOfContents.mainWidth = this.display.FullWidth;
+				
+				this.display.tableOfContents.y = this.display.page.verticalScrollPosition;
+				
 				this.display.tableOfContents.visible = true;
 			}
 			
