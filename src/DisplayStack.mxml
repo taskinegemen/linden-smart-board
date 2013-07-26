@@ -304,8 +304,6 @@
 					}
 				}
 				
-				//this.removeElement(this._pageMenu);
-				
 				this.bottomMenu.visible = false;
 				
 				if( this.page.height - this.clickPoint.y <= 50 ){

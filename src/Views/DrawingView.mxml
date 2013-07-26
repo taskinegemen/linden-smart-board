@@ -8,7 +8,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			
+			import spark.skins.spark.ImageSkin;
 			
 			[Bindable]public var _width: Number 				= 400;
 			[Bindable]public var _height: Number 				= 300;
@@ -16,24 +19,190 @@
 			[Bindable]public var croppedImageWidth: Number 		= 0;
 			[Bindable]public var croppedImageHeight: Number 	= 0;
 			
+			public var color: Number = 0x000000;
+			public var thickness: Number = 3;
+			public var pen: Number = 1;
+			
+			public var point: Point;
+			public var erase: Boolean = false;
+			
 			public function onCreationComplete(e: Event): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-ready"));
 			}
 			
 			public function onCloseClick(e: MouseEvent): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-close"));
+				
+			}
+			
+			public function onSaveClick(e: MouseEvent): void {
+				Alert.show("save click");
+			}
+			
+			public function onShareClick(e: MouseEvent): void {
+				Alert.show("share click");
+			}
+			
+			
+			public function onMouseDown(e: MouseEvent): void {
+				this.point = new Point(this.contentMouseX, this.contentMouseY);
+			}
+			
+			public function onMouseUp(e: MouseEvent): void {
+				this.pen = 1;
+			}
+			
+			public function onMouseMove(e: MouseEvent): void {
+				if(e.buttonDown){
+					if(this.erase){
+						this.transparentArea.graphics.lineStyle(this.thickness, 0xFFFFFF, this.pen);
+						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
+						this.point.x = this.contentMouseX;
+						this.point.y = this.contentMouseY;
+						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
+					}else{
+						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen);
+						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
+						this.point.x = this.contentMouseX;
+						this.point.y = this.contentMouseY;
+						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
+					}
+				}
+			}
+			
+			public function onEraseClick(e: MouseEvent): void {
+				this.erase = !this.erase;
+			}
+			
+			public function onUndoClick(e: MouseEvent): void {
+				Alert.show("undo click");
+			}
+			
+			public function onRefreshClick(e: MouseEvent): void {
+				Alert.show("refresh click");
+			}
+			
+			public function onColorClick(e: MouseEvent): void {
+				var image:Image = e.target as Image;
+				var imageSkin: ImageSkin = e.target as ImageSkin;
+				if(image == null){
+					image = imageSkin.parent as Image;
+				}
+				var color: String = image.id.split('_')[1];
+				
+				switch( color ) {
+					case "black":
+						this.color = 0x000000;
+						break;
+					case "yellow":
+						this.color = 0XFFFF00;
+						break;
+					case "red":
+						this.color = 0xFF0000;
+						break;
+					case "green":
+						this.color = 0x00FF00;
+						break;
+					case "blue":
+						this.color = 0X0000FF;
+						break;
+					default:
+						this.color = 0x000000;
+				}
+			}
+			
+			public function onThicknessClick(e: MouseEvent): void {
+				var image: Image = e.target as Image;
+				var imageSkin: ImageSkin = e.target as ImageSkin;
+				if(image == null){
+					image = imageSkin.parent as Image;
+				}
+				var thickness: String = image.id.split('_')[1];
+				
+				this.thickness = new Number(thickness);
 			}
 			
 		]]>
 	</fx:Script>
 	
-	<s:BorderContainer width="{this._width}" height="{this._height}" x="0" y="0">
-		<s:Image id="croppedImage" x="10" y="10" width="{this.croppedImageWidth}" height="{this.croppedImageHeight}">
+	<s:BorderContainer width="{this._width}" height="{this._height - this.drawingViewBottom.height}" x="0" y="0">
+		<mx:Canvas id="drawingViewDrawingArea"
+			width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
+			x="0" y="0">
+			
+			<s:Image id="croppedImage" x="10" y="10" width="{this.croppedImageWidth}" height="{this.croppedImageHeight}">
+				
+			</s:Image>
+		</mx:Canvas>
+	</s:BorderContainer>
+	
+	<!-- transparent drawing area -->
+	<mx:Canvas id="transparentArea"
+			   width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
+			   x="0" y="0" 
+			   backgroundColor="#000000" backgroundAlpha="0" mouseDown="onMouseDown(event)" mouseMove="onMouseMove(event)" mouseUp="onMouseUp(event)">
+	</mx:Canvas>
+	
+	<s:BorderContainer textAlign="center" width="{this._width}" id="drawingViewBottom" height="37" x="0" y="{this.drawingViewDrawingArea.height}" backgroundColor="#1b2630">			
+		<!-- close button -->
+		<s:Image id="backbutton" x="5" top="2" width="101" height="31" source="/Assets/backbutton.png" click="onCloseClick(event)">
+			
+		</s:Image>
+		<!-- save button -->
+		<s:Image x="111" width="101" top="2" height="31" source="/Assets/savebutton.png" click="onSaveClick(event)">
+			
+		</s:Image>
+		<!-- share button -->
+		<s:Image  x="217" width="101" top="2" height="31" source="/Assets/sharebutton.png" click="onShareClick(event)">
 			
 		</s:Image>
 		
-		<s:Image x="0" y="{this._height - 30}" width="30" height="30" backgroundColor="#FF0000" click="onCloseClick(event)">
+		<!-- erase button -->
+		<s:Image x="{this._width - 666}" width="71" height="31" top="2" source="/Assets/eraser.png" click="onEraseClick(event)">
 			
 		</s:Image>
+		<!-- undo button -->
+		<s:Image x="{this._width - 588}" width="71" height="31" top="2" source="/Assets/undo.png" click="onUndoClick(event)">
+			
+		</s:Image>
+		
+		<!-- refresh button -->
+		<s:Image x="{this._width - 510}" width="71" height="31" top="2" source="/Assets/refresh.png" click="onRefreshClick(event)">
+			
+		</s:Image>
+		
+		<!-- color buttons -->
+		<s:Image id="color_black" x="{this._width - 402}" top="2" width="31" height="31" source="/Assets/colorbutton-1.png" click="onColorClick(event)">
+			
+		</s:Image>
+		<s:Image id="color_yellow" x="{this._width - 364}" top="2" width="31" height="31" source="/Assets/colorbutton-2.png" click="onColorClick(event)">
+			
+		</s:Image>
+		<s:Image id="color_red" x="{this._width - 326}" top="2" width="31" height="31" source="/Assets/colorbutton-3.png" click="onColorClick(event)">
+			
+		</s:Image>
+		<s:Image id="color_green" x="{this._width - 288}" top="2" width="31" height="31" source="/Assets/colorbutton-4.png" click="onColorClick(event)">
+			
+		</s:Image>
+		<s:Image id="color_blue" x="{this._width - 250}" top="2" width="31" height="31" source="/Assets/colorbutton-5.png" click="onColorClick(event)">
+			
+		</s:Image>
+		
+		<!-- thickness buttons -->
+		<s:Image id="thickness_10" x="{this._width - 188}" top="2" width="31" height="31" source="/Assets/thicknessbutton-5.png" click="onThicknessClick(event)">
+			
+		</s:Image>
+		<s:Image id="thickness_8" x="{this._width - 150}" top="2" width="31" height="31" source="/Assets/thicknessbutton-4.png" click="onThicknessClick(event)">
+			
+		</s:Image>
+		<s:Image id="thickness_6" x="{this._width - 114}" top="2" width="31" height="31" source="/Assets/thicknessbutton-3.png" click="onThicknessClick(event)">
+			
+		</s:Image>
+		<s:Image id="thickness_4" x="{this._width - 76}" top="2" width="31" height="31" source="/Assets/thicknessbutton-2.png" click="onThicknessClick(event)">
+			
+		</s:Image>
+		<s:Image id="thickness_2" x="{this._width - 38}" top="2" width="31" height="31" source="/Assets/thicknessbutton-1.png" click="onThicknessClick(event)">
+			
+		</s:Image> 
 	</s:BorderContainer>
 </s:Group>

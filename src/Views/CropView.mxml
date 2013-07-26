@@ -48,7 +48,6 @@
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {
-				//this.pointEnd = new Point(this.contentMouseX, this.contentMouseY);
 				var event: CropRectangleEvent = 
 					new CropRectangleEvent(CropRectangleEvent.CROP_FINISHED, this.pointStart, this.pointEnd);
 				FlexGlobals.topLevelApplication.dispatchEvent(event);

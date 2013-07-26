@@ -77,8 +77,15 @@
 				this.books = new Array(this.library.getBookCount());
 				this.books = this.library.getBooks();
 				
-				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
+				setTimeout(this.eben, 1000);
+				
 				this.addEventListener("library-ready", fillLibrary);
+			}
+			
+			// triviri function to show loading view
+			// just delete when the time comes
+			private function eben(): void{
+				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;	
 			}
 			
 			// close application
