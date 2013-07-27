@@ -10,7 +10,9 @@
 		<![CDATA[
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			import mx.graphics.*;
 			
+			import spark.primitives.Rect;
 			import spark.skins.spark.ImageSkin;
 			
 			[Bindable]public var _width: Number 				= 400;
@@ -18,6 +20,8 @@
 			
 			[Bindable]public var croppedImageWidth: Number 		= 0;
 			[Bindable]public var croppedImageHeight: Number 	= 0;
+			
+			public var bitmaps: Vector.<BitmapData> = new Vector.<BitmapData>();
 			
 			public var color: Number = 0x000000;
 			public var thickness: Number = 3;
@@ -46,10 +50,15 @@
 			
 			public function onMouseDown(e: MouseEvent): void {
 				this.point = new Point(this.contentMouseX, this.contentMouseY);
+				
+				// save bitmapdata for undo
+				var bitmap: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0x000000);
+				bitmap.draw(this.transparentArea);
+				this.bitmaps.push(bitmap);
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {
-				this.pen = 1;
+				
 			}
 			
 			public function onMouseMove(e: MouseEvent): void {
@@ -74,12 +83,18 @@
 				this.erase = !this.erase;
 			}
 			
-			public function onUndoClick(e: MouseEvent): void {
-				Alert.show("undo click");
+			public function onUndoClick(e: MouseEvent): void {				
+				this.transparentArea.graphics.clear();
+				if( this.bitmaps.length ){
+					var bitmap: BitmapData = this.bitmaps.pop();
+					this.transparentArea.graphics.beginBitmapFill(bitmap, new Matrix());
+					this.transparentArea.graphics.drawRect(0, 0, bitmap.width, bitmap.height);
+					this.transparentArea.graphics.endFill();
+				}
 			}
 			
 			public function onRefreshClick(e: MouseEvent): void {
-				Alert.show("refresh click");
+				this.transparentArea.graphics.clear();
 			}
 			
 			public function onColorClick(e: MouseEvent): void {
@@ -136,8 +151,13 @@
 		</mx:Canvas>
 	</s:BorderContainer>
 	
+	<s:Image id="targetImage" visible="false"
+			   width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
+			   x="0" y="0">
+	</s:Image>
+	
 	<!-- transparent drawing area -->
-	<mx:Canvas id="transparentArea"
+	<mx:Canvas id="transparentArea" visible="true"
 			   width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
 			   x="0" y="0" 
 			   backgroundColor="#000000" backgroundAlpha="0" mouseDown="onMouseDown(event)" mouseMove="onMouseMove(event)" mouseUp="onMouseUp(event)">
