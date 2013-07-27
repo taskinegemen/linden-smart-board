@@ -78,7 +78,6 @@ package entities {
 			var jsonString: String;
 			this.pages = new Array();			
 			for(var i: Number = 1; i <= this.totalPageNumber; i++) {
-				file = file.resolvePath("C:\\docs\\userbooks.json");	
 				file = file.resolvePath("C:\\docs\\pages\\" + this.ID.toString() + "\\" + i.toString() + ".json");
 				fileStream.open(file, FileMode.READ);
 				

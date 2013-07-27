@@ -8,12 +8,18 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import flash.filesystem.*;
+			
 			import mx.controls.Alert;
+			import mx.core.BitmapAsset;
 			import mx.core.FlexGlobals;
 			import mx.graphics.*;
 			
 			import spark.primitives.Rect;
 			import spark.skins.spark.ImageSkin;
+			
+			[Embed(source="C:\\docs\\notebook.jpg")]
+			private var EmbeddedImage : Class;
 			
 			[Bindable]public var _width: Number 				= 400;
 			[Bindable]public var _height: Number 				= 300;
@@ -30,7 +36,20 @@
 			public var point: Point;
 			public var erase: Boolean = false;
 			
+			
 			public function onCreationComplete(e: Event): void {
+//				var image : Bitmap = new EmbeddedImage();
+//				image.width = this.drawingViewDrawingArea.width;
+//				image.height = this.drawingViewDrawingArea.height;
+//				
+//				var bitmapData: BitmapData = new BitmapData(this.drawingViewDrawingArea.width, this.drawingViewDrawingArea.height, true, 0x000000);
+//				
+//				bitmapData.copyPixels(image.bitmapData, new Rectangle(0, 0, this.drawingViewDrawingArea.width, this.drawingViewDrawingArea.height), new Point(0, 0));
+//				
+//				this.drawingViewDrawingArea.graphics.beginBitmapFill(bitmapData, new Matrix(), true);
+//				this.drawingViewDrawingArea.graphics.drawRect(0, 0, bitmapData.width, bitmapData.height);
+//				this.drawingViewDrawingArea.graphics.endFill();
+				
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-ready"));
 			}
 			
@@ -63,8 +82,23 @@
 			
 			public function onMouseMove(e: MouseEvent): void {
 				if(e.buttonDown){
-					if(this.erase){
-						this.transparentArea.graphics.lineStyle(this.thickness, 0xFFFFFF, this.pen);
+					if(this.erase) {
+//						var bitmapDataBack: BitmapData = new BitmapData( this.transparentArea.width, this.transparentArea.height, true, 0x000000);
+//						var bitmapDataTransparent: BitmapData = new BitmapData( this.transparentArea.width, this.transparentArea.height, true, 0x000000);
+//						
+//						bitmapDataBack.draw( this.drawingViewDrawingArea );
+//						bitmapDataTransparent.draw( this.transparentArea );
+//						
+//						var rect: Rectangle = new Rectangle(this.contentMouseX, this.contentMouseY, this.thickness * 2, this.thickness * 2);
+//						var bytes: ByteArray = bitmapDataBack.getPixels(rect);
+//						bytes.position = 0;
+//						bitmapDataTransparent.setPixels(rect, bytes);
+//						
+//						this.transparentArea.graphics.beginBitmapFill(bitmapDataTransparent, new Matrix());
+//						this.transparentArea.graphics.drawRect(0, 0, bitmapDataTransparent.width, bitmapDataTransparent.height);
+//						this.transparentArea.graphics.endFill();
+						
+						this.transparentArea.graphics.lineStyle(this.thickness * 4, 0xFFFFFF, this.pen);
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						this.point.x = this.contentMouseX;
 						this.point.y = this.contentMouseY;
@@ -144,17 +178,14 @@
 		<mx:Canvas id="drawingViewDrawingArea"
 			width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
 			x="0" y="0">
-			
-			<s:Image id="croppedImage" x="10" y="10" width="{this.croppedImageWidth}" height="{this.croppedImageHeight}">
-				
-			</s:Image>
 		</mx:Canvas>
+		
+		<s:Image id="croppedImage" x="10" y="10" width="{this.croppedImageWidth}" height="{this.croppedImageHeight}">
+			
+		</s:Image>
 	</s:BorderContainer>
 	
-	<s:Image id="targetImage" visible="false"
-			   width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
-			   x="0" y="0">
-	</s:Image>
+	
 	
 	<!-- transparent drawing area -->
 	<mx:Canvas id="transparentArea" visible="true"
