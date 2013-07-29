@@ -53,11 +53,7 @@
 					image = imageSkin.parent as Image;
 				}
 				
-				//var bitmapData: BitmapData = new BitmapData( image.sourceWidth, image.sourceHeight, true, 0x000000 );
-				
 				Alert.show("easy boy!...");
-				
-				//bitmapData.draw( image );
 			}
 			
 			private function bindOutlineDrawings ( drawings: Array ): void {

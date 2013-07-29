@@ -66,6 +66,8 @@
 				
 				this.addEventListener("crop-click", initializeCropView);
 				this.addEventListener("show drawings menu", this.showDrawingsMenu);
+				this.addEventListener("zoom in click", this.zoomInClick);
+				this.addEventListener("zoom out click", this.zoomOutClick);
 				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
@@ -288,6 +290,9 @@
 			public var cropView: CropView;
 			public function initializeCropView(e: Event): void {
 				this.addEventListener("crop-view-ready", this.cropViewReady);
+				
+				this.pageScale();
+				
 				this.cropView = new CropView();
 				
 				this.cropView._width = this.display.pageView.sourceWidth;
@@ -404,6 +409,36 @@
 				label.addEventListener(MouseEvent.CLICK, this.drawingsView.onChapterClick);
 				
 				return label;
+			}
+			
+			public function zoomInClick(e: Event): void {
+				
+				this.pageScale(0.1, 0.1);
+				this.pageCenter();
+			}
+			
+			public function zoomOutClick(e: Event): void {
+				
+				this.pageScale(-0.1, -0.1);
+				this.pageCenter();
+			}
+			
+			public function pageScale(x: Number = 0, y: Number = 0): void {
+				if(x == 0 && y == 0){
+					this.display.pageView.scaleX = 1.0;
+					this.display.pageView.scaleY = 1.0;
+				}else{
+					this.display.pageView.scaleX += x;
+					this.display.pageView.scaleY += y;
+				}
+				this.pageCenter();
+			}
+			
+			public function pageCenter(): void {
+				var xCoordinate:Number = (this.display.page.width - this.display.pageView.width * this.display.pageView.scaleX)/2;
+				var yCoordinate:Number = (this.display.page.height - this.display.pageView.height * this.display.pageView.scaleY)/2;
+				this.display.pageView.y = 0;
+				this.display.pageView.x = 0;
 			}
 		]]>
 		

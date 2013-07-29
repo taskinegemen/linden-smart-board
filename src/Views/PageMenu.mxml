@@ -77,11 +77,11 @@
 			}
 			
 			public function doZoomin(): void {
-				
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom in click"));
 			}
 			
 			public function doZoomout(): void {
-				
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom out click"));	
 			}
 			
 		]]>
