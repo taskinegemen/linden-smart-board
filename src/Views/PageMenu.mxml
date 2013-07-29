@@ -69,7 +69,7 @@
 			}
 			
 			public function doDrawings(): void {
-				
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("show drawings menu"));
 			}
 			
 			public function doLibrary(): void {

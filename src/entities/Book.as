@@ -84,7 +84,7 @@ package entities {
 				jsonString = fileStream.readUTFBytes(file.size);
 				
 				var pageObj: Object = com.adobe.serialization.json.JSON.decode(jsonString);
-				
+				pageObj.bookID = this.ID;
 				var page: Page = new Page(pageObj);
 				
 				this.addPage(page);
@@ -129,6 +129,37 @@ package entities {
 		
 		private function addOutline(outline: Outline): void {
 			this.outlines[ this.outlines.length ] = outline;
+		}
+		
+		public function getOutlineDrawings( id: Number ): Array {
+			var arr: Array = new Array();
+			var outline: Outline;
+			var pageArr: Array = new Array();
+			var i: Number = 0;
+			for(i = 0; i < this.outlines.length; i++) {
+				if( (this.outlines[i] as Outline).ID == id ){
+					outline = this.outlines[i] as Outline;
+				}
+			}
+			
+			if(outline == null) {
+				pageArr = this.getPages();
+			}else{
+				for(i = 0; i < this.getPages().length; i++ ){
+					var page_: Page = this.pages[i] as Page;
+					
+					if( outline.containsPage( page_.pageNo ) ){
+						pageArr.push( page_ );
+					}
+					
+				}
+			}
+			
+			for(i = 0; i < pageArr.length; i++ ){
+				( pageArr[i] as Page ).fillDrawings( arr );
+			}
+			
+			return arr;
 		}
 	}
 }

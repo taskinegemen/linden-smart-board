@@ -20,6 +20,7 @@
 			import Views.ChapterView;
 			import Views.CropView;
 			import Views.DrawingView;
+			import Views.DrawingsView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -54,7 +55,6 @@
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				
 				this.display = new DisplayStack();
-				this.api = new Api();
 				this.library = new Library();
 				
 				// add event handlers
@@ -65,6 +65,7 @@
 				this.addEventListener("back-to-library", backToLibrary);
 				
 				this.addEventListener("crop-click", initializeCropView);
+				this.addEventListener("show drawings menu", this.showDrawingsMenu);
 				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
@@ -269,95 +270,15 @@
 				
 				this.display.tableOfContents.visible = false;
 			}
-			
-//			private function changeToBookStack(e:BookClickEvent){
-//					this.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
-//					//todo get last page state of book
-//					this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
-//					this.currentBook = e.bookId.toString();
-//					this.currentPage = 1
-//					this.api.getPage(e.bookId.toString(),this.currentPage,this.display.FullWidth-20);
-//					this.api.addEventListener(GetThumbnailsResultEvent.GET_THUMBNAILS_SUCCESS,thumbnailsInitialized);
-//					this.api.getThumbnailsOfBook(this.currentBook);
-//					
-//			}
-			
-			private function thumbnailsInitialized(ev:GetThumbnailsResultEvent): void{
-				this.currentThumbnails = ev.thumbnails;
-				this.display.totalThumbnails = ev.thumbnails.length;
-			}
 
-			
-			private function backwardPage(ev:Event): void{
-				
-				if(this.currentPage > 1){
-					this.currentPage--;
-					this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
-					this.api.getPage(this.currentBook,this.currentPage,this.display.FullWidth-20);
-				}
-			}
-			
-			public function changePage(ev:MouseEvent): void{
-				this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
-				this.api.getPage(this.currentBook,ev.currentTarget.id,this.display.FullWidth-20);
-			}
-			
-			private function showOutline(ev:Event): void{
-				this.api.addEventListener(GetBookResultEvent.GET_BOOK_SUCCESS,bookDataInited);
-				this.api.getBook(this.currentBook);
-				this.display.showTableOfContents();
-			}
-			
-			private function bookDataInited(ev:GetBookResultEvent): void{
-				this.display.addChapters(ev.chapters);
-			}
-			
-			private function pageDataInited(ev:GetPageResultEvent): void{
-				
-				this.display.setPage(ev.pageUrl);
-				this.display.addItems(ev.items);
-				this.api.removeEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
-				
-			}
-			
-			private function forwardPage(ev:Event): void{
-				this.api.addEventListener(GetPageResultEvent.GET_PAGE_SUCCESS,pageDataInited);
-				this.currentPage++;
-				this.api.getPage(this.currentBook,this.currentPage,this.display.FullWidth-20);
-			}
-			
-			private function authorizeUser(ev:LoginButtonClickEvent): void{
-				//this.api = new Api(ev.email,ev.password);
-				this.api = new Api();
-				api.getToken();
-				this.api = api;
-//				this.api.addEventListener(LoginResultEvent.LOGIN_SUCCESS,loginSucess);
-//				this.api.addEventListener(LoginResultEvent.LOGIN_FAIL,loginFail);
-			}
 
-			
-//			private function loginSucess(ev:LoginResultEvent){
-//				this.display.mainStack.selectedIndex = ;
-//				this.api.getLibrary();
-//				this.api.addEventListener(GetLibraryResultEvent.GET_LIBRARY_SUCCESS,fillLibrary);
-//			}
-			
-			private function fillLibrary(ev:Event): void{
+			private function fillLibrary(ev:Event): void {
 				for each(var book: Book in this.books) {
 					var bookView: BookView = new BookView();
-					
 					bookView.book = book;
 					
 					this.display.booksArea.addElement(bookView);
 				}
-			}
-			
-			private function loginFail(ev:LoginResultEvent): void{
-//				this.api.getLibrary();
-			}
-			
-			private function init(): void{
-				
 			}
 			
 			public function backToLibrary(e: Event): void {
@@ -412,6 +333,8 @@
 				this.drawingView.croppedImageHeight = sourceRect.height;
 				
 				this.addElement(this.drawingView);
+				
+				this.addEventListener(DrawingSaveEvent.DRAWING_SAVE, this.saveDrawing);
 			}
 			
 			public function drawingViewReady(e: Event): void {
@@ -422,6 +345,65 @@
 			
 			public function drawingViewClose(e: Event): void {
 				this.removeElement(this.drawingView);
+			}
+			
+			public function saveDrawing(e: DrawingSaveEvent): void {
+				this.page.saveDrawing(e.bitmapData);
+				
+				this.removeElement( this.drawingView );
+			}
+			
+			
+
+			public var drawingsView: DrawingsView;
+			public function showDrawingsMenu(e: Event): void {
+				this.addEventListener("drawings view ready", this.drawingsViewReady);
+				
+				this.drawingsView = new DrawingsView();
+				
+				this.drawingsView._width = this.display.FullWidth;
+				this.drawingsView._height = this.display.FullHeight;
+				
+				this.addElement(this.drawingsView);
+			}
+			
+			public function drawingsViewReady(e: Event): void {
+				this.addEventListener("drawings view close", this.drawingsViewClose);
+				
+				// bind chapters
+				if( !this.outlines.length ) return;
+				
+				var label: Label = this.getDrawingsChapterLabel("all", "Hepsi");
+				
+				this.drawingsView.chapters.addElement(label);
+				
+				for each( var obj: Object in this.outlines ){
+					label = this.getDrawingsChapterLabel("chapter_" + obj.ID, obj.title);
+					this.drawingsView.chapters.addElement(label);
+				}
+			}
+			
+			public function drawingsViewClose(e: Event): void {
+				this.removeElement(this.drawingsView);				
+			}
+			
+			private function getDrawingsChapterLabel(id: String, text: String): Label {
+				var label: Label = new spark.components.Label();
+				
+				label.id = id;
+				label.text = text;
+				label.width = this.drawingsView.chapters.width;
+				label.height = 40;
+				label.setStyle("fontSize", "16");
+				label.setStyle("textAlign", "left");
+				label.setStyle("color", "#FFFFFF");
+				label.setStyle("paddingTop", "15");
+				label.setStyle("paddingLeft", "20");
+				label.setStyle("backgroundColor", "#CCCCCC");
+				
+				label.addEventListener(MouseEvent.CLICK, this.drawingsView.onChapterClick);
+				
+				return label;
 			}
 		]]>
 		

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="{this._width}" height="{this._height}" creationComplete="onCreationComplete(event)">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import entities.Book;
+			
+			import mx.containers.ViewStack;
+			import mx.controls.Alert;
+			import mx.controls.Label;
+			import mx.core.FlexGlobals;
+			
+			import spark.components.Image;
+			import spark.components.Label;
+			import spark.skins.spark.ImageSkin;
+			
+			[Bindable]public var _width: Number = 400;
+			[Bindable]public var _height: Number = 300;
+			
+			[Bindable]public var book: Book = FlexGlobals.topLevelApplication.book;
+			
+			public function onCreationComplete(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawings view ready"));
+			}
+			
+			public function closeDrawingsView(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawings view close"));
+			}
+			
+			public function onChapterClick(e: MouseEvent): void {
+				var label: spark.components.Label = e.target as spark.components.Label;
+				var drawings: Array = new Array();
+				
+				if(label.id == "all"){
+					drawings = this.book.getOutlineDrawings( 0 );
+				}else{
+					var id: Number = int( label.id.split('_')[1] );
+					drawings = this.book.getOutlineDrawings( id );
+				}
+				
+				this.bindOutlineDrawings( drawings );
+			}
+			
+			public function onDrawingClick(e: MouseEvent): void {
+				var image: spark.components.Image = e.target as spark.components.Image;
+				var imageSkin: ImageSkin = e.target as ImageSkin;
+				if( !image ){
+					image = imageSkin.parent as Image;
+				}
+				
+				//var bitmapData: BitmapData = new BitmapData( image.sourceWidth, image.sourceHeight, true, 0x000000 );
+				
+				Alert.show("easy boy!...");
+				
+				//bitmapData.draw( image );
+			}
+			
+			private function bindOutlineDrawings ( drawings: Array ): void {
+				this.drawings.removeAllElements();
+				
+				for each( var obj: Object in drawings ) {
+					var image: spark.components.Image = this.getDrawingImage( obj );
+					this.drawings.addElement( image );
+				}
+			}
+			
+			private function getDrawingImage( obj: Object ): spark.components.Image {
+				var image: spark.components.Image = new spark.components.Image();
+				
+				image.id = obj.id;
+				image.source = obj.source;
+				
+				image.width = 180;
+				image.height = 210;
+				image.setStyle("backgroundColor", "#FFFFFF");
+				
+				image.addEventListener(MouseEvent.CLICK, this.onDrawingClick);
+				
+				return image;
+			}
+		]]>
+	</fx:Script>
+	
+	<s:BorderContainer x="0" y="0" width="410" height="{this._height}" backgroundColor="#1b2630">
+		<s:VGroup id="chapters" width="200" height="{ this._height }">
+			
+		</s:VGroup>
+		<s:Scroller x="{ this.chapters.width }" y="0" width="210" verticalScrollPolicy="on">
+			<s:VGroup id="drawings" width="210" horizontalAlign="center" x="{ this.chapters.width }" height="{ this._height }" y="0">
+				
+			</s:VGroup>
+		</s:Scroller>
+	</s:BorderContainer>
+	<s:BorderContainer x="410" y="0" width="{ this._width - 410 }" height="{this._height}" backgroundColor="#000000" backgroundAlpha="0" click="closeDrawingsView(event)">
+		
+	</s:BorderContainer>
+</s:Group>
