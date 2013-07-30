@@ -73,6 +73,9 @@
 				this.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
 				this.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED, this.bookOutline);
 				
+				this.addEventListener(DrawingSaveEvent.DRAWING_SAVE, this.saveDrawing);
+				this.addEventListener(DrawingSaveEvent.DRAWING_UPDATE, this.updateDrawing);
+				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
 				
@@ -333,6 +336,8 @@
 				
 				this.drawingView = new DrawingView();
 				
+				this.drawingView.edit = false;
+				
 				this.drawingView._width = this.display.FullWidth;
 				this.drawingView._height = this.display.FullHeight;
 				
@@ -341,13 +346,12 @@
 				
 				this.addElement(this.drawingView);
 				
-				this.addEventListener(DrawingSaveEvent.DRAWING_SAVE, this.saveDrawing);
+				
 			}
 			
 			public function drawingViewReady(e: Event): void {
 				this.addEventListener("drawing-view-close", this.drawingViewClose);
 				this.drawingView.croppedImage.source = this.croppedImage;
-				//Alert.show("drawing view ready");
 			}
 			
 			public function drawingViewClose(e: Event): void {
@@ -355,11 +359,19 @@
 			}
 			
 			public function saveDrawing(e: DrawingSaveEvent): void {
+				
 				this.page.saveDrawing(e.bitmapData);
 				
 				this.removeElement( this.drawingView );
 			}
 			
+			public function updateDrawing(e: DrawingSaveEvent): void {	
+				
+				
+				this.page.updateDrawing(e.bitmapData, this.drawingView.editName);
+				
+				this.removeElement( this.drawingView );
+			}
 			
 
 			public var drawingsView: DrawingsView;
@@ -376,7 +388,7 @@
 			
 			public function drawingsViewReady(e: Event): void {
 				this.addEventListener("drawings view close", this.drawingsViewClose);
-				
+				this.addEventListener(DrawingsClickEvent.DRAWINGS_CLICK, this.drawingsClick);
 				// bind chapters
 				if( !this.outlines.length ) return;
 				
@@ -420,7 +432,6 @@
 			}
 			
 			public function zoomOutClick(e: Event): void {
-				
 				this.pageScale(-0.1, -0.1);
 				this.pageCenter();
 			}
@@ -442,6 +453,33 @@
 				this.display.pageView.y = 0;
 				this.display.pageView.x = 0;
 			}
+			
+			public function drawingsClick(e: DrawingsClickEvent): void {
+				
+				var strArr: Array = e.drawingInfo.split('_');
+				var pageNo: String = strArr[1];
+				var drawingNo: String = strArr[2];
+				
+				this.drawingView = new DrawingView();
+				
+				this.drawingView.edit = true;
+				this.drawingView.editName = drawingNo.toString();
+				
+				this.drawingView._width = this.display.FullWidth;
+				this.drawingView._height = this.display.FullHeight;
+				
+				this.addEventListener("bitmap read", this.drawingBitmapDataReady);
+				this.page.getDrawing( drawingNo, this.display.FullWidth, this.display.FullHeight );
+				
+				this.addEventListener("drawing-view-close", this.drawingViewClose);
+			}
+			
+			public function drawingBitmapDataReady(e: Event): void {
+				this.drawingView.setBitmapData( this.page.getDrawingBitmap() );
+			
+				this.addElement(this.drawingView);
+			}
+			
 		]]>
 		
 		

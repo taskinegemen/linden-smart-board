@@ -39,6 +39,8 @@
 			public var erase: Boolean = false;
 			
 			private var goErase: Boolean = false;
+			public var edit: Boolean = false;
+			public var editName: String;
 			
 			public function onCreationComplete(e: Event): void {
 //				var image : Bitmap = new EmbeddedImage();
@@ -56,6 +58,15 @@
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-ready"));
 			}
 			
+			public function setBitmapData(bitmapData: BitmapData): void {
+				
+				this.bitmaps.push( bitmapData );
+				
+				this.transparentArea.graphics.beginBitmapFill(bitmapData, new Matrix());
+				this.transparentArea.graphics.drawRect(0, 0, bitmapData.width, bitmapData.height);
+				this.transparentArea.graphics.endFill();
+			}
+			
 			public function onCloseClick(e: MouseEvent): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-close"));
 				
@@ -65,7 +76,15 @@
 				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0x000000);
 				bitmapData.draw(this.transparentArea);
 				
-				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SAVE, bitmapData))
+				if( this.croppedImage.bitmapData ){
+					bitmapData.copyPixels(this.croppedImage.bitmapData, new Rectangle(0, 0, this.croppedImage.width, this.croppedImage.height), new Point(10, 10));
+				}
+				
+				if( this.edit ){
+					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_UPDATE, bitmapData))	
+				}else{
+					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SAVE, bitmapData))	
+				}
 			}
 			
 			public function onShareClick(e: MouseEvent): void {
@@ -197,7 +216,7 @@
 			
 		</s:Image>
 		<!-- share button -->
-		<s:Image  x="217" width="101" top="2" height="31" source="/Assets/sharebutton.png" click="onShareClick(event)">
+		<s:Image  x="217" width="101" top="2" height="31" source="/Assets/sharebutton.png" click="onShareClick(event)" visible="false">
 			
 		</s:Image>
 		

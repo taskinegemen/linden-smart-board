@@ -8,6 +8,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import Events.DrawingsClickEvent;
+			
 			import entities.Book;
 			
 			import mx.containers.ViewStack;
@@ -53,7 +55,7 @@
 					image = imageSkin.parent as Image;
 				}
 				
-				Alert.show("easy boy!...");
+				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingsClickEvent(DrawingsClickEvent.DRAWINGS_CLICK, image.id));
 			}
 			
 			private function bindOutlineDrawings ( drawings: Array ): void {

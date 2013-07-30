@@ -355,7 +355,6 @@
 				}
 				
 				this.canScroll = false;
-				
 			}
 			
 			public function onMouseMove(e: MouseEvent): void {
