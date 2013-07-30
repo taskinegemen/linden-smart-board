@@ -13,6 +13,7 @@
 			import Events.ChangeViewToBitmapEvent;
 			import Events.ChapterViewClickEvent;
 			import Events.LoginButtonClickEvent;
+			import Events.PagePaletteClickEvent;
 			import Events.SwfClickEvent;
 			
 			import Views.ChapterView;
@@ -20,6 +21,7 @@
 			import Views.SwfView;
 			
 			import entities.DisplayStackConstants;
+			import entities.Page;
 			
 			import flash.utils.setTimeout;
 			
@@ -57,14 +59,14 @@
 				this.mainStack.selectedIndex = DisplayStackConstants.LOADING_VIEW_INDEX;
 			}
 			
-			protected function onMouseDown(e:MouseEvent): void{
-				this.sPosY = this.contentMouseY;
-				this.startToScroll();
-			}
+//			protected function onMouseDown(e:MouseEvent): void{
+//				this.sPosY = this.contentMouseY;
+//				this.startToScroll();
+//			}
 			
-			protected function onMouseUp(e:MouseEvent): void{
-				this.up = true;
-			}
+//			protected function onMouseUp(e:MouseEvent): void{
+//				this.up = true;
+//			}
 			
 			protected function startToScroll(): void {
 					if(!up){
@@ -333,6 +335,34 @@
 				this.bottomMenu.visible = false;
 			}
 			
+			
+			public var pageChangePoint: Point;
+			public var canScroll: Boolean = false;
+			public function onMouseDown(e: MouseEvent): void {
+				this.pageChangePoint = new Point(this.contentMouseX, this.contentMouseY);
+				
+				this.canScroll = true;
+				
+			}
+			
+			public function onMouseUp(e: MouseEvent): void {
+				var newPoint: Point = new Point( this.contentMouseX, this.contentMouseY );
+				
+				if( this.pageChangePoint.x - newPoint.x < -30) {
+					FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
+				}else if( this.pageChangePoint.x - newPoint.x > 30){
+					FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
+				}
+				
+				this.canScroll = false;
+			}
+			
+			public function onMouseMove(e: MouseEvent): void {
+				
+				
+				
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Style>
@@ -371,7 +401,7 @@
 		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)">
 			<s:Scroller id="pageViewScroller"  doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" height="{this.pageView.height}">
 				<s:Group  id="scrollerBar">
-					<s:Image id="pageView" x="0" y="0" enableLoadingState="true" verticalAlign="middle" horizontalAlign="center">
+					<s:Image id="pageView" x="0" y="0" enableLoadingState="true" verticalAlign="middle" horizontalAlign="center" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)" mouseMove="onMouseMove(event)">
 						
 					</s:Image>
 				</s:Group>

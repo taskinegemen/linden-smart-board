@@ -69,6 +69,10 @@
 				this.addEventListener("zoom in click", this.zoomInClick);
 				this.addEventListener("zoom out click", this.zoomOutClick);
 				
+				this.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
+				this.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
+				this.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED, this.bookOutline);
+				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
 				
@@ -153,9 +157,7 @@
 				
 				// bind event handlers, these handlers for bottom menu
 				
-				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
-				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
-				this.display.bottomMenu.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED, this.bookOutline);
+				
 				
 				this.setFirstPage();
 			}
@@ -169,7 +171,7 @@
 				
 			}
 			
-			private function nextPage(e: Event): void {
+			private function nextPage(e: Event): void {				
 				var nextPageNumber: Number = this.page.pageNo + 1;
 				this.page = this.book.getPage( nextPageNumber );
 				this.display.pageView.source = this.page.image;

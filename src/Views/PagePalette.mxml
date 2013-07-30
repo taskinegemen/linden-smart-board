@@ -9,18 +9,19 @@
 		<![CDATA[
 			import Events.PagePaletteClickEvent;
 			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
 			
 			protected function backPageClicked(e:MouseEvent): void {
-				dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
+				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
 			}
 			
 			
 			protected function outLineClicked(e:MouseEvent): void {
-				dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.OUTLINE_CLICKED));
+				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.OUTLINE_CLICKED));
 			}
 			
 			protected function frontPageClicked(e:MouseEvent): void {
-				dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
+				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
 			}
 			
 		]]>
