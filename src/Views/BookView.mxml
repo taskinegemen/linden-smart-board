@@ -41,11 +41,18 @@
 	</fx:Script>
 	<mx:ViewStack >
 		<mx:Canvas id="fullBook">
-			<s:BorderContainer width="150" height="210" borderWeight="6" borderColor="#3498db">
-				<s:Image enableLoadingState="true" x="0" y="0" maxWidth="138" id="coverImage" height="198"  scaleMode="stretch" source="{this.book.image}"/>
-				<s:Label x="0" y="210" width="150" height="20" color="#5d6666"
-						 fontFamily="DroidSans" fontSize="12" text="{this.book.title}" visible="true"/>
+			<s:BorderContainer width="240" height="280" borderWeight="6" borderColor="#3498db">
+				<s:Image enableLoadingState="true" x="0" y="0" width="228" id="coverImage" height="268"  scaleMode="stretch" source="{ this.book.image }"/>
+				
+				<!--
+				<s:BorderContainer textAlign="center" x="0" y="280" height="20" color="#5d6666" fontFamily="DroidSans">
+					<s:Label x="0" y="280" width="240" height="20" color="#5d6666"
+							 fontFamily="DroidSans" fontSize="14" text="{this.book.title}" visible="true"/>
+				</s:BorderContainer> -->
 			</s:BorderContainer>
+			<mx:Text text="{ this.book.title }" textAlign="center" x="0" y="280" width="240" height="20" color="#5D6666">
+				
+			</mx:Text>
 		</mx:Canvas>
 	</mx:ViewStack>
 	

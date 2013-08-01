@@ -32,7 +32,7 @@ package entities
 				var obj: Object = com.adobe.serialization.json.JSON.decode(jsonString);
 				fileStream.close();
 				
-				if(obj.hasOwnProperty("books")){
+				if( obj.hasOwnProperty("books") ){
 					//this.books = obj.books;
 					
 					var i: Number = 0;

@@ -51,8 +51,8 @@
 			public var timer: Timer;
 			
 			public function init(): void{
-				this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
-				this.gapSize = 90;
+				//this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
+				this.gapSize = 50;
 				this.paddingTop = 50;
 				this.addEventListener(ChangeViewToBitmapEvent.IMAGE_CROPPED, changeStackToCrop);
 				
@@ -359,11 +359,10 @@
 			
 			public function onMouseMove(e: MouseEvent): void {
 				if(this.canScroll){
-					if( this.pageChangePoint.y - this.contentMouseY > 0 && this.page.verticalScrollPosition){
-						this.page.verticalScrollPosition += (this.contentMouseY - this.pageChangePoint.y);
-					}else if( this.pageChangePoint.y - this.contentMouseY < 0 &&
-						true){
-						this.page.verticalScrollPosition -= (this.pageChangePoint.y - this.contentMouseY);
+					if( this.pageChangePoint.y - this.contentMouseY > 0){
+						this.page.verticalScrollPosition -= (this.contentMouseY - this.pageChangePoint.y);
+					}else if( this.pageChangePoint.y - this.contentMouseY < 0){
+						this.page.verticalScrollPosition += (this.pageChangePoint.y - this.contentMouseY);
 					}
 				}
 			}
@@ -388,9 +387,17 @@
 			</s:Image>
 		</mx:Canvas>
 		<mx:Canvas id="library" width="{this.FullWidth}" height="{this.FullHeight}" backgroundColor="#d6d8d8" creationComplete="onLibraryReady(event)">
-			<mx:Tile id="booksArea" y="0" paddingTop="{this.paddingTop}"  paddingLeft="{this.gapSize}" paddingRight="{this.gapSize}"  
-					 horizontalGap="{this.gapSize}"    minHeight="1" maxWidth="{this.FullWidth}" width="{this.FullWidth}" height="{this.FullHeight-41}">
-			</mx:Tile>	
+			
+			<mx:Tile id="booksArea" y="0" horizontalAlign="center" verticalAlign="middle"
+					 paddingTop="{ this.paddingTop }"  
+					 paddingLeft="{ this.gapSize }" 
+					 paddingRight="{ this.gapSize }"  
+					 horizontalGap="{ this.gapSize }"
+					 maxWidth="{ this.FullWidth }"
+					 width="{ this.FullWidth }" 
+					 height="{ this.FullHeight - this.bottomLine.height }">
+			</mx:Tile>
+			
 			<s:BorderContainer id="bottomLine" width="{this.FullWidth}" height="41" borderVisible="false" backgroundColor="#1b2630" y="{this.FullHeight - this.bottomLine.height}">
 				<s:Image source="/Assets/logoseviye.png" id="logo" x="{(this.FullWidth - this.logo.width)/2}">
 					
