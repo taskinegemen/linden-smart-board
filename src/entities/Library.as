@@ -5,6 +5,8 @@ package entities
 	import entities.Book;
 	
 	import flash.filesystem.*;
+	
+	import services.LibraryService;
 
 	
 	public class Library
@@ -12,11 +14,19 @@ package entities
 		private var bookCount: Number = 0;
 		private var books: Array = null;
 		
+		private var service: LibraryService;
+		
 		public function Library() {
+			this.service = new LibraryService();
 			
 		}
 		
 		public function readBooks(): void {
+			
+			this.service.getBooks();
+			
+			
+			
 			// not read before
 			if(this.books == null) {
 				// read books;
@@ -27,6 +37,7 @@ package entities
 				
 				var fileStream: FileStream = new FileStream();
 				fileStream.open(file, FileMode.READ);
+				
 				var jsonString: String = fileStream.readUTFBytes(file.size);
 				
 				var obj: Object = com.adobe.serialization.json.JSON.decode(jsonString);
