@@ -14,25 +14,25 @@ package services {
 		private var blowJob: BlowFishKey;
 		
 		public function LibraryService(): void {
-			var utf16 :ByteArray = new ByteArray();
+			//var utf16 :ByteArray = new ByteArray();
 			
-			utf16.writeBoolean(false);
-			utf16.endian = Endian.LITTLE_ENDIAN;
-			utf16.position = 0;
-			utf16.writeMultiByte(this.password, "unicode");
+			//utf16.writeBoolean(false);
+			//utf16.endian = Endian.LITTLE_ENDIAN;
+			//utf16.position = 0;
+			//utf16.writeMultiByte(this.password, "unicode");
 			
-			this.salt = SHA256.computeDigest( utf16 );
+			//this.salt = SHA256.computeDigest( utf16 );
 			
-			var bytes: ByteArray = new ByteArray();
-			bytes.writeMultiByte(this.salt, "unicode");
+			//var bytes: ByteArray = new ByteArray();
+			//bytes.writeMultiByte(this.salt, "unicode");
 			
-			this.blowJob = new BlowFishKey( bytes );
+			//this.blowJob = new BlowFishKey( bytes );
 			
-			var dataBytes: ByteArray = new ByteArray();
+			//var dataBytes: ByteArray = new ByteArray();
 			
-			blowJob.decrypt(  );
+			//blowJob.decrypt(  );
 			
-			this.blowJob = new BlowFishKey( bytes );
+			//this.blowJob = new BlowFishKey( bytes );
 		}
 		
 		public function getBooks(): void {
