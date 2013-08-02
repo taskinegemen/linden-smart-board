@@ -28,10 +28,6 @@
 			import mx.core.FlexGlobals;
 			import mx.controls.Alert;
 			
-			//[Bindable] public var title:String;
-			//public var bookId:String;
-			//[Bindable] public var imageSource:String;
-			
 			[Bindable]public var book: Book;
 			
 			protected function bookClicked(e:Event): void{

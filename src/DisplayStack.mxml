@@ -331,18 +331,14 @@
 			}
 			
 			public function onScrollChange(e: ScrollEvent): void {
-				
 				this.bottomMenu.visible = false;
 			}
-			
 			
 			public var pageChangePoint: Point;
 			public var canScroll: Boolean = false;
 			public function onMouseDown(e: MouseEvent): void {
 				this.pageChangePoint = new Point(this.contentMouseX, this.contentMouseY);
-				
 				this.canScroll = true;
-				
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {

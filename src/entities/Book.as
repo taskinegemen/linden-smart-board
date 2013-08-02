@@ -15,15 +15,15 @@ package entities {
 		public var book: String;
 		public var totalPageNumber: Number = 0;
 		
-		public var outlines: Array;
 		public var metadatas: Array;
 		public var pages: Array;
+		public var chapters: Array;
 		
 		public var image: String;
 		
 		public function Book(obj: Object = null) {
-			this.outlines 			= new Array();
 			this.metadatas 			= new Array();
+			this.chapters			= new Array();
 			
 			this.ID 				= obj.ID;
 			this.publisherID 		= obj.publisherID;
@@ -33,9 +33,9 @@ package entities {
 			
 			this.image = "C:\\docs\\covers\\" + this.ID + ".jpg";
 			
-			for each(var outlineObj: Object in obj.outlines){
-				var outline: Outline = new Outline(outlineObj);
-				this.addOutline(outline);
+			for each(var chapterObj: Object in obj.chapters){
+				var chapter: Chapter = new Chapter(chapterObj);
+				this.addChapter(chapter);
 			}
 		}
 	
@@ -107,48 +107,55 @@ package entities {
 			return this.pages.length;
 		}
 		
-		public function getOutlinePages(outlineId: Number): Array {
+		public function getChapterPages(chapterId: Number): Array {
 			var arr: Array = new Array();
 			
-			// this code snippet will be changed
-			var ran: Number = Math.ceil(Math.random() * 8);
+			var chapter: Chapter = this.getChapter( chapterId );
 			
-			for(var i: Number = 0; i < ran; i++) {
+			for(var i: Number = 0; i < chapter.pages.length; i++) {
 				var obj: Object = new Object();
 				
 				obj.bookID = this.ID;
-				obj.pageNo = (i + 1);
-				obj.image = "C:\\docs\\pages\\" + this.ID.toString() + "\\" + (i + 1).toString() + ".jpg";
+				obj.pageNo = chapter.pages[i];
+				obj.image = "C:\\docs\\pages\\" + this.ID.toString() + "\\" + obj.pageNo.toString() + ".jpg";
 				
 				arr[i] = obj;
 			}
 			
-			// until the end of this comment
 			return arr;
 		}
 		
-		private function addOutline(outline: Outline): void {
-			this.outlines[ this.outlines.length ] = outline;
+		private function getChapter( chapterId: Number ): Chapter {
+			for(var i: Number = 0; i < this.chapters.length; i++) {
+				if( this.chapters[i].ID == chapterId ){
+					return this.chapters[i];
+				}
+			}
+			return null;
 		}
 		
-		public function getOutlineDrawings( id: Number ): Array {
+		private function addChapter(chapter: Chapter): void {
+			this.chapters[ this.chapters.length ] = chapter;
+		}
+		
+		public function getChapterDrawings( id: Number ): Array {
 			var arr: Array = new Array();
-			var outline: Outline;
+			var chapter: Chapter;
 			var pageArr: Array = new Array();
 			var i: Number = 0;
-			for(i = 0; i < this.outlines.length; i++) {
-				if( (this.outlines[i] as Outline).ID == id ){
-					outline = this.outlines[i] as Outline;
+			for(i = 0; i < this.chapters.length; i++) {
+				if( (this.chapters[i] as Chapter).ID == id ){
+					chapter = this.chapters[i] as Chapter;
 				}
 			}
 			
-			if(outline == null) {
+			if(chapter == null) {
 				pageArr = this.getPages();
 			}else{
 				for(i = 0; i < this.getPages().length; i++ ){
 					var page_: Page = this.pages[i] as Page;
 					
-					if( outline.containsPage( page_.pageNo ) ){
+					if( chapter.containsPage( page_.pageNo ) ){
 						pageArr.push( page_ );
 					}
 					

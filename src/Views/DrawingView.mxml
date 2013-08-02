@@ -52,6 +52,8 @@
 //				this.drawingViewDrawingArea.graphics.drawRect(0, 0, bitmapData.width, bitmapData.height);
 //				this.drawingViewDrawingArea.graphics.endFill();
 				
+
+				
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-ready"));
 			}
 			
@@ -86,22 +88,20 @@
 			
 			public function onShareClick(e: MouseEvent): void {
 				Alert.show("share click");
+				
 			}
 			
 			
 			public function onMouseDown(e: MouseEvent): void {
 				this.point = new Point(this.contentMouseX, this.contentMouseY);
-				
-				this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true);
-				
-				this.transparentArea.graphics.drawCircle(this.point.x, this.point.y, this.thickness / 4);
-				
+	
 				// save bitmapdata for undo
 				var bitmap: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0x000000);
 				bitmap.draw(this.transparentArea);
 				this.bitmaps.push(bitmap);
 				
-				
+				this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true);
+				this.transparentArea.graphics.drawCircle(this.point.x, this.point.y, this.thickness / 5);
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {

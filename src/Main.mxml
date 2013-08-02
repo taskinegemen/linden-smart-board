@@ -49,9 +49,10 @@
 			public var books: Array;
 			public var book: Book;
 			public var page: Page;
-			public var outlines: Array;
+			public var chapters: Array;
 
 			private function applicationCompleted(): void{
+				
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				
 				this.display = new DisplayStack();
@@ -71,7 +72,7 @@
 				
 				this.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
 				this.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
-				this.addEventListener(PagePaletteClickEvent.OUTLINE_CLICKED, this.bookOutline);
+				this.addEventListener(PagePaletteClickEvent.CHAPTERS_CLICKED, this.bookChapters);
 				
 				this.addEventListener(DrawingSaveEvent.DRAWING_SAVE, this.saveDrawing);
 				this.addEventListener(DrawingSaveEvent.DRAWING_UPDATE, this.updateDrawing);
@@ -113,9 +114,9 @@
 				this.page = null;
 				this.bindBookPages(e.book);
 				if(this.display.tableOfContents == null){
-					this.addEventListener("tableofcontents-ready", this.bindBookOutlines);
+					this.addEventListener("tableofcontents-ready", this.bindBookChapters);
 				}else{
-					this.bindBookOutlines(null);
+					this.bindBookChapters(null);
 				}
 				
 				
@@ -130,27 +131,27 @@
 				this.book = book;
 			}
 			
-			private function bindBookOutlines(e: Event): void {
-				this.outlines = this.book.outlines;
-				if(this.outlines == null){
-					this.outlines = new Array();
+			private function bindBookChapters(e: Event): void {
+				this.chapters = this.book.chapters;
+				if(this.chapters == null){
+					this.chapters = new Array();
 				}
 				
 				this.display.tableOfContents.chapterArea.removeAllElements();
 				
-				for each(var outline: Outline in this.outlines) {
+				for each(var chapter: Chapter in this.chapters) {
 					var label: Label = new spark.components.Label();
 					
-					label.text = outline.title;
+					label.text = chapter.title;
 					label.setStyle("color", "#FFFFFF");
 					label.setStyle("fontSize", 20);
 					label.height = 30;
 					label.setStyle("paddingTop", 10);
 					label.setStyle("paddingLeft", 10);
-					label.id = "outline-" + outline.ID;
+					label.id = "chapter-" + chapter.ID;
 					
 					
-					label.addEventListener(MouseEvent.CLICK, this.outlineClicked);
+					label.addEventListener(MouseEvent.CLICK, this.chapterClicked);
 					
 					this.display.tableOfContents.chapterArea.addElement(label);
 				}
@@ -192,7 +193,7 @@
 				this.display.pageView.width = this.display.FullWidth;
 			}
 			
-			private function bookOutline(e: Event): void {
+			private function bookChapters(e: Event): void {
 				this.display.tableOfContents._parent = this.display;
 				this.display.tableOfContents.mainHeight = this.display.FullHeight;
 				this.display.tableOfContents.mainWidth = this.display.FullWidth;
@@ -202,7 +203,7 @@
 				this.display.tableOfContents.visible = true;
 			}
 			
-			private function outlineClicked(e: MouseEvent): void {
+			private function chapterClicked(e: MouseEvent): void {
 				var label: Label = e.target as Label;
 				
 				var children: Number = this.display.tableOfContents.chapterArea.numChildren;
@@ -215,11 +216,11 @@
 				
 				var id: Number = label.id.split('-')[1];
 				
-				this.setOutlinePages(id);
+				this.setChapterPages(id);
 			}
 			
-			private function setOutlinePages(outlineId: Number): void {
-				var arr: Array = this.book.getOutlinePages(outlineId);
+			private function setChapterPages(chapterId: Number): void {
+				var arr: Array = this.book.getChapterPages(chapterId);
 				
 				this.display.tableOfContents.thumbnailArea.removeAllElements();
 				
@@ -236,9 +237,9 @@
 					img.setStyle("paddingTop", 2);
 					img.setStyle("paddingBottom", 2);
 					
-					img.id = "outline-page-" + page.pageNo;
+					img.id = "chapter-page-" + page.pageNo;
 					
-					img.addEventListener(MouseEvent.CLICK, this.outlinePageClicked);
+					img.addEventListener(MouseEvent.CLICK, this.chapterPageClicked);
 					
 					border.addElement(img);
 					
@@ -263,7 +264,7 @@
 				
 			}
 			
-			private function outlinePageClicked(e: MouseEvent): void {
+			private function chapterPageClicked(e: MouseEvent): void {
 				var image: Image = e.target as Image;
 				var imageSkin: ImageSkin = e.target as ImageSkin;
 				
@@ -286,6 +287,7 @@
 					
 					this.display.booksArea.addElement(bookView);
 				}
+				
 			}
 			
 			public function backToLibrary(e: Event): void {
@@ -390,13 +392,13 @@
 				this.addEventListener("drawings view close", this.drawingsViewClose);
 				this.addEventListener(DrawingsClickEvent.DRAWINGS_CLICK, this.drawingsClick);
 				// bind chapters
-				if( !this.outlines.length ) return;
+				if( !this.chapters.length ) return;
 				
 				var label: Label = this.getDrawingsChapterLabel("all", "Hepsi");
 				
 				this.drawingsView.chapters.addElement(label);
 				
-				for each( var obj: Object in this.outlines ){
+				for each( var obj: Object in this.chapters ){
 					label = this.getDrawingsChapterLabel("chapter_" + obj.ID, obj.title);
 					this.drawingsView.chapters.addElement(label);
 				}

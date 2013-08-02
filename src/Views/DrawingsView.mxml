@@ -39,13 +39,13 @@
 				var drawings: Array = new Array();
 				
 				if(label.id == "all"){
-					drawings = this.book.getOutlineDrawings( 0 );
+					drawings = this.book.getChapterDrawings( 0 );
 				}else{
 					var id: Number = int( label.id.split('_')[1] );
-					drawings = this.book.getOutlineDrawings( id );
+					drawings = this.book.getChapterDrawings( id );
 				}
 				
-				this.bindOutlineDrawings( drawings );
+				this.bindChapterDrawings( drawings );
 			}
 			
 			public function onDrawingClick(e: MouseEvent): void {
@@ -58,7 +58,7 @@
 				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingsClickEvent(DrawingsClickEvent.DRAWINGS_CLICK, image.id));
 			}
 			
-			private function bindOutlineDrawings ( drawings: Array ): void {
+			private function bindChapterDrawings ( drawings: Array ): void {
 				this.drawings.removeAllElements();
 				
 				for each( var obj: Object in drawings ) {

@@ -44,7 +44,7 @@ package entities
 						fileStream.open(file, FileMode.READ);
 						jsonString = fileStream.readUTFBytes(file.size);
 												
-						var bookObj: Object = com.adobe.serialization.json.JSON.decode(jsonString);
+						var bookObj: Object = com.adobe.serialization.json.JSON.decode(jsonString);						
 						
 						var book: Book = new Book(bookObj);
 						
