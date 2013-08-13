@@ -245,7 +245,7 @@
 			
 			// dispatch search event
 			public function onSearchClick(e: Event): void{
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("search-view clicked"));
+				// FlexGlobals.topLevelApplication.dispatchEvent(new Event("search-view clicked"));
 			}
 			
 			// return to library
@@ -320,7 +320,6 @@
 					this.bottomMenu.visible = true;
 				}
 			}
-
 			
 			public function onBookViewInit(e: Event): void {
 				Alert.show("on book view Init");

@@ -158,11 +158,6 @@
 			}
 			
 			private function pageViewReady(e: Event): void {
-				
-				// bind event handlers, these handlers for bottom menu
-				
-				
-				
 				this.setFirstPage();
 			}
 			
@@ -173,6 +168,8 @@
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
 				
+				// page items
+				this.bindPageItems();
 			}
 			
 			private function nextPage(e: Event): void {				
@@ -182,6 +179,9 @@
 				
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
+				
+				// page items
+				this.bindPageItems();
 			}
 			
 			private function previousPage(e: Event): void {
@@ -191,6 +191,14 @@
 				
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
+				
+				// page items
+				this.bindPageItems();
+			}
+			
+			private function bindPageItems(): void {
+				// bind page items
+				// this.display.addItems(this.page.items);
 			}
 			
 			private function bookChapters(e: Event): void {
@@ -368,13 +376,9 @@
 			}
 			
 			public function updateDrawing(e: DrawingSaveEvent): void {	
-				
-				
 				this.page.updateDrawing(e.bitmapData, this.drawingView.editName);
-				
 				this.removeElement( this.drawingView );
 			}
-			
 
 			public var drawingsView: DrawingsView;
 			public function showDrawingsMenu(e: Event): void {
@@ -428,7 +432,6 @@
 			}
 			
 			public function zoomInClick(e: Event): void {
-				
 				this.pageScale(0.1, 0.1);
 				this.pageCenter();
 			}

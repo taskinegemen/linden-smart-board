@@ -25,7 +25,9 @@ package entities {
 		public var thumbnailImage: String;
 		public var image: String;
 		
-		
+		public static const _640x480: Number = 640;
+		public static const _1280x720: Number = 1280;
+		public static const _1920x1080: Number = 1920;
 		
 		public var loader: Loader;
 		

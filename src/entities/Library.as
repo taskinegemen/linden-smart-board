@@ -18,14 +18,11 @@ package entities
 		
 		public function Library() {
 			this.service = new LibraryService();
-			
 		}
 		
 		public function readBooks(): void {
 			
 			this.service.getBooks();
-			
-			
 			
 			// not read before
 			if(this.books == null) {

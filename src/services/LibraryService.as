@@ -9,17 +9,16 @@ package services {
 	
 	public class LibraryService {
 		private var password: String = "dontWorryBeHappy";
-		private var salt: String = "grenade";
 		
 		private var blowJob: BlowFishKey;
 		
 		public function LibraryService(): void {
-			//var utf16 :ByteArray = new ByteArray();
+			var utf16 :ByteArray = new ByteArray();
 			
-			//utf16.writeBoolean(false);
-			//utf16.endian = Endian.LITTLE_ENDIAN;
-			//utf16.position = 0;
-			//utf16.writeMultiByte(this.password, "unicode");
+			utf16.writeBoolean(false);
+			utf16.endian = Endian.LITTLE_ENDIAN;
+			utf16.position = 0;
+			utf16.writeMultiByte(this.password, "unicode");
 			
 			//this.salt = SHA256.computeDigest( utf16 );
 			
@@ -35,9 +34,32 @@ package services {
 			//this.blowJob = new BlowFishKey( bytes );
 		}
 		
+		// library read books
 		public function getBooks(): void {
 			
 		}
 		
+		// book initialization
+		// return byte array of book cover
+		public function getBookCover(bookId: Number): void {
+			
+		}
+		
+		// book read pages
+		public function getPageThumbnails(bookId: Number): void {
+			
+		}
+		
+		public function getPage(bookId: Number, pageNo: Number, resolution: Number): void {
+			
+		}
+		
+		public function getDrawings(bookId: Number, pageNo: Number): void {
+			
+		}
+
+		public function saveDrawing(bookId: Number, pageNo: Number): void {
+			
+		}
 	}
 }

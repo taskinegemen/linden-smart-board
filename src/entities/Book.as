@@ -39,8 +39,8 @@ package entities {
 			}
 		}
 	
-		public function getFirstPage(): Page {
-			if(this.pages == null){
+		public function getFirstPage(resolution: Number = Page._1280x720): Page {
+			if(this.pages == null) {
 				this.readPages();
 			}
 			if(this.pages.length == 0){
@@ -60,7 +60,7 @@ package entities {
 			return this.pages;
 		}
 		
-		public function getPage(pageNumber: Number): Page {
+		public function getPage(pageNumber: Number, resolution: Number = Page._1280x720): Page {
 			if(pageNumber < 1){
 				pageNumber = 1;
 			}else if(pageNumber > this.totalPageNumber){

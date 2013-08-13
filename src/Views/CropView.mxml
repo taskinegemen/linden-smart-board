@@ -48,8 +48,46 @@
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {
+				var leftUpper: Point = new Point();
+				var rightBottom: Point = new Point();
+				
+				if( this.pointEnd.x - this.pointStart.x > 0 
+					&& this.pointEnd.y - this.pointStart.y > 0){
+					
+					leftUpper.x = this.pointStart.x;
+					leftUpper.y = this.pointStart.y;
+					
+					rightBottom.x = this.pointEnd.x;
+					rightBottom.y = this.pointEnd.y;
+					
+				}else if( this.pointEnd.x - this.pointStart.x > 0 
+					&& this.pointEnd.y - this.pointStart.y < 0){
+					
+					leftUpper.x = this.pointStart.x;
+					leftUpper.y = this.pointEnd.y;
+					
+					rightBottom.x = this.pointEnd.x;
+					rightBottom.y = this.pointStart.y;
+					
+				}else if( this.pointEnd.x - this.pointStart.x < 0 
+					&& this.pointEnd.y - this.pointStart.y < 0){
+					
+					leftUpper.x = this.pointEnd.x;
+					leftUpper.y = this.pointEnd.y;
+					
+					rightBottom.x = this.pointStart.x;
+					rightBottom.y = this.pointStart.y;
+					
+				}else{
+					leftUpper.x = this.pointEnd.x;
+					leftUpper.y = this.pointStart.y;
+					
+					rightBottom.x = this.pointStart.x;
+					rightBottom.y = this.pointEnd.y;
+				}
+				
 				var event: CropRectangleEvent = 
-					new CropRectangleEvent(CropRectangleEvent.CROP_FINISHED, this.pointStart, this.pointEnd);
+					new CropRectangleEvent(CropRectangleEvent.CROP_FINISHED, leftUpper, rightBottom);
 				FlexGlobals.topLevelApplication.dispatchEvent(event);
 			}
 			
