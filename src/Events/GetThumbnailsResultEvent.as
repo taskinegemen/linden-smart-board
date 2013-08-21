@@ -11,9 +11,9 @@ package Events{
 			this.thumbnails = thumbnails;
 			
 		}
-		public static const GET_THUMBNAILS_SUCCESS = "get_thumb_success";
-		public var book;
-		public var thumbnails;
+		public static const GET_THUMBNAILS_SUCCESS: String = "get_thumb_success";
+		public var book: String;
+		public var thumbnails: Array;
 		override public function clone():Event {
 			return new GetThumbnailsResultEvent(type, book, thumbnails);
 		}

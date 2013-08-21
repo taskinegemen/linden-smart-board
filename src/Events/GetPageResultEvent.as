@@ -12,11 +12,11 @@ package Events{
 			this.items = items;
 			
 		}
-		public static const GET_PAGE_SUCCESS = "get_page_success";
-		public var book;
-		public var page;
-		public var pageUrl;
-		public var items;
+		public static const GET_PAGE_SUCCESS: String = "get_page_success";
+		public var book: String;
+		public var page: String;
+		public var pageUrl: String;
+		public var items: Array;
 		override public function clone():Event {
 			return new GetPageResultEvent(type, page, pageUrl, items);
 		}

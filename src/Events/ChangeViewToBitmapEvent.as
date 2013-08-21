@@ -10,7 +10,7 @@ public class ChangeViewToBitmapEvent extends Event
 		super(type);
 		this.bitmapData = bmp;
 	}
-	public static const IMAGE_CROPPED = "IMAGE_cropped";
+	public static const IMAGE_CROPPED: String = "IMAGE_cropped";
 	public var bitmapData:BitmapData;
 
 

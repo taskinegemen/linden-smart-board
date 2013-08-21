@@ -6,7 +6,7 @@ import flash.events.Event;
 
 public class BookClickEvent extends Event
 {
-	public static const BOOK_CLICKED = "book click";
+	public static const BOOK_CLICKED: String = "book click";
 	public var book: Book;
 	
 	public function BookClickEvent(type:String, book: Book) {

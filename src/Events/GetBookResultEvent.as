@@ -9,9 +9,9 @@ package Events{
 			this.book = book;
 			this.chapters = chapters;
 		}
-		public static const GET_BOOK_SUCCESS = "get_book_success";
-		public var book;
-		public var chapters;
+		public static const GET_BOOK_SUCCESS: String = "get_book_success";
+		public var book: String;
+		public var chapters: Array;
 		override public function clone():Event {
 			return new GetBookResultEvent(type, book,chapters);
 		}			

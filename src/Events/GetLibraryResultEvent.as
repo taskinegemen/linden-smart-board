@@ -9,8 +9,8 @@ package Events{
 			this.books = books;
 			
 		}
-		public static const GET_LIBRARY_SUCCESS = "get_success";
-		public var books;
+		public static const GET_LIBRARY_SUCCESS: String = "get_success";
+		public var books: Array;
 		
 		override public function clone():Event {
 			return new GetLibraryResultEvent(type, books);

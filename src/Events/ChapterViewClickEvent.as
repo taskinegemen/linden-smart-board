@@ -11,9 +11,9 @@ public class ChapterViewClickEvent extends Event
 		
 
 	}
-	public static const CHAPTER_CLICKED = "chapter_click";
+	public static const CHAPTER_CLICKED: String = "chapter_click";
 	
-	public var page;
+	public var page: Number;
 
 
 	override public function clone():Event {
