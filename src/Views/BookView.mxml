@@ -25,20 +25,21 @@
 			
 			import entities.Book;
 			
-			import mx.core.FlexGlobals;
 			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
 			
 			[Bindable]public var book: Book;
 			
 			protected function bookClicked(e:Event): void{
 				FlexGlobals.topLevelApplication.dispatchEvent(new BookClickEvent(BookClickEvent.BOOK_CLICKED, this.book));	
 			}
+			
 		]]>
 	</fx:Script>
 	<mx:ViewStack >
 		<mx:Canvas id="fullBook">
 			<s:BorderContainer width="240" height="280" borderWeight="6" borderColor="#3498db">
-				<s:Image enableLoadingState="true" x="0" y="0" width="228" id="coverImage" height="268"  scaleMode="stretch" source="{ this.book.image }"/>
+				<s:Image enableLoadingState="true" x="0" y="0" width="228" id="coverImage" height="268"  scaleMode="stretch" source="{ this.book.image }" />
 				
 				<!--
 				<s:BorderContainer textAlign="center" x="0" y="280" height="20" color="#5d6666" fontFamily="DroidSans">

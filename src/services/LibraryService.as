@@ -2,6 +2,7 @@ package services {
 	import com.hurlant.crypto.symmetric.BlowFishKey;
 	import com.hurlant.util.Hex;
 	
+	
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	
@@ -9,10 +10,8 @@ package services {
 	
 	public class LibraryService {
 		private var password: String = "dontWorryBeHappy";
-		
 		private var blowJob: BlowFishKey;
 		
-		// amk git
 		public function LibraryService(): void {
 			var utf16 :ByteArray = new ByteArray();
 			

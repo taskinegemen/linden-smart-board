@@ -72,7 +72,7 @@
 			}
 			
 			public function onSaveClick(e: MouseEvent): void {
-				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0x000000);
+				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0);
 				bitmapData.draw(this.transparentArea);
 				
 				if( this.croppedImage.bitmapData ){

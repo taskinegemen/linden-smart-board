@@ -28,7 +28,7 @@
 			}			
 			
 			public function onMouseMove(e: MouseEvent): void {
-				if(e.buttonDown){
+				if (e.buttonDown) {
 					this.cropCanvasElement.graphics.clear();
 					this.cropCanvasElement.graphics.lineStyle(2, 0x990000, 1);
 					

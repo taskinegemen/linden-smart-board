@@ -50,7 +50,10 @@
 			public var book: Book;
 			public var page: Page;
 			public var chapters: Array;
+			public var items: Array;
 
+			private var pageResolution: Number = Page._640;
+			
 			private function applicationCompleted(): void{
 				
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
@@ -69,6 +72,8 @@
 				this.addEventListener("show drawings menu", this.showDrawingsMenu);
 				this.addEventListener("zoom in click", this.zoomInClick);
 				this.addEventListener("zoom out click", this.zoomOutClick);
+				this.addEventListener("item-view-close", this.itemViewClose);
+				this.addEventListener("item-view-ready", this.display.itemViewReady);
 				
 				this.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
 				this.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
@@ -88,15 +93,8 @@
 				this.books = new Array(this.library.getBookCount());
 				this.books = this.library.getBooks();
 				
-				setTimeout(this.eben, 1000);
-				
+				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
 				this.addEventListener("library-ready", fillLibrary);
-			}
-			
-			// triviri function to show loading view
-			// just delete when the time comes
-			private function eben(): void{
-				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;	
 			}
 			
 			// close application
@@ -132,6 +130,7 @@
 			}
 			
 			private function bindBookChapters(e: Event): void {
+				
 				this.chapters = this.book.chapters;
 				if(this.chapters == null){
 					this.chapters = new Array();
@@ -142,7 +141,7 @@
 				for each(var chapter: Chapter in this.chapters) {
 					var label: Label = new spark.components.Label();
 					
-					label.text = chapter.title;
+					label.text = chapter.title.length > 30 ? chapter.title.substr(0, 30) + ' ...' : chapter.title;
 					label.setStyle("color", "#FFFFFF");
 					label.setStyle("fontSize", 20);
 					label.height = 30;
@@ -162,7 +161,7 @@
 			}
 			
 			private function setFirstPage(): void{
-				this.page = this.book.getFirstPage();
+				this.page = this.book.getFirstPage( this.pageResolution );
 				this.display.pageView.source = this.page.image;
 				
 				this.display.pageView.height = this.page.height;
@@ -174,7 +173,8 @@
 			
 			private function nextPage(e: Event): void {				
 				var nextPageNumber: Number = this.page.pageNo + 1;
-				this.page = this.book.getPage( nextPageNumber );
+				this.page = this.book.getPage( nextPageNumber, this.pageResolution );
+				
 				this.display.pageView.source = this.page.image;
 				
 				this.display.pageView.height = this.page.height;
@@ -186,7 +186,7 @@
 			
 			private function previousPage(e: Event): void {
 				var previousPageNumber: Number = this.page.pageNo - 1;
-				this.page = this.book.getPage( previousPageNumber );
+				this.page = this.book.getPage( previousPageNumber, this.pageResolution );
 				this.display.pageView.source = this.page.image;
 				
 				this.display.pageView.height = this.page.height;
@@ -198,7 +198,7 @@
 			
 			private function bindPageItems(): void {
 				// bind page items
-				// this.display.addItems(this.page.items);
+				this.display.addItems( this.page.items );
 			}
 			
 			private function bookChapters(e: Event): void {
@@ -215,12 +215,12 @@
 				var label: Label = e.target as Label;
 				
 				var children: Number = this.display.tableOfContents.chapterArea.numChildren;
-				for(var i: Number = 0; i < children; i++) {
-					var _label:Label = this.display.tableOfContents.chapterArea.getElementAt(i) as Label;
-					_label.setStyle("backgroundColor", "#1B2630");
-				}
+				//for(var i: Number = 0; i < children; i++) {
+				//	var _label:Label = this.display.tableOfContents.chapterArea.getElementAt(i) as Label;
+				//	_label.setStyle("backgroundColor", "#1B2630");
+				//}
 				
-				label.setStyle("backgroundColor", "#FF00FF");
+				//label.setStyle("backgroundColor", "#FF00FF");
 				
 				var id: Number = label.id.split('-')[1];
 				
@@ -281,10 +281,12 @@
 				}
 				
 				var pageNo: Number = image.id.split('-')[2];
-				this.page = this.book.getPage(pageNo);
+				this.page = this.book.getPage(pageNo, this.pageResolution);
 				this.display.pageView.source = this.page.image;
 				
 				this.display.tableOfContents.visible = false;
+				
+				this.bindPageItems();
 			}
 
 
@@ -369,15 +371,19 @@
 			}
 			
 			public function saveDrawing(e: DrawingSaveEvent): void {
-				
-				this.page.saveDrawing(e.bitmapData);
-				
-				this.removeElement( this.drawingView );
+				if( this.page.saveDrawing(e.bitmapData) ){
+					this.removeElement( this.drawingView );	
+				} else {
+					Alert.show("kaydedemedik ya la!");
+				}
 			}
 			
 			public function updateDrawing(e: DrawingSaveEvent): void {	
-				this.page.updateDrawing(e.bitmapData, this.drawingView.editName);
-				this.removeElement( this.drawingView );
+				if( this.page.updateDrawing(e.bitmapData, this.drawingView.editName) ){
+					this.removeElement( this.drawingView );
+				} else {
+					Alert.show("hata oluştu!");
+				}
 			}
 
 			public var drawingsView: DrawingsView;
@@ -416,7 +422,7 @@
 				var label: Label = new spark.components.Label();
 				
 				label.id = id;
-				label.text = text;
+				label.text = text.length > 20 ? text.substr(0, 20) + " ..." : text;
 				label.width = this.drawingsView.chapters.width;
 				label.height = 40;
 				label.setStyle("fontSize", "16");
@@ -424,7 +430,6 @@
 				label.setStyle("color", "#FFFFFF");
 				label.setStyle("paddingTop", "15");
 				label.setStyle("paddingLeft", "20");
-				label.setStyle("backgroundColor", "#CCCCCC");
 				
 				label.addEventListener(MouseEvent.CLICK, this.drawingsView.onChapterClick);
 				
@@ -462,8 +467,8 @@
 			public function drawingsClick(e: DrawingsClickEvent): void {
 				
 				var strArr: Array = e.drawingInfo.split('_');
-				var pageNo: String = strArr[1];
-				var drawingNo: String = strArr[2];
+				var pageNo: Number = int(strArr[1]);
+				var drawingNo: Number = int(strArr[2]);
 				
 				this.drawingView = new DrawingView();
 				
@@ -474,7 +479,9 @@
 				this.drawingView._height = this.display.FullHeight;
 				
 				this.addEventListener("bitmap read", this.drawingBitmapDataReady);
-				this.page.getDrawing( drawingNo, this.display.FullWidth, this.display.FullHeight );
+				
+				var _page: Page = this.book.pages[pageNo - 1];
+				_page.getDrawing( drawingNo, this.display.FullWidth, this.display.FullHeight );
 				
 				this.addEventListener("drawing-view-close", this.drawingViewClose);
 			}
@@ -483,6 +490,10 @@
 				this.drawingView.setBitmapData( this.page.getDrawingBitmap() );
 			
 				this.addElement(this.drawingView);
+			}
+			
+			public function itemViewClose(e: Event): void {
+				this.display.closeItem();
 			}
 			
 		]]>
