@@ -148,7 +148,7 @@
 					label.setStyle("paddingTop", 10);
 					label.setStyle("paddingLeft", 10);
 					label.id = "chapter-" + chapter.ID;
-					
+					label.width = this.display.tableOfContents.chapterArea.width;
 					
 					label.addEventListener(MouseEvent.CLICK, this.chapterClicked);
 					
@@ -215,12 +215,12 @@
 				var label: Label = e.target as Label;
 				
 				var children: Number = this.display.tableOfContents.chapterArea.numChildren;
-				//for(var i: Number = 0; i < children; i++) {
-				//	var _label:Label = this.display.tableOfContents.chapterArea.getElementAt(i) as Label;
-				//	_label.setStyle("backgroundColor", "#1B2630");
-				//}
+				for(var i: Number = 0; i < children; i++) {
+					var _label:Label = this.display.tableOfContents.chapterArea.getElementAt(i) as Label;
+					_label.setStyle("backgroundColor", "#1B2630");
+				}
 				
-				//label.setStyle("backgroundColor", "#FF00FF");
+				label.setStyle("backgroundColor", "#B8BBD9");
 				
 				var id: Number = label.id.split('-')[1];
 				
@@ -357,8 +357,6 @@
 				this.drawingView.croppedImageHeight = sourceRect.height;
 				
 				this.addElement(this.drawingView);
-				
-				
 			}
 			
 			public function drawingViewReady(e: Event): void {
@@ -374,7 +372,7 @@
 				if( this.page.saveDrawing(e.bitmapData) ){
 					this.removeElement( this.drawingView );	
 				} else {
-					Alert.show("kaydedemedik ya la!");
+					Alert.show("hata oldu!");
 				}
 			}
 			
@@ -382,7 +380,7 @@
 				if( this.page.updateDrawing(e.bitmapData, this.drawingView.editName) ){
 					this.removeElement( this.drawingView );
 				} else {
-					Alert.show("hata oluştu!");
+					Alert.show("hata oldu!");
 				}
 			}
 
@@ -424,14 +422,16 @@
 				label.id = id;
 				label.text = text.length > 20 ? text.substr(0, 20) + " ..." : text;
 				label.width = this.drawingsView.chapters.width;
-				label.height = 40;
-				label.setStyle("fontSize", "16");
+				label.height = 30;
+				label.setStyle("fontSize", 20);
 				label.setStyle("textAlign", "left");
 				label.setStyle("color", "#FFFFFF");
-				label.setStyle("paddingTop", "15");
-				label.setStyle("paddingLeft", "20");
+				label.setStyle("paddingTop", 10);
+				label.setStyle("paddingLeft", 20);
 				
 				label.addEventListener(MouseEvent.CLICK, this.drawingsView.onChapterClick);
+				
+				label.width = this.drawingsView.chapters.width;
 				
 				return label;
 			}

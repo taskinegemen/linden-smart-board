@@ -18,8 +18,11 @@
 			
 			import Views.ChapterView;
 			import Views.ItemView;
+			import Views.Mp3PlayerSkin;
 			import Views.PageMenu;
 			import Views.SwfView;
+			
+			import components.Mp3Player;
 			
 			import entities.DisplayStackConstants;
 			import entities.Item;
@@ -39,7 +42,6 @@
 			import org.osmf.events.TimeEvent;
 			
 			import spark.components.VideoPlayer;
-			
 			
 			[Embed(source="/Assets/background_login.png")]
 			[Bindable]
@@ -361,8 +363,7 @@
 			private var itemView: ItemView;
 			private var item: Item;
 			private var videoPlayer: VideoPlayer;
-			private var soundChannel: SoundChannel;
-			private var sound: Sound;
+			private var mp3Player: Mp3Player;
 			private var imageItem: Image;
 			public function showItem( item: Item ) : void {
 				this.item = item;
@@ -427,22 +428,17 @@
 						fileStream2.writeBytes( bytes2, 0, bytes2.length );
 						fileStream2.close();
 						
+						var mp3Player: Mp3Player = new Mp3Player();
+						this.itemView.addElement( mp3Player );
 						
-						this.sound = new Sound(new URLRequest(path2));
+						mp3Player.source = path2;
+						mp3Player.autoPlay = true;
+						mp3Player.width = this.FullWidth * 0.5;
 						
-						this.soundChannel = this.sound.play();
-						this.playPausePosition = 0;
+						this.mp3Player = mp3Player;
 						
-						this.button = new Button();
-						
-						this.button.addEventListener(MouseEvent.CLICK, this.itemPlayPause);
-						
-						this.button.x =  (this.FullWidth - this.button.width) / 2;
-						this.button.y =  (this.FullHeight - this.button.height) / 2;
-						
-						this.button.label = "Duraklat";
-						
-						this.itemView.addElement( button );
+						mp3Player.x = ( this.FullWidth - mp3Player.width ) / 2;
+						mp3Player.y = ( this.FullHeight - 24 ) / 2;
 						
 						break;
 					
@@ -510,21 +506,6 @@
 				this.addElement( this.itemView );
 			}
 			
-			private var pause: Boolean = true;
-			private var button: Button;
-			private var playPausePosition: Number;
-			public function itemPlayPause(e: MouseEvent): void {
-				if( pause ){
-					this.playPausePosition =  this.soundChannel.position;
-					this.soundChannel.stop();
-					this.button.label = "Oynat";
-				}else{
-					this.soundChannel = this.sound.play(this.playPausePosition);
-					this.button.label = "Duraklat";
-				}
-				pause = !pause;
-			}
-			
 			public function closeItem( ): void {
 				var path: String;
 				var file: File;
@@ -545,8 +526,8 @@
 							break;
 						case Item.ITEM_AUDIO_TYPE:
 							
-							if( this.sound != null){
-								this.soundChannel.stop();
+							if( this.mp3Player != null){
+								this.mp3Player.stop();
 							}
 							
 							path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
@@ -660,9 +641,11 @@
 				<s:Image source="/Assets/close.png" id="closeImage" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
 					
 				</s:Image>
+				<!--
 				<s:Image source="/Assets/search.png" id="searchImage" x="0" click="onSearchClick(event)">
 					
 				</s:Image>
+				-->
 			</s:BorderContainer>
 		</mx:Canvas>
 		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)">
