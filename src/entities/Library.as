@@ -7,6 +7,7 @@ package entities
 	import flash.filesystem.*;
 	import flash.utils.ByteArray;
 	
+	import services.LibraryService;
 	import services.MockLibraryService;
 
 	public class Library
@@ -15,10 +16,12 @@ package entities
 		private var books: Array = null;
 		
 		private var service: MockLibraryService;
+		private var libraryService: LibraryService;
 		
 		public function Library() {
 			// this.service = new LibraryService();
-			this.service = new MockLibraryService();
+			// this.service = new MockLibraryService();
+			this.libraryService = new LibraryService();
 		}
 		
 		public function readBooks(): void {
@@ -30,14 +33,15 @@ package entities
 				this.books = new Array();
 				var i: Number = 0;
 				
-				for each( var bookBytes: ByteArray in this.service.getBooks()){
+				for each( var bookBytes: ByteArray in this.libraryService.getBooks()){
 					var metajson: String = bookBytes.toString();
-					var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);
+					trace( metajson );
+					//var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);
 					
-					var book: Book = new Book(bookObj);
+					//var book: Book = new Book(bookObj);
 					
-					this.books[i] = book;
-					i++;
+					//this.books[i] = book;
+					//i++;
 				}
 			}
 		}
