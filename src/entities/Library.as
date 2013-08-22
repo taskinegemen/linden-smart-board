@@ -35,13 +35,13 @@ package entities
 				
 				for each( var bookBytes: ByteArray in this.libraryService.getBooks()){
 					var metajson: String = bookBytes.toString();
-					trace( metajson );
-					//var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);
 					
-					//var book: Book = new Book(bookObj);
+					var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);
 					
-					//this.books[i] = book;
-					//i++;
+					var book: Book = new Book(bookObj);
+					
+					this.books[i] = book;
+					i++;
 				}
 			}
 		}
