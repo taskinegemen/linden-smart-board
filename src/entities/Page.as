@@ -5,6 +5,7 @@ package entities {
 	import flash.display.LoaderInfo;
 	import flash.events.Event;
 	import flash.filesystem.*;
+	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
@@ -12,7 +13,11 @@ package entities {
 	import mx.controls.Alert;
 	import mx.controls.Image;
 	import mx.core.FlexGlobals;
+	import mx.graphics.codec.JPEGEncoder;
 	import mx.graphics.codec.PNGEncoder;
+	import mx.utils.Base64Decoder;
+	
+	import services.MockLibraryService;
 	
 	import spark.components.Image;
 	
@@ -22,118 +27,65 @@ package entities {
 		public var width: Number;
 		public var height: Number;
 		
-		public var thumbnailImage: String;
-		public var image: String;
+		public var thumbnailImage: ByteArray;
+		public var image: ByteArray;
 		
-		public static const _640x480: Number = 640;
-		public static const _1280x720: Number = 1280;
-		public static const _1920x1080: Number = 1920;
+		public var items: Array = new Array();
 		
-		public var loader: Loader;
+		public static const _640: Number = 640;
+		public static const _1280: Number = 1280;
+		public static const _1920: Number = 1920;
 		
-		public function Page(obj: Object) {	
-			
-			this.bookID = obj.bookID;
-			this.pageNo = obj.page;
-			this.width = obj.width;
-			this.height = obj.height;
-			
-			this.thumbnailImage = "C:\\docs\\thumbnails\\" + obj.bookID + "\\" + this.pageNo.toString() + ".jpg";
+		public var service: MockLibraryService = new MockLibraryService();
+		
+		public function Page(thumbnail: Object) {
+			this.thumbnailImage = thumbnail as ByteArray;
 		}
 		
 		public function saveDrawing(bitmapData: BitmapData): Boolean {
-			var file: File = File.documentsDirectory;
-			var name: String = this.getNextName();
-			
 			var encoder: PNGEncoder = new PNGEncoder();
-			var bytes: ByteArray = encoder.encode(bitmapData);
-			try
-			{
-				file = file.resolvePath("C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString() + "\\" + name + ".png");
-				
-				var fileStream: FileStream = new FileStream();
-				fileStream.open(file, FileMode.WRITE);
-				bytes.position = 0;
-				fileStream.writeBytes(bytes, 0, bytes.length);
-				
-				return true;
-			}
-			catch(error: Error){
-				
-			}
-			finally {
-				fileStream.close();
-			}
-			return false;
+			return this.service.saveDrawing( this.bookID, this.pageNo, encoder.encode(bitmapData) );
 		}
 		
 		public function updateDrawing(bitmapData: BitmapData, no: String): Boolean {
-			var file: File = File.documentsDirectory;
-			
 			var encoder: PNGEncoder = new PNGEncoder();
-			var bytes: ByteArray = encoder.encode(bitmapData);
-			try
-			{
-				file = file.resolvePath("C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString() + "\\" + no + ".png");
-				
-				var fileStream: FileStream = new FileStream();
-				fileStream.open(file, FileMode.WRITE);
-				bytes.position = 0;
-				fileStream.writeBytes(bytes, 0, bytes.length);
-				
-				return true;
-			}
-			catch(error: Error){
-				
-			}
-			finally {
-				fileStream.close();
-			}
-			return false;
+			return this.service.updateDrawing( this.bookID, this.pageNo, int(no), encoder.encode(bitmapData) );
 		}
-		
-		private function getNextName(): String {
-			var dir: File = File.documentsDirectory;
-			dir = dir.resolvePath("C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString());
-			var files: Array = dir.getDirectoryListing();
-			
-			if( !files.length ){
-				return "1";
-			}else {
-				var file: File = files[ files.length - 1 ] as File;
-				var name_: String = file.name.split('.')[0];
-				var intName: Number = int(name_);
-				return (intName + 1).toString();
-			}
-		}
-		
+
 		public function getDrawings(): Array {
 			var arr: Array = new Array();
 			
-			var dir: File = File.documentsDirectory.resolvePath("C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString());
-			for each( var file: File in dir.getDirectoryListing()) {
-				var obj: Object = new Object();
+			try {
+				var i: Number = 0;
+				for each( var drawing: Object in this.service.getDrawings( this.bookID, this.pageNo )) {
+					var obj: Object = new Object();
+					obj.image = drawing;
+					obj.id = "drawing_" + pageNo.toString() + "_" + (i + 1).toString();
+					i++;
+				}
+			}catch(e: Error) {
 				
-				obj.id = "drawing_" + this.pageNo.toString() + "_" + file.name.split('.')[0];
-				obj.source = "C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString() + "\\" + file.name;
-				
-				arr.push( obj );
 			}
-			
-			return arr;
+			finally {
+				return arr;	
+			}
 		}
 		
-		public function getDrawing(no_: String, width: Number, height: Number): void {
-			var no: Number = int(no_);
-			
-			this.loader = new Loader();
-			this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
-			this.loader.load(new URLRequest("C:\\docs\\drawings\\"+ this.bookID.toString() + "\\" + this.pageNo.toString() + "\\" + no.toString() + ".png"));			
-		}
-		
+		private var loader: Loader = new Loader();
 		private var bitmapData: BitmapData;
-		private function onComplete(e: Event): void {
-			this.bitmapData = ((LoaderInfo(e.target).content) as Bitmap).bitmapData;
+		public function getDrawing(no: Number, width: Number, height: Number): void {
+			var bytes: ByteArray = this.service.getDrawing( this.bookID, this.pageNo, no);
+			
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.bytesLoaded);
+			loader.loadBytes(bytes);
+		}
+		
+		private function bytesLoaded(e: Event): void {
+			var bytes: * = loader.content;
+			
+			this.bitmapData = new BitmapData(bytes.width, bytes.height, true, 0);
+			var matrix: Matrix = new Matrix();
+			this.bitmapData.draw(bytes, matrix, null, null, null, true);
 			
 			FlexGlobals.topLevelApplication.dispatchEvent(new Event("bitmap read"));
 		}
@@ -143,16 +95,29 @@ package entities {
 		}
 		
 		public function fillDrawings(arr: Array): void {
-			var dir: File = File.documentsDirectory.resolvePath("C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString());
-			for each( var file: File in dir.getDirectoryListing()) {
-				var obj: Object = new Object();
-				
-				obj.id = "drawing_" + this.pageNo.toString() + "_" + file.name.split('.')[0];
-				obj.source = "C:\\docs\\drawings\\" + this.bookID.toString() + "\\" + this.pageNo.toString() + "\\" + file.name;
-				
-				arr.push( obj );
-			}
 			
+			try
+			{
+				var i: Number = 0;
+				for each( var image: ByteArray in this.service.getDrawings( this.bookID, this.pageNo )) {
+					var obj: Object = new Object();
+					
+					obj.id = "drawing_" + pageNo.toString() + "_" + (i + 1).toString();
+					obj.image = image;
+					
+					arr.push( obj );
+					i++;					
+				}
+			}catch(e: Error) {
+				
+			}
+
+		}
+		
+		public function setItems( items: Array ): void {
+			for each( var item: Object in items ){
+				this.items.push( new Item( item ) );
+			}
 		}
 	}
 }

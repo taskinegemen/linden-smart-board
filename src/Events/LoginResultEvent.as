@@ -10,10 +10,10 @@ package Events{
 			this.password=password;
 			
 		}
-		public static const LOGIN_SUCCESS = "success";
-		public static const LOGIN_FAIL = "fail";
-		public var email;
-		public var password;
+		public static const LOGIN_SUCCESS: String = "success";
+		public static const LOGIN_FAIL: String = "fail";
+		public var email: String;
+		public var password: String;
 		
 		override public function clone():Event {
 			return new LoginResultEvent(type,email,password);

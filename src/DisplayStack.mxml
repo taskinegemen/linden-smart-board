@@ -17,23 +17,31 @@
 			import Events.SwfClickEvent;
 			
 			import Views.ChapterView;
+			import Views.ItemView;
+			import Views.Mp3PlayerSkin;
 			import Views.PageMenu;
 			import Views.SwfView;
 			
+			import components.Mp3Player;
+			
 			import entities.DisplayStackConstants;
+			import entities.Item;
 			import entities.Page;
 			
 			import flash.utils.setTimeout;
 			
 			import mx.controls.Alert;
+			import mx.controls.Button;
 			import mx.controls.SWFLoader;
 			import mx.core.FlexGlobals;
 			import mx.core.IUIComponent;
 			import mx.events.FlexEvent;
 			import mx.events.ScrollEvent;
 			
+			import org.osmf.elements.AudioElement;
 			import org.osmf.events.TimeEvent;
 			
+			import spark.components.VideoPlayer;
 			
 			[Embed(source="/Assets/background_login.png")]
 			[Bindable]
@@ -49,6 +57,8 @@
 			
 			private var _pageMenu: PageMenu = null;
 			public var timer: Timer;
+			
+			public var items: Array;
 			
 			public function init(): void{
 				//this.gapSize = (this.FullWidth - int((this.FullWidth/348))*348)/((int((this.FullWidth/348)))+2)
@@ -184,17 +194,22 @@
 				
 			}
 
-			public function addItems(items:Array): void{
-				for each (var item:Object in items) {
-					var swf:SwfView = new SwfView();
-					swf.x = item.luX;
-					swf.y = item.luY;
-					swf.itemId = item.ID;
-					swf.itemHeight = item.height;
-					swf.itemWidth = item.width;
-					swf.addEventListener(SwfClickEvent.SWF_CLICKED,itemClicked);
-					this.scrollerBar.addElement(swf);
+			public function addItems(items:Array): void {
+				this.items = new Array();
+				if( items.length ){
+					this.items = items;
 				}
+				
+//				for each (var item:Object in items) {
+//					var swf:SwfView = new SwfView();
+//					swf.x = item.luX;
+//					swf.y = item.luY;
+//					swf.itemId = item.ID;
+//					swf.itemHeight = item.height;
+//					swf.itemWidth = item.width;
+//					swf.addEventListener(SwfClickEvent.SWF_CLICKED,itemClicked);
+//					this.scrollerBar.addElement(swf);
+//				}
 			}
 			
 			public function itemClicked(ev:SwfClickEvent): void{
@@ -313,16 +328,244 @@
 					this.bottomMenu.x = this.clickPoint.x;
 					
 					if( this.clickPoint.x + this.bottomMenu.width > this.page.width) {
-						
 						this.bottomMenu.x = this.clickPoint.x - this.bottomMenu.width;
 					}
 					
 					this.bottomMenu.visible = true;
+					
+				} else if( this.items  && this.items.length ){
+					// check for click an item 
+					var item: Item = null;
+					if( (item =  isItemClicked(this.clickPoint)) != null ){
+						this.showItem( item );
+					}
 				}
 			}
 			
+			private function isItemClicked(point: Point): Item {
+				var n: Number = ( this.FullWidth - this.pageView.sourceWidth ) / 2;
+				var scrollX: Number = this.page.horizontalScrollPosition;
+				var scrollY: Number = this.page.verticalScrollPosition;
+				
+				for each( var item: Item in items ){
+					if(
+						item.luX + n <= point.x + scrollX &&
+						point.x + scrollX <= item.rlX + n &&
+						item.luY <= point.y + scrollY &&
+						point.y + scrollY <= item.rlY
+					) {
+						return item;
+					}
+				}
+				return null;
+			}
+			
+			private var itemView: ItemView;
+			private var item: Item;
+			private var videoPlayer: VideoPlayer;
+			private var mp3Player: Mp3Player;
+			private var imageItem: Image;
+			public function showItem( item: Item ) : void {
+				this.item = item;
+				
+				this.itemView = new ItemView();
+				
+				this.addElement(this.itemView);
+			}
+			
+			
+			public function itemViewReady(e: Event): void {
+				var itemViewRef: Object = this;
+				
+				this.itemView._width = this.FullWidth;
+				this.itemView._height = this.FullHeight;
+				
+				this.itemView.item = this.item;
+				
+				switch(this.item.type) {
+					
+					case Item.ITEM_VIDEO_TYPE:
+						
+						var videoPlayer1: VideoPlayer = new VideoPlayer();
+						this.videoPlayer = videoPlayer1;
+						
+						var bytes1: ByteArray = this.item.getBytes();
+						
+						var path1: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
+						var file1: File = new File(path1);
+						var fileStream1: FileStream = new FileStream();
+						
+						fileStream1.open( file1, FileMode.WRITE );
+						fileStream1.writeBytes( bytes1, 0, bytes1.length );
+						fileStream1.close();
+						
+						videoPlayer1.source = path1;
+						
+						this.itemView.addElement( videoPlayer1 );
+						
+						var w1: Number = this.FullWidth * 0.7;
+						var h1: Number = this.FullHeight * 0.7;
+						var x1: Number = ( this.FullWidth - w1 ) / 2;
+						var y1: Number = ( this.FullHeight - h1 ) / 2;
+						
+						videoPlayer1.explicitWidth = w1;
+						videoPlayer1.explicitHeight = h1;
+						videoPlayer1.x = x1;
+						videoPlayer1.y = y1;
+						
+						videoPlayer1.fullScreenButton.enabled = false;
+						
+						break;
+					case Item.ITEM_AUDIO_TYPE:
+						
+						var bytes2: ByteArray = this.item.getBytes();
+						
+						var path2: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
+						var file2: File = new File(path2);
+						var fileStream2: FileStream = new FileStream();
+						
+						fileStream2.open( file2, FileMode.WRITE );
+						fileStream2.writeBytes( bytes2, 0, bytes2.length );
+						fileStream2.close();
+						
+						var mp3Player: Mp3Player = new Mp3Player();
+						this.itemView.addElement( mp3Player );
+						
+						mp3Player.source = path2;
+						mp3Player.autoPlay = true;
+						mp3Player.width = this.FullWidth * 0.5;
+						
+						this.mp3Player = mp3Player;
+						
+						mp3Player.x = ( this.FullWidth - mp3Player.width ) / 2;
+						mp3Player.y = ( this.FullHeight - 24 ) / 2;
+						
+						break;
+					
+					case Item.ITEM_FLASH_TYPE:
+						
+						var videoPlayer3: VideoPlayer = new VideoPlayer();
+						this.videoPlayer = videoPlayer3;
+						
+						var bytes3: ByteArray = this.item.getBytes();
+						
+						var path3: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
+						var file3: File = new File(path3);
+						var fileStream3: FileStream = new FileStream();
+						
+						fileStream3.open( file3, FileMode.WRITE );
+						fileStream3.writeBytes( bytes3, 0, bytes3.length );
+						fileStream3.close();
+						
+						videoPlayer3.source = path3;
+						
+						this.itemView.addElement( videoPlayer3 );
+						
+						var w3: Number = this.FullWidth * 0.7;
+						var h3: Number = this.FullHeight * 0.7;
+						var x3: Number = ( this.FullWidth - w3 ) / 2;
+						var y3: Number = ( this.FullHeight - h3 ) / 2;
+						
+						videoPlayer3.explicitWidth = w3;
+						videoPlayer3.explicitHeight = h3;
+						videoPlayer3.x = x3;
+						videoPlayer3.y = y3;
+						
+						videoPlayer3.fullScreenButton.enabled = false;
+						
+						break;
+					
+					case Item.ITEM_LINK_TYPE:
+						
+						break;
+					
+					case Item.ITEM_IMAGE_TYPE:
+						
+						this.imageItem = new Image();
+						
+						this.imageItem.visible = false;
+						
+						this.imageItem.source =  this.item.getBytes();
+						this.itemView.addElement( this.imageItem );
+						
+						var stackRef: Object = this;
+						
+						setTimeout(function(): void {
+							
+							stackRef.imageItem.x = ( stackRef.FullWidth - stackRef.imageItem.sourceWidth ) / 2;
+							stackRef.imageItem.y = ( stackRef.FullHeight - stackRef.imageItem.sourceHeight ) / 2;
+							
+							stackRef.imageItem.visible = true;
+						}, 100);
+						
+						break;
+					
+					default:
+						break;
+				}
+				
+				this.addElement( this.itemView );
+			}
+			
+			public function closeItem( ): void {
+				var path: String;
+				var file: File;
+				
+				if ( this.item != null) {
+					
+					switch( this.item.type ){
+						case Item.ITEM_VIDEO_TYPE:
+							
+							if( this.videoPlayer != null){
+								this.videoPlayer.source = null;
+							}
+							
+							path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
+							file = new File(path);
+							file.deleteFile();
+							
+							break;
+						case Item.ITEM_AUDIO_TYPE:
+							
+							if( this.mp3Player != null){
+								this.mp3Player.stop();
+							}
+							
+							path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
+							file = new File(path);
+							file.deleteFile();
+							
+							break;
+						case Item.ITEM_FLASH_TYPE:
+							
+							if( this.videoPlayer != null){
+								this.videoPlayer.source = null;
+							}
+							
+							path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
+							file = new File(path);
+							file.deleteFile();
+							
+							break;
+						case Item.ITEM_LINK_TYPE:
+							
+							break;
+						case Item.ITEM_IMAGE_TYPE:
+							
+							if( this.imageItem ){
+								this.itemView.removeElement( this.imageItem );
+							}
+							
+							break;
+						default:
+					}
+				}
+				
+				this.removeElement( this.itemView );
+			}
+			
 			public function onBookViewInit(e: Event): void {
-				Alert.show("on book view Init");
+				//Alert.show("on book view Init");
 			}
 			
 			public function onPageViewReady(e: Event): void {
@@ -400,12 +643,14 @@
 				<s:Image source="/Assets/close.png" id="closeImage" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
 					
 				</s:Image>
+				<!--
 				<s:Image source="/Assets/search.png" id="searchImage" x="0" click="onSearchClick(event)">
 					
 				</s:Image>
+				-->
 			</s:BorderContainer>
 		</mx:Canvas>
-		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)">
+		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)" backgroundColor="#d6d8d8">
 			<s:Scroller id="pageViewScroller"  doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" height="{this.pageView.height}">
 				<s:Group  id="scrollerBar">
 					<s:Image id="pageView" x="0" y="0" enableLoadingState="true" verticalAlign="middle" horizontalAlign="center" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)" mouseMove="onMouseMove(event)">

@@ -13,8 +13,8 @@ public class SwfClickEvent extends Event
 
 
 	}
-	public static const SWF_CLICKED = "swf click";
-	public var swf;
+	public static const SWF_CLICKED: String = "swf click";
+	public var swf: SwfView;
 
 
 	override public function clone():Event {

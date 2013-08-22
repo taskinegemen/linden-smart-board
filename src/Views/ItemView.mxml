@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="{ this._width }" height="{ this._height }" x="0" y="0">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import entities.Item;
+			
+			import mx.core.FlexGlobals;
+			import mx.controls.Alert;
+			
+			[Bindable]public var _width: Number;
+			[Bindable]public var _height: Number;
+			
+			[Bindable]public var item: Item;
+			
+			public function onCreationComplete(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("item-view-ready"));
+			}
+			
+			public function onBorderContainerClick(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("item-view-close"));
+			}
+			
+		]]>
+		
+	</fx:Script>
+	
+	<s:BorderContainer id="container" x="0" y="0" width="{ this._width }" height="{ this._height }" backgroundColor="#000000" backgroundAlpha="0.5" 
+					   click="onBorderContainerClick(event)" creationComplete="onCreationComplete(event)">
+		
+		
+	</s:BorderContainer>
+</s:Group>

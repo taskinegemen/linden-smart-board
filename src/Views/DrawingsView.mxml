@@ -21,7 +21,7 @@
 			import spark.components.Label;
 			import spark.skins.spark.ImageSkin;
 			
-			[Bindable]public var _width: Number = 400;
+			[Bindable]public var _width: Number = 500;
 			[Bindable]public var _height: Number = 300;
 			
 			[Bindable]public var book: Book = FlexGlobals.topLevelApplication.book;
@@ -37,6 +37,13 @@
 			public function onChapterClick(e: MouseEvent): void {
 				var label: spark.components.Label = e.target as spark.components.Label;
 				var drawings: Array = new Array();
+				
+				var children: Number = this.chapters.numChildren;
+				for(var i: Number = 0; i < children; i++) {
+					var _label: spark.components.Label = this.chapters.getElementAt(i) as spark.components.Label;
+					_label.setStyle("backgroundColor", "#1B2630");
+				}
+				label.setStyle("backgroundColor", "#B8BBD9");
 				
 				if(label.id == "all"){
 					drawings = this.book.getChapterDrawings( 0 );
@@ -62,6 +69,7 @@
 				this.drawings.removeAllElements();
 				
 				for each( var obj: Object in drawings ) {
+					
 					var image: spark.components.Image = this.getDrawingImage( obj );
 					this.drawings.addElement( image );
 				}
@@ -71,7 +79,7 @@
 				var image: spark.components.Image = new spark.components.Image();
 				
 				image.id = obj.id;
-				image.source = obj.source;
+				image.source = obj.image;
 				
 				image.width = 180;
 				image.height = 210;
@@ -84,8 +92,13 @@
 		]]>
 	</fx:Script>
 	
-	<s:BorderContainer x="0" y="0" width="410" height="{this._height}" backgroundColor="#1b2630">
-		<s:VGroup id="chapters" width="200" height="{ this._height }">
+	<s:BorderContainer x="0" y="0" width="510" height="{this._height}" backgroundColor="#1b2630">
+		<s:BorderContainer x="0" y="0" width="300" height="40" backgroundColor="#1B2630"
+						   borderColor="#1B2630">
+			<s:Label x="122" y="14" color="#FFFFFF" fontSize="21" text="Çizimler"/>
+			<s:Image x="4" y="2" width="42" height="38" source="Assets/tableofcontents-icon.png"/>
+		</s:BorderContainer>
+		<s:VGroup id="chapters" width="300" height="{ this._height - 40}" y="40">
 			
 		</s:VGroup>
 		<s:Scroller x="{ this.chapters.width }" y="0" width="210" verticalScrollPolicy="on">
@@ -94,7 +107,7 @@
 			</s:VGroup>
 		</s:Scroller>
 	</s:BorderContainer>
-	<s:BorderContainer x="410" y="0" width="{ this._width - 410 }" height="{this._height}" backgroundColor="#000000" backgroundAlpha="0" click="closeDrawingsView(event)">
+	<s:BorderContainer x="510" y="0" width="{ this._width - 410 }" height="{this._height}" backgroundColor="#000000" backgroundAlpha="0" click="closeDrawingsView(event)">
 		
 	</s:BorderContainer>
 </s:Group>
