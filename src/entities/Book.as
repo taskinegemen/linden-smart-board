@@ -36,7 +36,7 @@ package entities {
 			this.book 				= obj.book;
 			this.totalPageNumber 	= obj.totalPageNumber;
 			
-			this.image = this.service.getBookCover( this.ID.toString() );
+			this.image = this.service.getBookCover( this.ID );
 			
 			// ********************
 			for(var i: Number = 0; i < obj.outlines.length; i++){

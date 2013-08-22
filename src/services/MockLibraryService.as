@@ -53,12 +53,12 @@ package services {
 			return arr;
 		}
 		
-		public function getBookCover(bookId: String): ByteArray {
+		public function getBookCover(bookId: Number): ByteArray {
 			var bytes: ByteArray = new ByteArray();
 			var bookDir: File = File.documentsDirectory;
 			var fileStream: FileStream = new FileStream();
 			
-			bookDir = bookDir.resolvePath(MockLibraryService.LibraryPath + bookId + "\\cover\\1.jpg");
+			bookDir = bookDir.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\cover\\1.jpg");
 			
 			fileStream.open(bookDir, FileMode.READ);
 			
