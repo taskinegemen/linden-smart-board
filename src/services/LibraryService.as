@@ -1,21 +1,16 @@
 package services {
-<<<<<<< HEAD
-=======
 	import com.hurlant.crypto.symmetric.BlowFishKey;
 	import com.hurlant.util.Hex;
 	
-	
->>>>>>> origin/master
+
 	import flash.utils.ByteArray;
 	
 	public class LibraryService {
-<<<<<<< HEAD
 
-=======
 		private var password: String = "dontWorryBeHappy";
 		private var blowJob: BlowFishKey;
 		
->>>>>>> origin/master
+
 		public function LibraryService(): void {
 			var decrypt:DecryptionService = new DecryptionService();
 			var jsonAndImg: Vector.<ByteArray>;
