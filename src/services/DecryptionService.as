@@ -66,37 +66,40 @@ package services
 			cbcmode.encrypt(dummy); // dummy encrypt
 			cbcmode.IV = cbcmode.IV; 
 			cbcmode.decrypt(barray);
-			return barray;
+			
+			var retBytes: ByteArray = new ByteArray();
+			retBytes.writeBytes(barray, 8);
+			return retBytes;
 		}
 		
 		public function byteArrayToFile(barray: ByteArray, destinationPath: String) : void
 		{
 			//remove dummy bytes, null bytes
-			var newbytes: ByteArray = new ByteArray();
+			//var newbytes: ByteArray = new ByteArray();
 			//var i: Number;
 			//for(i = barray.length - 1; barray[i] == 0; i--){}
 			//newbytes.writeBytes(barray, 10, i-9);
-			newbytes.writeBytes(barray, 8);
+			//newbytes.writeBytes(barray, 8);
 			
 			//write into file
 			var file:File = File.documentsDirectory;
 			var filestream:FileStream = new FileStream();
 			file = file.resolvePath(destinationPath);
 			filestream.open(file, FileMode.WRITE);
-			filestream.writeBytes(newbytes);
+			filestream.writeBytes(barray);
 		}
 		
 		public function byteArrayToImage(barray: ByteArray, destinationPath: String) : void
 		{
 			//remove dummy bytes
-			var newbytes: ByteArray = new ByteArray();
-			newbytes.writeBytes(barray, 8);
+			//var newbytes: ByteArray = new ByteArray();
+			//newbytes.writeBytes(barray, 8);
 			
 			var file:File = File.documentsDirectory;
 			var filestream:FileStream = new FileStream();
 			file = file.resolvePath(destinationPath);
 			filestream.open(file, FileMode.WRITE);
-			filestream.writeBytes(newbytes);
+			filestream.writeBytes(barray);
 		}
 		
 		public function decryptBookMetas() :Array
