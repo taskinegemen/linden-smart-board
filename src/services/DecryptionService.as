@@ -25,7 +25,7 @@ package services
 	public class DecryptionService
 	{
 		private var password: String = "dontWorryBeHappy";
-		private var booksPath: String = "C:/c_ouz/repositories/linden-sharp-smartboard/Smartboard.Security/bin/Debug/encryptedBooks/";
+		private var booksPath: String = "C:/encryptedBooks/";
 		private var theSalt: ByteArray;
 		private var blowFish: BlowFishKey;
 		
@@ -99,12 +99,20 @@ package services
 			filestream.writeBytes(newbytes);
 		}
 		
-		public function decryptBookMetas() :void
+		public function decryptBookMetas() :Array
 		{
-		
+			var metas: Array = new Array();
+			var file:File = File.documentsDirectory;
+			file = file.resolvePath(booksPath);
+			var files: Array = file.getDirectoryListing();
+			for(var i: int = 0; i < files.length; i++)
+			{
+				metas.push(decryptMeta(i+1));
+			}
+			return metas;
 		}
 		
-		public function decryptPage(reqBook: Number, reqRes: Number, reqPage: Number) : Vector.<ByteArray>
+		public function decryptPage(reqBook: Number, reqRes: Number, reqPage: Number) : Array
 		{
 			var bookIndex: int;
 			var sizeOfMeta: int;
@@ -113,7 +121,7 @@ package services
 			var sizeOfRequestedPage: int;
 			var theBook: ByteArray;
 			var pages: Array;
-			var jsonAndImage: Vector.<ByteArray>;
+			var jsonAndImage: Array;
 			var encryptedImgBytes: ByteArray;
 			var encryptedJsonBytes: ByteArray;
 			var intBytes: ByteArray;
@@ -121,7 +129,7 @@ package services
 			bookIndex = 0;
 			theBook = this.getBookBytes(reqBook);
 			pages = new Array();
-			jsonAndImage = new Vector.<ByteArray>();
+			jsonAndImage = new Array();
 			encryptedImgBytes = new ByteArray();
 			encryptedJsonBytes = new ByteArray();
 			intBytes = new ByteArray();
