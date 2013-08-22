@@ -15,7 +15,6 @@
 			protected function group1_clickHandler(event:MouseEvent):void
 			{
 				dispatchEvent(new SwfClickEvent(SwfClickEvent.SWF_CLICKED,this));
-				
 			}
 			
 		]]>
