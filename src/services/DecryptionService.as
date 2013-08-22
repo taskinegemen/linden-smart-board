@@ -59,7 +59,7 @@ package services
 			theSalt = Hex.toArray(saltString);
 		}
 		
-		private function decryptByteArray(barray: ByteArray) : ByteArray
+		private function decryptByteArray(barray: ByteArray) : void
 		{	
 			var dummy: ByteArray = new ByteArray();
 			var cbcmode:CBCMode = new CBCMode(this.blowFish);
@@ -69,7 +69,8 @@ package services
 			
 			var retBytes: ByteArray = new ByteArray();
 			retBytes.writeBytes(barray, 8);
-			return retBytes;
+			barray =retBytes;
+			//return retBytes;
 		}
 		
 		public function byteArrayToFile(barray: ByteArray, destinationPath: String) : void
