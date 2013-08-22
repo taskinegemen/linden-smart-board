@@ -491,11 +491,12 @@
 						var stackRef: Object = this;
 						
 						setTimeout(function(): void {
+							
 							stackRef.imageItem.x = ( stackRef.FullWidth - stackRef.imageItem.sourceWidth ) / 2;
 							stackRef.imageItem.y = ( stackRef.FullHeight - stackRef.imageItem.sourceHeight ) / 2;
 							
 							stackRef.imageItem.visible = true;
-						}, 50);
+						}, 100);
 						
 						break;
 					
@@ -547,6 +548,7 @@
 							
 							break;
 						case Item.ITEM_LINK_TYPE:
+							
 							break;
 						case Item.ITEM_IMAGE_TYPE:
 							
@@ -648,7 +650,7 @@
 				-->
 			</s:BorderContainer>
 		</mx:Canvas>
-		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)">
+		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)" backgroundColor="#d6d8d8">
 			<s:Scroller id="pageViewScroller"  doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" height="{this.pageView.height}">
 				<s:Group  id="scrollerBar">
 					<s:Image id="pageView" x="0" y="0" enableLoadingState="true" verticalAlign="middle" horizontalAlign="center" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)" mouseMove="onMouseMove(event)">

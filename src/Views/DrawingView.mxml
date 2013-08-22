@@ -10,12 +10,15 @@
 		<![CDATA[
 			import Events.DrawingSaveEvent;
 			
+			import components.CursorBitmap;
+			
 			import flash.filesystem.*;
 			
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
 			import mx.graphics.*;
 			import mx.graphics.codec.PNGEncoder;
+			import mx.managers.CursorManager;
 			
 			import spark.primitives.Rect;
 			import spark.skins.spark.ImageSkin;
@@ -39,22 +42,81 @@
 			public var edit: Boolean = false;
 			public var editName: String;
 			
+			private var loaderPen: Loader = new Loader();
+			private var loaderEraser: Loader = new Loader();
+			
+			public var penBitmapData: BitmapData;
+			public var eraserBitmapData: BitmapData;
+			
+			public var cursorID: Number = 0;
+			
 			public function onCreationComplete(e: Event): void {
-//				var image : Bitmap = new EmbeddedImage();
-//				image.width = this.drawingViewDrawingArea.width;
-//				image.height = this.drawingViewDrawingArea.height;
-//				
-//				var bitmapData: BitmapData = new BitmapData(this.drawingViewDrawingArea.width, this.drawingViewDrawingArea.height, true, 0x000000);
-//				
-//				bitmapData.copyPixels(image.bitmapData, new Rectangle(0, 0, this.drawingViewDrawingArea.width, this.drawingViewDrawingArea.height), new Point(0, 0));
-//				
-//				this.drawingViewDrawingArea.graphics.beginBitmapFill(bitmapData, new Matrix(), true);
-//				this.drawingViewDrawingArea.graphics.drawRect(0, 0, bitmapData.width, bitmapData.height);
-//				this.drawingViewDrawingArea.graphics.endFill();
 				
-
+				// pen and eraser icons
+				var eraserBytes: ByteArray = this.getEraserBytes();
+				loaderEraser.contentLoaderInfo.addEventListener(Event.COMPLETE, this.eraserBytesLoaded);
+				loaderEraser.loadBytes( eraserBytes );
+				
+				var bytes: ByteArray = this.getPenBytes( );
+				loaderPen.contentLoaderInfo.addEventListener(Event.COMPLETE, this.penBytesLoaded);
+				loaderPen.loadBytes(bytes);
+				
+				
+			}
+			
+			private function penBytesLoaded(e: Event): void {
+				var bytes: * = loaderPen.content;
+				
+				this.penBitmapData = new BitmapData(bytes.width, bytes.height, true, 0);
+				var matrix: Matrix = new Matrix();
+				this.penBitmapData.draw(bytes, matrix, null, null, null, true);
+				
+				CursorBitmap.bitmapData = this.penBitmapData;
+				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+				
+				this.cursorManager.removeCursor( this.cursorID );
+				CursorBitmap.bitmapData = this.eraserBitmapData;
+				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+				
+				this.cursorManager.removeCursor( this.cursorID );
+				CursorBitmap.bitmapData = this.penBitmapData;
+				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+				this.cursorManager.currentCursorXOffset = 0;
+				this.cursorManager.currentCursorYOffset = -22;
 				
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-ready"));
+			}
+			
+			private function eraserBytesLoaded(e: Event): void {
+				var bytes: * = loaderEraser.content;
+				
+				this.eraserBitmapData = new BitmapData(bytes.width, bytes.height, true, 0);
+				var matrix: Matrix = new Matrix();
+				this.eraserBitmapData.draw(bytes, matrix, null, null, null, true);
+			}
+			
+			private function getPenBytes(): ByteArray {
+				var bytes: ByteArray = new ByteArray();
+				var file: File = File.applicationDirectory.resolvePath("Assets\\penCursor.png");
+				var fileStream: FileStream = new FileStream();
+				
+				fileStream.open( file, FileMode.READ );
+				fileStream.readBytes( bytes );
+				fileStream.close();
+				
+				return bytes;
+			}
+			
+			private function getEraserBytes(): ByteArray {
+				var bytes: ByteArray = new ByteArray();
+				var file: File = File.applicationDirectory.resolvePath("Assets\\eraserCursor.png");
+				var fileStream: FileStream = new FileStream();
+				
+				fileStream.open( file, FileMode.READ );
+				fileStream.readBytes( bytes );
+				fileStream.close();
+				
+				return bytes;
 			}
 			
 			public function setBitmapData(bitmapData: BitmapData): void {
@@ -67,8 +129,10 @@
 			}
 			
 			public function onCloseClick(e: MouseEvent): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-close"));
 				
+				this.cursorManager.removeCursor( this.cursorID );
+				
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-close"));
 			}
 			
 			public function onSaveClick(e: MouseEvent): void {
@@ -88,9 +152,7 @@
 			
 			public function onShareClick(e: MouseEvent): void {
 				Alert.show("share click");
-				
 			}
-			
 			
 			public function onMouseDown(e: MouseEvent): void {
 				this.point = new Point(this.contentMouseX, this.contentMouseY);
@@ -100,8 +162,10 @@
 				bitmap.draw(this.transparentArea);
 				this.bitmaps.push(bitmap);
 				
-				this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true);
-				this.transparentArea.graphics.drawCircle(this.point.x, this.point.y, this.thickness / 5);
+				if( !this.erase ) {
+					this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true);
+					this.transparentArea.graphics.drawCircle(this.point.x, this.point.y, this.thickness / 5);
+				}
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {
@@ -111,14 +175,13 @@
 			public function onMouseMove(e: MouseEvent): void {
 				if(e.buttonDown){
 					if( this.erase ) {
-						this.transparentArea.graphics.lineStyle(this.thickness * 4, 0xFFFFFF, this.pen);
+						this.transparentArea.graphics.lineStyle(this.thickness * 4, 0xd6d8d8, this.pen);
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						this.point.x = this.contentMouseX;
 						this.point.y = this.contentMouseY;
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
 					}else{
 						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true);
-						
 						
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						
@@ -130,7 +193,36 @@
 			}
 			
 			public function onEraseClick(e: MouseEvent): void {
-				this.erase = !this.erase;
+				
+				if( this.erase ) {
+					
+					CursorBitmap.bitmapData = this.penBitmapData;
+					
+					this.cursorManager.removeCursor( this.cursorID );
+					
+					this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+					
+					this.cursorManager.currentCursorXOffset = 0;
+					this.cursorManager.currentCursorYOffset = -22;
+					
+					this.eraserButton.source = "Assets\\eraser.png";
+					
+					this.erase = false;
+				}else{
+
+					CursorBitmap.bitmapData = this.eraserBitmapData;
+					
+					this.cursorManager.removeCursor( this.cursorID );
+					
+					this.cursorID = this.cursorManager.setCursor( CursorBitmap  );
+					this.cursorManager.currentCursorXOffset = -12;
+					this.cursorManager.currentCursorYOffset = -15;
+					
+					this.eraserButton.source = "Assets\\pen.png";
+					
+					this.erase = true;
+				}
+				
 			}
 			
 			public function onUndoClick(e: MouseEvent): void {				
@@ -190,7 +282,7 @@
 		]]>
 	</fx:Script>
 	
-	<s:BorderContainer width="{this._width}" height="{this._height - this.drawingViewBottom.height}" x="0" y="0">
+	<s:BorderContainer width="{this._width}" height="{this._height - this.drawingViewBottom.height}" x="0" y="0" backgroundColor="#d6d8d8">
 		<mx:Canvas id="drawingViewDrawingArea"
 			width="{this._width}" height="{this._height - this.drawingViewBottom.height}" 
 			x="0" y="0">
@@ -200,8 +292,6 @@
 			
 		</s:Image>
 	</s:BorderContainer>
-	
-	
 	
 	<!-- transparent drawing area -->
 	<mx:Canvas id="transparentArea" visible="true"
@@ -225,7 +315,7 @@
 		</s:Image>
 		
 		<!-- erase button -->
-		<s:Image x="{this._width - 666}" width="71" height="31" top="2" source="/Assets/eraser.png" click="onEraseClick(event)">
+		<s:Image id="eraserButton" x="{this._width - 666}" width="71" height="31" top="2" source="/Assets/eraser.png" click="onEraseClick(event)">
 			
 		</s:Image>
 		<!-- undo button -->

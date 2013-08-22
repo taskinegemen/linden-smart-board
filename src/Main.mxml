@@ -370,6 +370,7 @@
 			
 			public function saveDrawing(e: DrawingSaveEvent): void {
 				if( this.page.saveDrawing(e.bitmapData) ){
+					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
 					this.removeElement( this.drawingView );	
 				} else {
 					Alert.show("hata oldu!");
@@ -378,6 +379,7 @@
 			
 			public function updateDrawing(e: DrawingSaveEvent): void {	
 				if( this.page.updateDrawing(e.bitmapData, this.drawingView.editName) ){
+					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
 					this.removeElement( this.drawingView );
 				} else {
 					Alert.show("hata oldu!");
