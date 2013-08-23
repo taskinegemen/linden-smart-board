@@ -59,6 +59,7 @@
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				
 				this.display = new DisplayStack();
+				this.addElement(this.display);
 				this.library = new Library();
 				
 				// add event handlers
@@ -85,16 +86,18 @@
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
 				
-				this.addElement(this.display);
+				
 				
 				// get library
-				this.library.readBooks();
-				
-				this.books = new Array(this.library.getBookCount());
-				this.books = this.library.getBooks();
-				
-				this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
-				this.addEventListener("library-ready", fillLibrary);
+				var self: Object = this;
+				setTimeout( function(): void {
+					self.library.readBooks();
+					self.books = new Array(self.library.getBookCount());
+					self.books = self.library.getBooks();
+					
+					self.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
+					self.addEventListener("library-ready", fillLibrary);
+				}, 1000);
 			}
 			
 			// close application
@@ -116,7 +119,6 @@
 				}else{
 					this.bindBookChapters(null);
 				}
-				
 				
 				if(this.display.pageView == null) {
 					this.addEventListener("page-view-ready", this.pageViewReady);
@@ -297,7 +299,6 @@
 					
 					this.display.booksArea.addElement(bookView);
 				}
-				
 			}
 			
 			public function backToLibrary(e: Event): void {

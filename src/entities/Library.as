@@ -33,7 +33,7 @@ package entities
 				this.books = new Array();
 				var i: Number = 0;
 				
-				for each( var bookBytes: ByteArray in this.mockService.getBooks()){
+				for each( var bookBytes: ByteArray in this.libraryService.getBooks()){
 					var metajson: String = bookBytes.toString();
 					
 					var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);
