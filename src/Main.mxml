@@ -86,8 +86,6 @@
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
 				
-				
-				
 				// get library
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -169,6 +167,9 @@
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
 				
+				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
+				var y: Number = (f < 0) ? 0 : (f / 2);
+				
 				// page items
 				this.bindPageItems();
 			}
@@ -182,6 +183,9 @@
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
 				
+				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
+				var y: Number = (f < 0) ? 0 : (f / 2);
+				
 				// page items
 				this.bindPageItems();
 			}
@@ -193,6 +197,9 @@
 				
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
+				
+				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
+				var y: Number = (f < 0) ? 0 : (f / 2);
 				
 				// page items
 				this.bindPageItems();
@@ -290,7 +297,6 @@
 				
 				this.bindPageItems();
 			}
-
 
 			private function fillLibrary(ev:Event): void {
 				for each(var book: Book in this.books) {

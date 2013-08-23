@@ -89,7 +89,7 @@
 			}
 
 			protected function initBottomMenu(ev:MouseEvent): void {
-				bottomMenu.x = ev.stageX - 100;
+				bottomMenu.x = (ev.stageX - 100) / 2;
 				bottomMenu.visible = !bottomMenu.visible;
 			}
 		
@@ -323,12 +323,17 @@
 				
 				this.bottomMenu.visible = false;
 				
-				if( this.page.height - this.clickPoint.y <= 50 ){
+				if( this.FullHeight - this.clickPoint.y <= 50 ){
 					this.bottomMenu.y = this.page.height + this.page.verticalScrollPosition - 50;
-					this.bottomMenu.x = this.clickPoint.x;
+					this.bottomMenu.x = this.clickPoint.x - (this.bottomMenu.width / 2);
 					
-					if( this.clickPoint.x + this.bottomMenu.width > this.page.width) {
+					
+					if( this.clickPoint.x + (this.bottomMenu.width / 2) > this.page.width) {
 						this.bottomMenu.x = this.clickPoint.x - this.bottomMenu.width;
+					}
+					
+					if( this.clickPoint.x - (this.bottomMenu.width / 2) < 0) {
+						this.bottomMenu.x = 0;
 					}
 					
 					this.bottomMenu.visible = true;
@@ -653,7 +658,7 @@
 		<mx:Canvas id="page" creationComplete="onPageViewReady(event)" scroll="onScrollChange(event)" backgroundColor="#d6d8d8">
 			<s:Scroller id="pageViewScroller"  doubleClick="onPageDoubleClick(event)" doubleClickEnabled="true" click="onPageClick(event)" width="{this.pageView.width}" height="{this.pageView.height}">
 				<s:Group  id="scrollerBar">
-					<s:Image id="pageView" x="0" y="0" enableLoadingState="true" verticalAlign="middle" horizontalAlign="center" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)" mouseMove="onMouseMove(event)">
+					<s:Image id="pageView" x="0" y="0" enableLoadingState="true" mouseDown="onMouseDown(event)" mouseUp="onMouseUp(event)" mouseMove="onMouseMove(event)">
 						
 					</s:Image>
 				</s:Group>
