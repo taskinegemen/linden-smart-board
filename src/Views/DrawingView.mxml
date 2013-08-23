@@ -181,8 +181,7 @@
 						this.point.y = this.contentMouseY;
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
 					}else{
-						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true);
-						
+						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true, "none", "round", "round", 1);
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						
 						this.point.x = this.contentMouseX;
