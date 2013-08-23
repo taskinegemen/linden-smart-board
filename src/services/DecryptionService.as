@@ -138,6 +138,14 @@ package services
 			encryptedJsonBytes = new ByteArray();
 			intBytes = new ByteArray();
 			
+			switch(reqRes)
+			{
+				case 640: 	{reqRes = 1; break;}
+				case 1280: 	{reqRes = 2; break;}
+				case 1920: 	{reqRes = 3; break;}
+				default: 	{reqRes = 1; break;}
+			}
+			
 			var sortFunc : Function = function (x: PageImage, y: PageImage):Number{
 				if(x.size < y.size)
 					return -1;
@@ -326,6 +334,7 @@ package services
 			theBook = this.getBookBytes(reqBook);
 			pages = new Array();
 			thumbs = new Array();
+			retThumbs = new Array();
 			encryptedImgBytes = new ByteArray();
 			intBytes = new ByteArray();
 			
