@@ -59,7 +59,7 @@ package services
 			theSalt = Hex.toArray(saltString);
 		}
 		
-		private function decryptByteArray(barray: ByteArray) : void
+		private function decryptByteArray(barray: ByteArray) : ByteArray
 		{	
 			var dummy: ByteArray = new ByteArray();
 			var cbcmode:CBCMode = new CBCMode(this.blowFish);
@@ -69,8 +69,8 @@ package services
 			
 			var retBytes: ByteArray = new ByteArray();
 			retBytes.writeBytes(barray, 8);
-			barray =retBytes;
-			//return retBytes;
+			//barray =retBytes;
+			return retBytes;
 		}
 		
 		public function byteArrayToFile(barray: ByteArray, destinationPath: String) : void
@@ -175,8 +175,7 @@ package services
 				if(i == indexOfRequestedPage)
 				{
 					encryptedJsonBytes.writeBytes(theBook, bookIndex, intBytes.readInt());
-					decryptByteArray(encryptedJsonBytes);
-					jsonAndImage.push(encryptedJsonBytes);
+					jsonAndImage.push(decryptByteArray(encryptedJsonBytes));
 				}
 				intBytes.position = 0;
 				bookIndex += intBytes.readInt();
@@ -212,8 +211,8 @@ package services
 				bookIndex = temp;
 				bookIndex += 3 * pageNumber - finished;
 			}
-			decryptByteArray(encryptedImgBytes);
-			jsonAndImage.push(encryptedImgBytes);
+			
+			jsonAndImage.push(decryptByteArray(encryptedImgBytes));
 			
 			return jsonAndImage;
 			
@@ -269,9 +268,7 @@ package services
 				reversedMetaBytes.writeByte(encryptedMetaBytes[j]);
 			}
 			
-			decryptByteArray(reversedMetaBytes);
-			
-			return reversedMetaBytes;
+			return decryptByteArray(reversedMetaBytes);
 		}
 		
 		public function decryptCover(reqBook: Number) : ByteArray
@@ -308,8 +305,7 @@ package services
 			intBytes.position = 0;
 			bookIndex += 4;
 			encryptedCoverBytes.writeBytes(theBook, bookIndex, intBytes.readInt());
-			decryptByteArray(encryptedCoverBytes);
-			return encryptedCoverBytes;
+			return decryptByteArray(encryptedCoverBytes);
 		}
 		
 		public function decryptThumbs(reqBook: Number) : Array
@@ -321,6 +317,7 @@ package services
 			var theBook: ByteArray;
 			var pages: Array;
 			var thumbs: Array;
+			var retThumbs: Array;
 			var encryptedImgBytes: ByteArray;
 			var intBytes: ByteArray;
 			
@@ -401,10 +398,10 @@ package services
 			for (var r:Number = 0; r < thumbs.length; r++)
 			{
 				//trace(r);
-				decryptByteArray(thumbs[r]);
+				retThumbs.push(decryptByteArray(thumbs[r]));
 			}
 			
-			return thumbs
+			return retThumbs
 		}
 	}
 }
