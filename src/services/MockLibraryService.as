@@ -26,7 +26,7 @@ package services {
 				var book: ByteArray = this.getBookMeta( bookDir.name );
 				books.push( book );
 			}
-
+			
 			return books;
 		}
 		
@@ -68,7 +68,7 @@ package services {
 			
 			return bytes;
 		}
-
+		
 		public function getPage( bookId: Number, pageNo: Number, resolution: Number ): Array {
 			var arr: Array = new Array(2);
 			
@@ -140,7 +140,7 @@ package services {
 				fileStream.open(file, FileMode.READ);
 				fileStream.readBytes( bytes );
 				fileStream.close();
-
+				
 				arr.push( bytes );
 			}
 			
@@ -165,12 +165,12 @@ package services {
 		public function saveDrawing( bookId: Number, pageNo: Number, bytes: ByteArray ): Boolean {
 			var name: String = this.getNextDrawingName(bookId, pageNo);
 			var result: Boolean = true;
-
+			
 			try
 			{
 				var file: File = File.documentsDirectory;
 				var fileStream: FileStream = new FileStream();
-			
+				
 				file = file.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + name + ".png");
 				fileStream.open(file, FileMode.WRITE);
 				bytes.position = 0;
