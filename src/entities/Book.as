@@ -25,8 +25,8 @@ package entities {
 		
 		public var image: ByteArray;
 		
-		private var mockService: MockLibraryService = new MockLibraryService();
-		private var libraryService: LibraryService = new LibraryService();
+		//private var mockService: MockLibraryService = new MockLibraryService();
+		private var libraryService: MockLibraryService = new MockLibraryService();
 		
 		public function Book(obj: Object = null) {
 			this.metadatas 			= new Array();
@@ -38,7 +38,7 @@ package entities {
 			this.book 				= obj.book;
 			this.totalPageNumber 	= obj.totalPageNumber;
 			
-			this.image = this.mockService.getBookCover( this.ID );
+			this.image = this.libraryService.getBookCover( this.ID );
 			
 			// ********************
 			for(var i: Number = 0; i < obj.outlines.length; i++){
@@ -68,7 +68,7 @@ package entities {
 				return null;
 			}
 			
-			var arr: Array = this.mockService.getPage( this.ID, 1, resolution );
+			var arr: Array = this.libraryService.getPage( this.ID, 1, resolution );
 			
 			var jsonString: String = arr[0].toString();
 			var pageObj: Object = com.adobe.serialization.json.JSON.decode(jsonString);
@@ -103,7 +103,7 @@ package entities {
 			
 			//if( this.pages[ pageNumber - 1 ].bookID ) return this.pages[ pageNumber - 1];
 			
-			var arr: Array = this.mockService.getPage( this.ID, pageNumber, resolution );
+			var arr: Array = this.libraryService.getPage( this.ID, pageNumber, resolution );
 			
 			var jsonString: String = arr[0].toString();
 			var pageObj: Object = com.adobe.serialization.json.JSON.decode(jsonString);
@@ -122,7 +122,7 @@ package entities {
 		// fill pages of the book
 		private function readPages(): void {
 			
-			for each( var pageThumbnail: Object in this.mockService.getThumbnails( this.ID ) ){
+			for each( var pageThumbnail: Object in this.libraryService.getThumbnails( this.ID ) ){
 				var page: Page = new Page( pageThumbnail );	
 				this.addPage( page );
 			}

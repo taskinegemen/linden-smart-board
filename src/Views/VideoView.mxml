@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Container xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			  xmlns:s="library://ns.adobe.com/flex/spark" 
+			  xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" creationComplete="init()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import entities.Item;
+			
+			import mx.utils.ObjectUtil;
+		
+			private var nc:NetConnection;
+			private var ns:NetStream;
+			private var video:Video;
+			private var meta:Object;
+			
+			public var item: Item;
+			
+			public function setItem(item: Item): void {
+				this.item = item;
+			}
+				
+			public function play(item: Item): void {
+				this.setItem(item);
+				
+				var nsClient:Object = {};
+				nsClient.onMetaData = ns_onMetaData;
+				nsClient.onCuePoint = ns_onCuePoint;
+				
+				nc = new NetConnection();
+				nc.connect(null);
+				
+				ns = new NetStream(nc);
+				
+				ns.play("C:\\aaa.flv");
+				ns.client = nsClient;
+				
+				video = new Video();
+				video.attachNetStream(ns);
+				uic.addChild(video);
+			}
+			
+			private function init():void {
+	
+			}
+			
+			private function ns_onMetaData(item:Object):void {
+				trace("meta");
+				meta = item;
+				// Resize Video object to same size as meta data.
+				video.width = item.width;
+				video.height = item.height;
+				// Resize UIComponent to same size as Video object.
+				uic.width = video.width;
+				uic.height = video.height;
+				
+				trace(ObjectUtil.toString(item));
+			}
+			
+			private function ns_onCuePoint(item:Object):void {
+				trace("cue");
+			}
+		]]>
+	</fx:Script>
+		<mx:Container id="panel" visible="true">
+			<mx:UIComponent id="uic" visible="true">
+			</mx:UIComponent>
+			
+		</mx:Container>
+</mx:Container>

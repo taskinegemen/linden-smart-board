@@ -37,6 +37,7 @@ package entities {
 		public static const _1920: Number = 1920;
 		
 		public var service: MockLibraryService = new MockLibraryService();
+		private var gonulGozu: GonulGozu = new GonulGozu();
 		
 		public function Page(thumbnail: Object) {
 			this.thumbnailImage = thumbnail as ByteArray;
@@ -63,7 +64,7 @@ package entities {
 					obj.id = "drawing_" + pageNo.toString() + "_" + (i + 1).toString();
 					i++;
 				}
-			}catch(e: Error) {
+			} catch(e: Error) {
 				
 			}
 			finally {

@@ -15,12 +15,12 @@ package entities
 		private var bookCount: Number = 0;
 		private var books: Array = null;
 		
-		private var mockService: MockLibraryService;
-		private var libraryService: LibraryService;
+		//private var mockService: MockLibraryService;
+		private var libraryService: MockLibraryService = new MockLibraryService();;
 		
 		public function Library() {
-			this.mockService = new MockLibraryService();
-			this.libraryService = new LibraryService();
+			//this.mockService = new MockLibraryService();
+			
 		}
 		
 		public function readBooks(): void {
@@ -32,7 +32,7 @@ package entities
 				this.books = new Array();
 				var i: Number = 0;
 				
-				for each( var bookBytes: ByteArray in this.mockService.getBooks()){
+				for each( var bookBytes: ByteArray in this.libraryService.getBooks()){
 					var metajson: String = bookBytes.toString();
 					
 					var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);

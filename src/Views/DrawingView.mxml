@@ -151,7 +151,11 @@
 			}
 			
 			public function onShareClick(e: MouseEvent): void {
-				Alert.show("share click");
+				
+				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0);
+				bitmapData.draw(this.transparentArea);
+				
+				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData));
 			}
 			
 			public function onMouseDown(e: MouseEvent): void {
@@ -181,12 +185,14 @@
 						this.point.y = this.contentMouseY;
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
 					}else{
+						
 						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true, "none", "round", "round", 1);
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						
 						this.point.x = this.contentMouseX;
 						this.point.y = this.contentMouseY;
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
+						
 					}
 				}
 			}
@@ -309,7 +315,7 @@
 			
 		</s:Image>
 		<!-- share button -->
-		<s:Image  x="217" width="101" top="2" height="31" source="/Assets/sharebutton.png" click="onShareClick(event)" visible="false">
+		<s:Image  x="217" width="101" top="2" height="31" source="/Assets/sharebutton.png" click="onShareClick(event)">
 			
 		</s:Image>
 		

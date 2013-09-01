@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="{ this._width }" height="{ this._height }">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.events.SelectionEvent;
+			
+			import mx.controls.Alert;
+			
+			[Bindable]public var _width: Number = 400;
+			[Bindable]public var _height: Number = 300;
+			
+			[Bindable]public var checkboxWidth: Number = 49;
+			[Bindable]public var bookCoverWidth: Number = 100;
+			[Bindable]public var bookTitleWidth: Number = 210;
+			
+			[Bindable]public var book: Object;
+			
+			public function onClick(e: MouseEvent): void {
+				e.stopImmediatePropagation();
+			}
+			
+			public function onSelected(e: Event): void {
+				this.book.selected = !this.book.selected;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:BorderContainer id="container" borderWeight="0" borderVisible="false" click="onClick(event)"
+					   width="{ this._width }" height="{ this._height }" backgroundColor="#E2E2E2">
+		
+		<mx:Tile tileWidth="{ this.checkboxWidth }" tileHeight="{ this._height }"
+				 horizontalAlign="center" verticalAlign="middle" >
+			<s:CheckBox id="checkbox" selected="{ this.book.selected }" change="onSelected(event)">
+				
+			</s:CheckBox>
+			
+		</mx:Tile>
+		
+		<mx:Tile tileWidth="{ this.bookCoverWidth }" tileHeight="{ this._height }"
+				 x="{ this.checkboxWidth }"
+				 horizontalAlign="left" verticalAlign="middle">
+			<s:Image source="{ this.book.image }"
+					 width="92" height="122">
+				
+			</s:Image>
+		</mx:Tile>
+		
+		<s:TileGroup width="{ this.bookTitleWidth }" height="{ this._height }"
+				 x="{ this.checkboxWidth + this.bookCoverWidth }"
+				 paddingTop="10">
+			
+			<mx:Tile tileWidth="{ this.bookTitleWidth }"
+					 paddingLeft="0" paddingTop="5">
+				<s:Label id="title" text="{ this.book.title }"
+						 fontWeight="bold" color="#555555">
+					
+				</s:Label>
+			</mx:Tile>
+			
+			<mx:Tile tileWidth="{ this.bookTitleWidth }" x="10" 
+					 paddingLeft="0" paddingTop="0">
+				<s:Label id="publisher" text="{ this.book.publisher }" 
+						 fontStyle="italic" color="#555555">
+					
+				</s:Label>
+			</mx:Tile>
+			
+		</s:TileGroup>
+		
+		
+	</s:BorderContainer>
+</s:Group>

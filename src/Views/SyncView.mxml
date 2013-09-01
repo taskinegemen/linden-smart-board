@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" creationComplete="init(event)">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Events.DownloaderToMainEvent;
+			
+			import air.net.URLMonitor;
+			
+			import com.adobe.serialization.json.*;
+			
+			import components.gif.player.GIFPlayer;
+			
+			import entities.Book;
+			import entities.HTTPURLLoader;
+			
+			import flash.events.StatusEvent;
+			import flash.net.URLRequest;
+			import flash.system.MessageChannel;
+			import flash.system.MessageChannelState;
+			import flash.system.Worker;
+			import flash.system.WorkerDomain;
+			import flash.system.WorkerState;
+			import flash.utils.ByteArray;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.core.UIComponent;
+			
+			
+			[Bindable]public var _width: Number = 400;
+			[Bindable]public var _height: Number = 300;
+			
+			[Bindable]private var containerWidth: Number = 359;
+			
+			private var player: GIFPlayer = new GIFPlayer();
+			
+			private static const API_URL: String = "http://api.linden.pro";
+			private var email: String = "kurtulus@linden-tech.com";
+			private var password: String = "123456";
+			
+			private var token: String;
+			
+			private var monitor: URLMonitor;
+			private var loader: HTTPURLLoader;	
+			private var urlLoader: URLLoader;
+			
+			public var books: Array;
+			public var booksInDisk: Array;
+			
+			private var fileRef: FileReference = new FileReference();
+			
+			public function init(e: Event): void {
+				try {
+					var request: URLRequest = new URLRequest();
+					this.loader = new HTTPURLLoader();
+					
+					this.loader.addEventListener("complete", onLoginComplete);
+					this.loader.addEventListener("ioError", onIOError);
+					request = new URLRequest();
+					request.url = SyncView.API_URL + "/user-login?email="+this.email+"&password="+this.password;
+					request.method = URLRequestMethod.GET;
+					
+					this.loader.load( request );
+					
+				}catch(e: *){
+					
+				}
+			}
+			
+			private function onIOError(e: Event): void {
+				Alert.show("İnternet bağlantısı yok!");
+			}
+			
+			private function onLoginComplete(e: Event): void {
+				var str: String = "";
+				var result: Object;
+				
+				str = HTTPURLLoader(e.target).data;
+				result = com.adobe.serialization.json.JSON.decode( str );
+				
+				this.token = result.token;
+				
+				var file: File = File.applicationDirectory;
+				var fileStream: FileStream = new FileStream();
+				
+				file = file.resolvePath( "organization.txt" );
+				
+				fileStream.open( file, FileMode.READ );
+				var organization: String = fileStream.readUTFBytes( file.size );
+				fileStream.close();
+				
+				var request: URLRequest = new URLRequest();
+				this.loader = new HTTPURLLoader();
+				
+				this.loader.addEventListener("complete", onComplete);
+				request = new URLRequest();
+				request.url = SyncView.API_URL + "/book?filter[publisherID]=" + organization + "&token="+this.token;
+				request.method = URLRequestMethod.GET;
+				
+				this.loader.load( request );
+			}
+			
+			private function onComplete(e: Event): void {
+				try {
+					var str: String = "";
+					var result: Object;
+					
+					str = HTTPURLLoader(e.target).data;
+					result = com.adobe.serialization.json.JSON.decode( str );
+					
+					this.books = new Array();
+					// download organization books
+					for(var i: Number = 0; i < result.books.length; i++) {
+						var resObj: Object = result.books[i];
+						var obj: Object = new Object();
+						
+						obj.id = resObj.ID;
+						obj.title = resObj.title;
+						obj.publisher = "Seviye yayıncılık";
+						obj.image = "/Assets/kitap.jpg";
+						
+						if( this.isAlreadyInDisk( obj.id ) ) {
+							continue;
+						}
+						obj.selected = false;
+						
+						var syncBookView: SyncBookView = new SyncBookView();
+						this.container.addElement( syncBookView );
+						
+						syncBookView.book = obj;
+						
+						this.books.push( obj );
+						
+						syncBookView._width = this.containerWidth - this.scroller.verticalScrollBar.width;
+						syncBookView._height = 130;
+					}
+					this.body.visible = true;
+					
+				}catch(e: Error) {
+					
+				}
+			}
+			
+			public function onCloseClick(e: Event): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-close"));
+			}
+			
+			public function onStartDownload(e: MouseEvent): void {
+				e.stopImmediatePropagation();
+				
+				var arr: Array = new Array();
+				
+				for each(var book: Object in this.books ) {
+					if( book.selected ) {
+						arr.push( book.id );		
+					}
+				}
+				
+				if( arr.length ) {
+					this.download( arr );
+				}
+			}
+			
+			private function download( books: Array ): void {
+				
+				try {
+					
+					var request: URLRequest = new URLRequest();
+					
+					this.urlLoader = new URLLoader();
+					
+					request.url = SyncView.API_URL + "/book-export/1?widths[]=960&token="+this.token;
+					request.method = URLRequestMethod.GET;
+					
+					this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatus);
+					this.urlLoader.addEventListener(Event.COMPLETE, onDownloadComplete);
+					this.urlLoader.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onURLIOError);
+					
+					this.urlLoader.load( request );
+					
+					this.loader.load( request );
+				}catch(e: Error) {
+					trace( e.message );
+				}
+			}
+			
+			private function onURLIOError(e: IOErrorEvent): void {
+				trace( "io error" );
+				trace( e.text );
+			}
+			
+			private function onProgress(e: ProgressEvent): void {
+				trace( e.bytesLoaded );
+			}
+			
+			private function httpResponseStatus(e: HTTPStatusEvent): void {
+				trace("http status event: " + e.status );
+			}
+			
+			private function onDownloadComplete(e: Event): void {
+				trace( this.urlLoader.data );
+			}
+			
+			private function isAlreadyInDisk( id: Number ): Boolean {
+				for each( var book: Book in this.booksInDisk) {
+					if( book.ID == id){
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			private function stopPropagation(e: MouseEvent): void {
+				e.stopImmediatePropagation();
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer id="body" visible="false" width="{ this._width }" click="onCloseClick(event)" height="{ this._height }" backgroundColor="#000000" backgroundAlpha="0.5">
+		
+		<s:BorderContainer click="stopPropagation(event)" borderWeight="0" borderVisible="false" id="topLine" backgroundColor="#F1C40F" 
+						   width="{ this.containerWidth }" height="10" 
+						   x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.25 - this.topLine.height }">
+		</s:BorderContainer>
+		
+		<s:Scroller id="scroller" verticalScrollPolicy="on" click="stopPropagation(event)"
+					width="{ this.containerWidth }" height="{ this._height * 0.5 }" 
+					x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.25 }">
+			<s:Group id="group" width="{ this.containerWidth }" height="{ this._height * 0.5 }"
+					 x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.25 }">
+				<!--
+				<s:Rect id="rect" width="{ this.containerWidth - this.scroller.verticalScrollBar.width }" height="{ this._height * 0.5 }" x="{ 0 }" y="0">
+					<s:fill><s:SolidColor color="#E2E2E2" /></s:fill>
+				</s:Rect>
+				-->
+				<s:VGroup id="container" gap="0">
+					
+				</s:VGroup>
+			</s:Group>
+		</s:Scroller>
+		
+		<s:BorderContainer borderWeight="0" borderVisible="false" id="buttonContainer" 
+						   width="{ this.containerWidth }"
+						   x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.75 }">
+			<s:Image click="onStartDownload(event)" source="/Assets/downloadbuttons.png">
+				
+			</s:Image>
+		</s:BorderContainer>
+		
+	</s:BorderContainer>
+</s:Group>

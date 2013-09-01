@@ -7,6 +7,7 @@ package Events {
 	public class DrawingSaveEvent extends Event {
 		public static const DRAWING_SAVE: String = "drawing save";
 		public static const DRAWING_UPDATE: String ="drawing update";
+		public static const DRAWING_SHARE: String = "drawing share";
 		
 		public var bitmapData: BitmapData;
 		

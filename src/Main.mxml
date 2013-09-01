@@ -21,6 +21,7 @@
 			import Views.CropView;
 			import Views.DrawingView;
 			import Views.DrawingsView;
+			import Views.SyncView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -54,6 +55,8 @@
 
 			private var pageResolution: Number = Page._640;
 			
+			public var pageViewY: Number = 0;
+			
 			private function applicationCompleted(): void{
 				
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
@@ -76,12 +79,16 @@
 				this.addEventListener("item-view-close", this.itemViewClose);
 				this.addEventListener("item-view-ready", this.display.itemViewReady);
 				
+				this.addEventListener("sync-clicked", this.openSyncView);
+				this.addEventListener("sync-close", this.closeSyncView);
+				
 				this.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
 				this.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
 				this.addEventListener(PagePaletteClickEvent.CHAPTERS_CLICKED, this.bookChapters);
 				
 				this.addEventListener(DrawingSaveEvent.DRAWING_SAVE, this.saveDrawing);
 				this.addEventListener(DrawingSaveEvent.DRAWING_UPDATE, this.updateDrawing);
+				this.addEventListener(DrawingSaveEvent.DRAWING_SHARE, this.shareDrawing);
 				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
@@ -167,8 +174,7 @@
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
 				
-				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
-				var y: Number = (f < 0) ? 0 : (f / 2);
+				this.adjustPage();
 				
 				// page items
 				this.bindPageItems();
@@ -183,8 +189,7 @@
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
 				
-				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
-				var y: Number = (f < 0) ? 0 : (f / 2);
+				this.adjustPage();
 				
 				// page items
 				this.bindPageItems();
@@ -198,11 +203,18 @@
 				this.display.pageView.height = this.page.height;
 				this.display.pageView.width = this.display.FullWidth;
 				
-				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
-				var y: Number = (f < 0) ? 0 : (f / 2);
+				this.adjustPage();
 				
 				// page items
 				this.bindPageItems();
+			}
+			
+			private function adjustPage(): void {
+				var f: Number = ( this.display.FullHeight - this.display.pageView.height );
+				var y: Number = (f < 0) ? 0 : (f / 2);
+				
+				this.pageViewY = y;
+				this.display.pageView.y = this.pageViewY;
 			}
 			
 			private function bindPageItems(): void {
@@ -343,7 +355,7 @@
 				
 				// crop image
 				var pageScrollPositionX: Number = this.display.page.horizontalScrollPosition;
-				var pageScrollPositionY: Number = this.display.page.verticalScrollPosition;
+				var pageScrollPositionY: Number = this.display.page.verticalScrollPosition + this.pageViewY;
 				
 				var sourceRect: Rectangle = 
 					new Rectangle(e.pointStart.x + pageScrollPositionX, e.pointStart.y + pageScrollPositionY, e.pointEnd.x - e.pointStart.x, e.pointEnd.y - e.pointStart.y);
@@ -375,13 +387,45 @@
 				this.removeElement(this.drawingView);
 			}
 			
+			public function shareDrawing(e: DrawingSaveEvent): void {
+				
+				if (this.page.saveDrawing(e.bitmapData) ){
+					
+					var gonulGozu: GonulGozu = new GonulGozu();
+					
+					gonulGozu.addEventListener(UploadingComplete.COMPLETE, this.uploadingComplete);
+					gonulGozu.addEventListener(UploadingComplete.IOERROR, this.uploadingIOError);
+					
+					gonulGozu.container = this.drawingView;
+					gonulGozu.sendImage( this.page.bookID, this.page.pageNo, e.bitmapData );
+					
+				} else {
+					Alert.show("hata oldu!");
+				}			
+				
+			}
+			
 			public function saveDrawing(e: DrawingSaveEvent): void {
-				if( this.page.saveDrawing(e.bitmapData) ){
+				if (this.page.saveDrawing(e.bitmapData) ){
 					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
 					this.removeElement( this.drawingView );	
 				} else {
 					Alert.show("hata oldu!");
 				}
+			}
+			
+			private function uploadingComplete(e: UploadingComplete): void {
+				if( e.success ) {
+					Alert.show("paylaşıldı");
+					//this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
+					//this.removeElement( this.drawingView );	
+				} else {
+					Alert.show("Kaydedildi ama paylaşılamadı!");
+				}
+			}
+			
+			private function uploadingIOError(e: UploadingComplete): void {
+				Alert.show("İnternet bağlantısı yok!");
 			}
 			
 			public function updateDrawing(e: DrawingSaveEvent): void {	
@@ -505,6 +549,19 @@
 				this.display.closeItem();
 			}
 			
+			public var syncView: SyncView;
+			public function openSyncView(e: Event): void {
+				this.syncView = new SyncView();
+				this.syncView.booksInDisk = this.books;
+				this.syncView._width = this.display.FullWidth;
+				this.syncView._height = this.display.FullHeight;
+				
+				this.display.addElement( this.syncView );
+			}
+			
+			public function closeSyncView(e: Event): void {
+				this.display.removeElement( this.syncView );
+			}
 		]]>
 		
 		

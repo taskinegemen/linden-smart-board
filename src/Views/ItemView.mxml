@@ -28,7 +28,9 @@
 		]]>
 		
 	</fx:Script>
-	
+	<mx:Container id="mxContainer">
+		
+	</mx:Container>
 	<s:BorderContainer id="container" x="0" y="0" width="{ this._width }" height="{ this._height }" backgroundColor="#000000" backgroundAlpha="0.5" 
 					   click="onBorderContainerClick(event)" creationComplete="onCreationComplete(event)">
 		

@@ -9,6 +9,8 @@ package services {
 	
 	public class MockLibraryService {
 		private static const LibraryPath: String = "C:\\books\\";
+		private static const APP_PATH: String = "books\\";
+		
 		
 		public function MockLibraryService() {
 			
@@ -125,10 +127,9 @@ package services {
 			return bytes;
 		}
 		
-		// fuck
 		public function getDrawings( bookId: Number, pageNo: Number ): Array {
 			
-			var dir: File = File.documentsDirectory.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\"  + pageNo.toString());
+			var dir: File = File.applicationDirectory.resolvePath(MockLibraryService.APP_PATH + bookId.toString() + "\\drawings\\"  + pageNo.toString());
 			var fileStream: FileStream = new FileStream();
 			
 			if( !dir.exists ) throw Error("Drawing yok");
@@ -147,13 +148,13 @@ package services {
 			return arr;
 		}
 		
-		// fuck
 		public function getDrawing( bookId: Number, pageNo: Number, drawingNo: Number): ByteArray {
 			var bytes: ByteArray = new ByteArray();
-			var file: File = File.documentsDirectory;
+			var _file: File = File.applicationDirectory;
+			var path: String = _file.resolvePath( MockLibraryService.APP_PATH + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png").nativePath;
 			var fileStream: FileStream = new FileStream();
 			
-			file = file.resolvePath( MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
+			var file: File = new File(path);
 			fileStream.open( file, FileMode.READ );
 			fileStream.readBytes( bytes );
 			fileStream.close();
@@ -161,17 +162,17 @@ package services {
 			return bytes;
 		}
 		
-		// fuck
 		public function saveDrawing( bookId: Number, pageNo: Number, bytes: ByteArray ): Boolean {
 			var name: String = this.getNextDrawingName(bookId, pageNo);
 			var result: Boolean = true;
 
 			try
 			{
-				var file: File = File.documentsDirectory;
+				var _file: File = File.applicationDirectory;
+				var path: String = _file.resolvePath(MockLibraryService.APP_PATH + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + name + ".png").nativePath;
 				var fileStream: FileStream = new FileStream();
 			
-				file = file.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + name + ".png");
+				var file: File = new File(path);
 				fileStream.open(file, FileMode.WRITE);
 				bytes.position = 0;
 				fileStream.writeBytes(bytes, 0, bytes.length);
@@ -179,20 +180,21 @@ package services {
 				
 			}
 			catch(error: Error){
+				trace( error.message );
 				result = false;
 			}finally{
 				return result;
 			}
 		}
 		
-		// fuck
 		public function updateDrawing( bookId: Number, pageNo: Number, drawingNo:Number ,bytes: ByteArray ): Boolean {
 			var res: Boolean = true;
 			try{
-				var file: File = File.documentsDirectory;
+				var _file: File = File.applicationDirectory;
+				var path: String = _file.resolvePath( MockLibraryService.APP_PATH + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png").nativePath; 
 				var fileStream: FileStream = new FileStream();
 				
-				file = file.resolvePath( MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
+				var file: File = new File(path);
 				
 				fileStream.open( file, FileMode.WRITE );
 				bytes.position = 0;
@@ -209,12 +211,19 @@ package services {
 		private function getNextDrawingName( bookId: Number, pageNo: Number ): String {
 			var name: String = (1).toString();
 			try{
-				var dir: File = File.documentsDirectory;
+				var dir: File = File.applicationDirectory;
 				
-				dir = dir.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString());
+				dir = dir.resolvePath(MockLibraryService.APP_PATH + bookId.toString() + "\\drawings\\" + pageNo.toString());
 				
 				name = (dir.getDirectoryListing().length + 1).toString();
 			}catch(e: Error){
+				//create book directory
+				var book: File = File.applicationDirectory;
+				var path: String = book.resolvePath(MockLibraryService.APP_PATH + bookId.toString()).nativePath;
+				
+				book.createDirectory();
+				
+				//create drawing directory
 				dir.createDirectory();
 			}finally{
 				return name;	
