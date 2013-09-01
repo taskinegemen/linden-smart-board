@@ -25,7 +25,7 @@ package services
 	public class DecryptionService
 	{
 		private var password: String = "dontWorryBeHappy";
-		private var booksPath: String = "C:/encryptedBooks/";
+		private var encryptedBooksPath: String = "C:/encryptedBooks/";
 		private var theSalt: ByteArray;
 		private var blowFish: BlowFishKey;
 		
@@ -41,7 +41,7 @@ package services
 			var theBookBytes: ByteArray = new ByteArray();
 			var file:File = File.documentsDirectory;
 			var filestream:FileStream = new FileStream();
-			file = file.resolvePath(booksPath + "encryptedBook" + bookID + ".dat");
+			file = file.resolvePath(encryptedBooksPath + "encryptedBook" + bookID + ".dat");
 			filestream.open(file, FileMode.READ);
 			filestream.readBytes(theBookBytes);
 			return theBookBytes;
@@ -105,11 +105,20 @@ package services
 		
 		public function decryptBookMetas() :Array
 		{
+			var numberOfBooks: Number = 0;
 			var metas: Array = new Array();
 			var file:File = File.documentsDirectory;
-			file = file.resolvePath(booksPath);
+			file = file.resolvePath(encryptedBooksPath);
 			var files: Array = file.getDirectoryListing();
-			for(var i: int = 0; i < files.length; i++)
+			
+			for each (var f:File in files) 
+			{
+				if(!f.isDirectory && f.type == ".dat" && f.name.search("Book") != -1)
+					numberOfBooks++;
+			}
+			
+			
+			for(var i: int = 0; i < numberOfBooks; i++)
 			{
 				metas.push(decryptMeta(i+1));
 			}
@@ -121,6 +130,7 @@ package services
 			var bookIndex: int;
 			var sizeOfMeta: int;
 			var pageNumber: int;
+			var startOfPages: int;
 			var indexOfRequestedPage: int;
 			var sizeOfRequestedPage: int;
 			var theBook: ByteArray;
@@ -165,6 +175,11 @@ package services
 			pageNumber = intBytes.readInt();
 			bookIndex += 4;
 			
+			intBytes.clear();
+			intBytes.writeBytes(theBook, theBook.length - sizeOfMeta / 2 - 8, 4);
+			intBytes.position = 0;
+			startOfPages = intBytes.readInt();
+			
 			indexOfRequestedPage = (reqPage - 1) * 3 + reqRes-1;
 			
 			for(var i: Number = 0; i < pageNumber * 3; i++)
@@ -189,15 +204,11 @@ package services
 				bookIndex += intBytes.readInt();
 			}
 			
-			intBytes.clear();
-			intBytes.writeBytes(theBook, bookIndex, 4);
-			intBytes.position = 0;
-			bookIndex += 4 + intBytes.readInt();
-			
-			bookIndex += (sizeOfMeta + 1) / 2;
 			sizeOfRequestedPage = pages[indexOfRequestedPage].size;
 			pages.sort(sortFunc);
 
+			bookIndex = startOfPages;
+			
 			var finished: int = 0;
 			var finishedAndPlacedBeforeReqPage: int = 0;
 			var temp: int;
@@ -225,11 +236,12 @@ package services
 			return jsonAndImage;
 			
 		}
+		
 		public function decryptMeta(reqBook: Number) : ByteArray
 		{
 			var bookIndex: int;
 			var sizeOfMeta: int;
-			var pageNumber: int;
+			var startOfMeta: int;
 			var theBook: ByteArray;
 			var intBytes: ByteArray;
 			var encryptedMetaBytes: ByteArray;
@@ -245,30 +257,15 @@ package services
 			intBytes.writeBytes(theBook, bookIndex, 4);
 			intBytes.position = 0;
 			sizeOfMeta = intBytes.readInt();
-			bookIndex += 4;
 			
 			intBytes.clear();
-			intBytes.writeBytes(theBook, bookIndex, 4);
+			intBytes.writeBytes(theBook, theBook.length - sizeOfMeta / 2 - 16, 4);
 			intBytes.position = 0;
-			pageNumber = intBytes.readInt();
-			bookIndex += 4;
-		
-			for(var i: Number = 0; i < pageNumber * 3; i++)
-			{
-				bookIndex += 4;
-				intBytes.clear();
-				intBytes.writeBytes(theBook, bookIndex, 4);
-				intBytes.position = 0;
-				bookIndex += intBytes.readInt();
-				bookIndex += 4;
-			}
+			startOfMeta = intBytes.readInt();
 			
-			intBytes.clear();
-			intBytes.writeBytes(theBook, bookIndex, 4);
-			intBytes.position = 0;
-			bookIndex += 4 + intBytes.readInt();
+			bookIndex = startOfMeta;
+			
 			encryptedMetaBytes.writeBytes(theBook, bookIndex, (sizeOfMeta + 1) / 2);
-			bookIndex += (sizeOfMeta + 1) / 2;
 			encryptedMetaBytes.writeBytes(theBook, theBook.length - sizeOfMeta / 2, sizeOfMeta / 2);
 			
 			for(var j: Number = encryptedMetaBytes.length - 1; j >=0; j--)
@@ -282,7 +279,8 @@ package services
 		public function decryptCover(reqBook: Number) : ByteArray
 		{
 			var bookIndex: int;
-			var pageNumber: int;
+			var sizeOfMeta: int;
+			var startOfCover: int;
 			var theBook: ByteArray;
 			var intBytes: ByteArray;
 			var encryptedCoverBytes: ByteArray;
@@ -292,21 +290,17 @@ package services
 			intBytes = new ByteArray();
 			encryptedCoverBytes = new ByteArray();
 			
-			bookIndex += 4;
 			intBytes.endian = Endian.LITTLE_ENDIAN;
 			intBytes.writeBytes(theBook, bookIndex, 4);
 			intBytes.position = 0;
-			pageNumber = intBytes.readInt();
-			bookIndex += 4;
+			sizeOfMeta = intBytes.readInt();
 			
-			for(var i:Number = 0; i < pageNumber * 3; i++)
-			{
-				bookIndex += 4;
-				intBytes.clear();
-				intBytes.writeBytes(theBook, bookIndex, 4);
-				intBytes.position = 0;
-				bookIndex += intBytes.readInt() + 4;
-			}
+			intBytes.clear();
+			intBytes.writeBytes(theBook, theBook.length - sizeOfMeta / 2 - 12, 4);
+			intBytes.position = 0;
+			startOfCover = intBytes.readInt();
+			
+			bookIndex = startOfCover;
 			
 			intBytes.clear();
 			intBytes.writeBytes(theBook, bookIndex, 4);
@@ -321,6 +315,7 @@ package services
 			var bookIndex: int;
 			var sizeOfMeta: int;
 			var pageNumber: int;
+			var startOfThumbs: int;
 			var totalPageSize: int;
 			var theBook: ByteArray;
 			var pages: Array;
@@ -350,27 +345,12 @@ package services
 			pageNumber = intBytes.readInt();
 			bookIndex += 4;
 			
-			for(var i: Number = 0; i < pageNumber*3; i++)
-			{
-				intBytes.clear();
-				intBytes.writeBytes(theBook, bookIndex, 4);
-				intBytes.position = 0;
-				totalPageSize += intBytes.readInt();
-				bookIndex += 4;
-				
-				intBytes.clear();
-				intBytes.writeBytes(theBook, bookIndex, 4);
-				intBytes.position = 0;
-				bookIndex += intBytes.readInt();
-				bookIndex += 4;
-			}
-			
 			intBytes.clear();
-			intBytes.writeBytes(theBook, bookIndex, 4);
+			intBytes.writeBytes(theBook, theBook.length - sizeOfMeta / 2 - 4, 4);
 			intBytes.position = 0;
-			bookIndex += 4 + intBytes.readInt();
-			bookIndex += (sizeOfMeta + 1) / 2;
-			bookIndex += totalPageSize;
+			startOfThumbs = intBytes.readInt();
+			
+			bookIndex = startOfThumbs;
 			
 			for (var v: Number = 0; v < pageNumber; v++)
 			{
@@ -411,6 +391,62 @@ package services
 			}
 			
 			return retThumbs
+		}
+		
+		public function decryptItem( bookId: Number, itemId: Number): ByteArray
+		{
+			var theItem: ByteArray = new ByteArray();
+			var intBytes: ByteArray = new ByteArray();
+			var numberOfItems: int;
+			var itemPlace: int = -1;
+			var jumpSize: int = 0;
+			var sizeOfItem: int = -1;
+			
+			var file:File = File.documentsDirectory;
+			var fs:FileStream = new FileStream();
+			file = file.resolvePath(encryptedBooksPath + "encryptedItems" + bookId + ".dat");
+			fs.open(file, FileMode.READ);
+			
+			intBytes.endian = Endian.LITTLE_ENDIAN;
+			fs.readBytes(intBytes, 0, 4);
+			intBytes.position = 0;
+			numberOfItems = intBytes.readInt();
+			
+			for (var i:int = 0; i < numberOfItems; i++)
+			{
+				intBytes.clear();
+				fs.readBytes(intBytes, 0, 4);
+				intBytes.position = 0;
+				if (intBytes.readInt() == itemId) 
+				{
+					itemPlace = i;
+					break;
+				}
+			}
+			fs.position = 4 + numberOfItems * 4;
+			
+			for (var j: int = 0; j < numberOfItems; j++)
+			{
+				if (j == itemPlace)
+				{
+					intBytes.clear();
+					fs.readBytes(intBytes, 0, 4);
+					intBytes.position = 0;
+					sizeOfItem = intBytes.readInt();
+					break;
+				}
+				intBytes.clear();
+				fs.readBytes(intBytes, 0, 4);
+				intBytes.position = 0;
+				jumpSize += intBytes.readInt() + 22;
+			}
+			fs.position = 4 + numberOfItems * 8 + jumpSize + 11;
+			
+			fs.readBytes(theItem, 0, sizeOfItem / 2);
+			fs.position += 11;
+			fs.readBytes(theItem, sizeOfItem / 2, (sizeOfItem + 1) / 2);
+			
+			return theItem;
 		}
 	}
 }

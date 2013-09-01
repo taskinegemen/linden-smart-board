@@ -64,7 +64,10 @@ package services {
 			return decryption.decryptPage(bookId, resolution, pageNo);
 		}
 		
-		
+		public function getItem( bookId: Number, itemId: Number): ByteArray
+		{
+			return decryption.decryptItem(bookId, itemId);
+		}
 		
 
 	}

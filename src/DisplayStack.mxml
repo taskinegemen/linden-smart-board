@@ -185,12 +185,12 @@
 			
 			protected function drawLine(): void{
 				if(!upDrawing){
-					this.drawingArea.graphics.lineStyle(2, 0x990000,1);
+					this.drawingArea.graphics.lineStyle(2, 0x990000,1,null,null,null,"round");
 					this.drawingArea.graphics.beginFill(0x00FF00);
-					this.drawingArea.graphics.moveTo(this.oldPoint.x, this.oldPoint.y);
-					this.oldPoint.x = this.contentMouseX;
-					this.oldPoint.y = this.contentMouseY;
-					this.drawingArea.graphics.lineTo(this.oldPoint.x, this.oldPoint.y);
+					//this.drawingArea.graphics.moveTo(this.oldPoint.x, this.oldPoint.y);
+					//this.oldPoint.x = this.contentMouseX;
+					//this.oldPoint.y = this.contentMouseY;
+					this.drawingArea.graphics.curveTo(this.oldPoint.x, this.oldPoint.y, this.contentMouseX, this.contentMouseY);
 					setTimeout(drawLine,10);
 				}else{
 					this.upDrawing = false;
