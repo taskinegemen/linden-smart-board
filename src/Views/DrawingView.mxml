@@ -36,6 +36,7 @@
 			public var pen: Number = 1;
 			
 			public var point: Point;
+			public var oldPoint: Point;
 			public var erase: Boolean = false;
 			
 			private var goErase: Boolean = false;
@@ -189,9 +190,14 @@
 						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true, "none", "round", "round", 1);
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						
+						this.oldPoint.x = this.point.x;
+						this.oldPoint.y = this.point.y;
+						
 						this.point.x = this.contentMouseX;
 						this.point.y = this.contentMouseY;
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
+						
+						//this.transparentArea.graphics.curveTo(this.oldPoint.x, this.oldPoint.y, this.point.x, this.point.y);
 						
 					}
 				}
