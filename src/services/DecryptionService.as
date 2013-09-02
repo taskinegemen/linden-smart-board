@@ -124,10 +124,10 @@ package services
 			}
 			
 			
-/*			for(var i: int = 0; i < numberOfBooks; i++)
+			for(var i: int = 0; i < numberOfBooks; i++)
 			{
 				metas.push(decryptMeta(int(arr[i])));
-			}*/
+			}
 			return metas;
 		}
 		
