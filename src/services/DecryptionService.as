@@ -24,8 +24,8 @@ package services
 	
 	public class DecryptionService
 	{
-		private var password: String = "dontWorryBeHappy";
-		private var encryptedBooksPath: String = "C:/encryptedBooks/";
+		private var password: String = "kestimAkittimDamarlarimdakiKanimdaAkanOKirliSiyahYalanlari";
+		private var encryptedBooksPath: String = "/books";
 		private var theSalt: ByteArray;
 		private var blowFish: BlowFishKey;
 		
@@ -39,9 +39,10 @@ package services
 		private function getBookBytes(bookID: Number) : ByteArray
 		{
 			var theBookBytes: ByteArray = new ByteArray();
-			var file:File = File.documentsDirectory;
+			var file:File = File.applicationDirectory;
+			var path: String = file.nativePath;
 			var filestream:FileStream = new FileStream();
-			file = file.resolvePath(encryptedBooksPath + "encryptedBook" + bookID + ".dat");
+			file = file.resolvePath(path + encryptedBooksPath + "/encryptedBook." + bookID + ".dat");
 			filestream.open(file, FileMode.READ);
 			filestream.readBytes(theBookBytes);
 			return theBookBytes;
@@ -83,7 +84,7 @@ package services
 			//newbytes.writeBytes(barray, 8);
 			
 			//write into file
-			var file:File = File.documentsDirectory;
+			var file:File = File.applicationDirectory;
 			var filestream:FileStream = new FileStream();
 			file = file.resolvePath(destinationPath);
 			filestream.open(file, FileMode.WRITE);
@@ -107,21 +108,29 @@ package services
 		{
 			var numberOfBooks: Number = 0;
 			var metas: Array = new Array();
-			var file:File = File.documentsDirectory;
-			file = file.resolvePath(encryptedBooksPath);
+			var file:File = File.applicationDirectory;
+			var path: String = file.nativePath;
+			file = file.resolvePath( path + encryptedBooksPath);
 			var files: Array = file.getDirectoryListing();
+			
+			var arr: Array = new Array();
 			
 			for each (var f:File in files) 
 			{
-				if(!f.isDirectory && f.type == ".dat" && f.name.search("Book") != -1)
+				if(!f.isDirectory && f.type == ".dat" && f.name.search("Book") != -1){
+					arr[numberOfBooks] = f.name.split('.')[1];
 					numberOfBooks++;
+				}
 			}
 			
 			
 			for(var i: int = 0; i < numberOfBooks; i++)
 			{
-				metas.push(decryptMeta(i+1));
+				metas.push(decryptMeta(int(arr[i])));
 			}
+			//metas.push(decryptMeta(1));
+			//metas.push(decryptMeta(2));
+			//metas.push(decryptMeta(64));
 			return metas;
 		}
 		
@@ -402,9 +411,10 @@ package services
 			var jumpSize: int = 0;
 			var sizeOfItem: int = -1;
 			
-			var file:File = File.documentsDirectory;
+			var file:File = File.applicationDirectory;
+			var path: String = file.nativePath;
 			var fs:FileStream = new FileStream();
-			file = file.resolvePath(encryptedBooksPath + "encryptedItems" + bookId + ".dat");
+			file = file.resolvePath( path + encryptedBooksPath + "/encryptedItems." + bookId + ".dat");
 			fs.open(file, FileMode.READ);
 			
 			intBytes.endian = Endian.LITTLE_ENDIAN;

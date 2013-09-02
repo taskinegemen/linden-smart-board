@@ -190,6 +190,9 @@
 					//this.drawingArea.graphics.moveTo(this.oldPoint.x, this.oldPoint.y);
 					//this.oldPoint.x = this.contentMouseX;
 					//this.oldPoint.y = this.contentMouseY;
+					
+					var x: Number = 0 / 0;
+					
 					this.drawingArea.graphics.curveTo(this.oldPoint.x, this.oldPoint.y, this.contentMouseX, this.contentMouseY);
 					setTimeout(drawLine,10);
 				}else{

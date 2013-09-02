@@ -174,8 +174,6 @@
 				if( this.selectedBooks.length ) {
 					//this.download( );
 					
-					
-					
 					this.addElement( this.borderContainer );
 					
 					this.borderContainer.width = 400;
@@ -240,6 +238,40 @@
 				}
 			}
 			
+			private function startDownloadItems(): void {
+				try {
+					
+					var request: URLRequest = new URLRequest();
+					
+					var fileRef1: FileReference = new FileReference();
+					
+					var file: File = new File(File.applicationDirectory.nativePath + "/books" );
+					
+					file.addEventListener(Event.COMPLETE, onDownloadItemsComplete);
+					file.addEventListener(IOErrorEvent.IO_ERROR, onDownloadIOError);
+					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					
+					request.url = "http://github.com/mozilla/pdf.js/zipball/master";
+					request.method = URLRequestMethod.GET;
+					
+					trace( this.currentBookID + " download items started." );
+					
+					
+					this.progressBar.setProgress(0 , 100);
+					this.progressBar.label = this.currentBook.title + " bileşenler";
+					
+					this.borderContainer.visible = true;
+					
+					// start download
+					file.download(request);
+					
+					this.canExit = false;
+					
+				}catch(e: Error) {
+					trace( e.message );
+				}
+			}
+			
 			private function getCurrentBook( id: Number ): Object {
 				
 				for(var i: Number = 0; i < this.books.length; i++ ) {
@@ -265,6 +297,11 @@
 			
 			private function onDownloadIOError(e: IOErrorEvent): void {
 				trace( "download io error: " + e.text );
+				if( this.selectedBooks.length ) {
+					this.startDownload();
+				} else {
+					this.canExit = true;	
+				}
 			}
 			
 			private function onProgress(e: ProgressEvent): void {
@@ -279,10 +316,21 @@
 			
 			private function onDownloadComplete(e: Event): void {
 				trace( this.currentBookID + " download completed" );
-				var fr: File = e.currentTarget as File;
+				//var fr: File = e.currentTarget as File;
 				
 				this.borderContainer.visible = false;
 				this.canExit = true;
+				
+				this.startDownloadItems();
+			}
+			
+			private function onDownloadItemsComplete(e: Event): void {
+				trace( this.currentBookID + " download items completed" );
+				//var fr: File = e.currentTarget as File;
+				
+				this.borderContainer.visible = false;
+				this.canExit = true;
+				
 				if ( this.selectedBooks.length ){
 					this.startDownload();
 				} else {

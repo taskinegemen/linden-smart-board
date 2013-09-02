@@ -16,7 +16,8 @@ package entities
 		private var books: Array = null;
 		
 		//private var mockService: MockLibraryService;
-		private var libraryService: MockLibraryService = new MockLibraryService();;
+		//private var libraryService: MockLibraryService = new MockLibraryService();
+		private var libraryService: LibraryService = new LibraryService();
 		
 		public function Library() {
 			//this.mockService = new MockLibraryService();

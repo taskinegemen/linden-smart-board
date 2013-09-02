@@ -62,7 +62,6 @@
 				loaderPen.contentLoaderInfo.addEventListener(Event.COMPLETE, this.penBytesLoaded);
 				loaderPen.loadBytes(bytes);
 				
-				
 			}
 			
 			private function penBytesLoaded(e: Event): void {
@@ -156,6 +155,10 @@
 				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0);
 				bitmapData.draw(this.transparentArea);
 				
+				if( this.croppedImage.bitmapData ){
+					bitmapData.copyPixels(this.croppedImage.bitmapData, new Rectangle(0, 0, this.croppedImage.width, this.croppedImage.height), new Point(10, 10));
+				}
+				
 				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData));
 			}
 			
@@ -190,15 +193,9 @@
 						this.transparentArea.graphics.lineStyle(this.thickness, this.color, this.pen, true, "none", "round", "round", 1);
 						this.transparentArea.graphics.moveTo(this.point.x, this.point.y);
 						
-						this.oldPoint.x = this.point.x;
-						this.oldPoint.y = this.point.y;
-						
 						this.point.x = this.contentMouseX;
 						this.point.y = this.contentMouseY;
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
-						
-						//this.transparentArea.graphics.curveTo(this.oldPoint.x, this.oldPoint.y, this.point.x, this.point.y);
-						
 					}
 				}
 			}
