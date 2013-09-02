@@ -216,6 +216,7 @@
 					file.addEventListener(Event.COMPLETE, onDownloadComplete);
 					file.addEventListener(IOErrorEvent.IO_ERROR, onDownloadIOError);
 					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					file.addEventListener(Event.CANCEL, onDownloadComplete);
 					
 					request.url = "http://github.com/mozilla/pdf.js/zipball/master";
 					request.method = URLRequestMethod.GET;
@@ -250,6 +251,7 @@
 					file.addEventListener(Event.COMPLETE, onDownloadItemsComplete);
 					file.addEventListener(IOErrorEvent.IO_ERROR, onDownloadIOError);
 					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					file.addEventListener(Event.CANCEL, onDownloadItemsComplete);
 					
 					request.url = "http://github.com/mozilla/pdf.js/zipball/master";
 					request.method = URLRequestMethod.GET;
