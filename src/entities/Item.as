@@ -2,6 +2,7 @@ package entities {
 	import flash.utils.ByteArray;
 	
 	import services.MockLibraryService;
+	import services.LibraryService;
 
 	public class Item {
 		
@@ -37,7 +38,8 @@ package entities {
 		public var imageWidth		:Number;
 		public var imageHeight		:Number;
 		
-		public var service: MockLibraryService = new MockLibraryService();
+		//public var service: MockLibraryService = new MockLibraryService();
+		public var service: LibraryService = new LibraryService();
 		
 		public function Item( obj: Object ) {
 			this.ID 			= obj.ID;

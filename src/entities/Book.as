@@ -26,7 +26,8 @@ package entities {
 		public var image: ByteArray;
 		
 		//private var mockService: MockLibraryService = new MockLibraryService();
-		private var libraryService: MockLibraryService = new MockLibraryService();
+		private var libraryService: LibraryService = new LibraryService();
+		//private var libraryService: MockLibraryService = new MockLibraryService();
 		
 		public function Book(obj: Object = null) {
 			this.metadatas 			= new Array();

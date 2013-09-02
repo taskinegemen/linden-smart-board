@@ -37,6 +37,7 @@ package entities {
 		public static const _1920: Number = 1920;
 		
 		public var service: MockLibraryService = new MockLibraryService();
+		
 		private var gonulGozu: GonulGozu = new GonulGozu();
 		
 		public function Page(thumbnail: Object) {

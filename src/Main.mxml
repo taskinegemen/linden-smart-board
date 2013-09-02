@@ -82,6 +82,8 @@
 				this.addEventListener("sync-clicked", this.openSyncView);
 				this.addEventListener("sync-close", this.closeSyncView);
 				
+				this.addEventListener("error-crop-view", this.errorCropView);
+				
 				this.addEventListener(PagePaletteClickEvent.LEFT_CLICKED, this.previousPage);
 				this.addEventListener(PagePaletteClickEvent.RIGHT_CLICKED, this.nextPage);
 				this.addEventListener(PagePaletteClickEvent.CHAPTERS_CLICKED, this.bookChapters);
@@ -172,7 +174,7 @@
 				this.display.pageView.source = this.page.image;
 				
 				this.display.pageView.height = this.page.height;
-				this.display.pageView.width = this.display.FullWidth;
+				this.display.pageView.width = this.display.FullWidth;				
 				
 				this.adjustPage();
 				
@@ -388,8 +390,9 @@
 			}
 			
 			public function shareDrawing(e: DrawingSaveEvent): void {
+				var bitmapDataCopy: BitmapData = e.bitmapData.clone();
 				
-				if (this.page.saveDrawing(e.bitmapData) ){
+				if ( this.page.saveDrawing(e.bitmapData) ){
 					
 					var gonulGozu: GonulGozu = new GonulGozu();
 					
@@ -561,6 +564,11 @@
 			
 			public function closeSyncView(e: Event): void {
 				this.display.removeElement( this.syncView );
+			}
+			
+			private function errorCropView(e: Event): void {
+				Alert.show("hata oldu.");
+				this.removeElement( this.cropView );
 			}
 		]]>
 		

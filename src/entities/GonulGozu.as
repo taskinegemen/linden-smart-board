@@ -130,6 +130,7 @@ package entities {
 		
 			
 			request.data = variables.toString();
+			request.idleTimeout = 60 * 1000;
 			request.url = //GonulGozu.API_URL + "/book-imagenote";
 				GonulGozu.API_URL + "/book-imagenote?token=" + this.token+"&bookID="+this.bookID+"&page="+pageNo;
 			request.method = URLRequestMethod.POST;

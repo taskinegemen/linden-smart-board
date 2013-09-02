@@ -28,9 +28,10 @@
 			import flash.utils.ByteArray;
 			
 			import mx.controls.Alert;
+			import mx.controls.ProgressBar;
+			import mx.controls.ProgressBarMode;
 			import mx.core.FlexGlobals;
 			import mx.core.UIComponent;
-			
 			
 			[Bindable]public var _width: Number = 400;
 			[Bindable]public var _height: Number = 300;
@@ -50,9 +51,16 @@
 			private var urlLoader: URLLoader;
 			
 			public var books: Array;
+			public var selectedBooks: Array;
 			public var booksInDisk: Array;
 			
-			private var fileRef: FileReference = new FileReference();
+			public var currentBookID: Number;
+			public var currentBook: Object;
+			
+			private var borderContainer: BorderContainer = new BorderContainer();
+			private var progressBar: ProgressBar = new ProgressBar();
+			
+			private var canExit: Boolean = true;
 			
 			public function init(e: Event): void {
 				try {
@@ -122,7 +130,7 @@
 						obj.id = resObj.ID;
 						obj.title = resObj.title;
 						obj.publisher = "Seviye yayıncılık";
-						obj.image = "/Assets/kitap.jpg";
+						obj.image = "http://api.linden.pro/book-cover/" + resObj.ID +"?width=92";
 						
 						if( this.isAlreadyInDisk( obj.id ) ) {
 							continue;
@@ -147,56 +155,159 @@
 			}
 			
 			public function onCloseClick(e: Event): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-close"));
+				if( this.canExit ) {
+					FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-close"));
+				}
 			}
 			
 			public function onStartDownload(e: MouseEvent): void {
 				e.stopImmediatePropagation();
 				
-				var arr: Array = new Array();
+				this.selectedBooks = new Array();
 				
 				for each(var book: Object in this.books ) {
 					if( book.selected ) {
-						arr.push( book.id );		
+						this.selectedBooks.push( book.id );		
 					}
 				}
 				
-				if( arr.length ) {
-					this.download( arr );
+				if( this.selectedBooks.length ) {
+					//this.download( );
+					
+					this.addElement( this.borderContainer );
+					
+					this.borderContainer.width = 400;
+					this.borderContainer.height = 100;
+					
+					this.borderContainer.x = ( this._width - this.borderContainer.width ) / 2;
+					this.borderContainer.y = ( this._height - this.borderContainer.height ) / 2;
+					
+					this.borderContainer.visible = false;
+					
+					this.borderContainer.addElement( this.progressBar );
+					
+					this.progressBar.mode = ProgressBarMode.MANUAL;
+					this.progressBar.minimum = 0;
+					this.progressBar.maximum = 100;
+					
+					this.progressBar.width = 200;
+					
+					this.progressBar.x = ( this.borderContainer.width - this.progressBar.width ) / 2;
+					this.progressBar.y = ( this.borderContainer.height - this.progressBar.height ) / 2;
+					
+					this.startDownload();
+					
 				}
 			}
 			
-			private function download( books: Array ): void {
+			private function startDownload(): void {
 				
 				try {
+
+					this.currentBookID = this.selectedBooks.pop();
+					this.currentBook = this.getCurrentBook( this.currentBookID );
 					
 					var request: URLRequest = new URLRequest();
 					
-					this.urlLoader = new URLLoader();
+					var fileRef1: FileReference = new FileReference();
 					
-					request.url = SyncView.API_URL + "/book-export/1?widths[]=960&token="+this.token;
+					var file: File = new File(File.applicationDirectory.nativePath + "/books" );
+					
+					file.addEventListener(Event.COMPLETE, onDownloadComplete);
+					file.addEventListener(IOErrorEvent.IO_ERROR, onDownloadIOError);
+					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					
+					request.url = "http://github.com/mozilla/pdf.js/zipball/master";
 					request.method = URLRequestMethod.GET;
 					
-					this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatus);
-					this.urlLoader.addEventListener(Event.COMPLETE, onDownloadComplete);
-					this.urlLoader.addEventListener(ProgressEvent.PROGRESS, onProgress);
-					this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onURLIOError);
+					trace( this.currentBookID + " download started." );
 					
-					this.urlLoader.load( request );
 					
-					this.loader.load( request );
+					this.progressBar.setProgress(0 , 100);
+					this.progressBar.label = this.currentBook.title;
+					
+					this.borderContainer.visible = true;
+					
+					// start download
+					file.download(request);
+					
+					this.canExit = false;
+					
 				}catch(e: Error) {
 					trace( e.message );
 				}
 			}
 			
-			private function onURLIOError(e: IOErrorEvent): void {
-				trace( "io error" );
-				trace( e.text );
+			private function startDownloadItems(): void {
+				try {
+					
+					var request: URLRequest = new URLRequest();
+					
+					var fileRef1: FileReference = new FileReference();
+					
+					var file: File = new File(File.applicationDirectory.nativePath + "/books" );
+					
+					file.addEventListener(Event.COMPLETE, onDownloadItemsComplete);
+					file.addEventListener(IOErrorEvent.IO_ERROR, onDownloadIOError);
+					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					
+					request.url = "http://github.com/mozilla/pdf.js/zipball/master";
+					request.method = URLRequestMethod.GET;
+					
+					trace( this.currentBookID + " download items started." );
+					
+					
+					this.progressBar.setProgress(0 , 100);
+					this.progressBar.label = this.currentBook.title + " bileşenler";
+					
+					this.borderContainer.visible = true;
+					
+					// start download
+					file.download(request);
+					
+					this.canExit = false;
+					
+				}catch(e: Error) {
+					trace( e.message );
+				}
+			}
+			
+			private function getCurrentBook( id: Number ): Object {
+				
+				for(var i: Number = 0; i < this.books.length; i++ ) {
+					if( this.books[i].id == id ) {
+						return this.books[i];
+					}
+				}
+				return new Object();
+			}
+			
+			private function download(): void {
+				
+				try {
+					
+					for each( var id: Number in this.selectedBooks ) {
+						// only one file can be downloaded at a time.
+					}				
+					
+				}catch(e: Error) {
+					trace( e.message );
+				}
+			}
+			
+			private function onDownloadIOError(e: IOErrorEvent): void {
+				trace( "download io error: " + e.text );
+				if( this.selectedBooks.length ) {
+					this.startDownload();
+				} else {
+					this.canExit = true;	
+				}
 			}
 			
 			private function onProgress(e: ProgressEvent): void {
-				trace( e.bytesLoaded );
+				var percentLoaded:Number= e.bytesLoaded / e.bytesTotal * 100;
+				this.progressBar.setProgress(percentLoaded, 100);
+				//this.progressBar.setProgress( e.bytesLoaded, e.bytesTotal + e.bytesLoaded );
 			}
 			
 			private function httpResponseStatus(e: HTTPStatusEvent): void {
@@ -204,12 +315,32 @@
 			}
 			
 			private function onDownloadComplete(e: Event): void {
-				trace( this.urlLoader.data );
+				trace( this.currentBookID + " download completed" );
+				//var fr: File = e.currentTarget as File;
+				
+				this.borderContainer.visible = false;
+				this.canExit = true;
+				
+				this.startDownloadItems();
+			}
+			
+			private function onDownloadItemsComplete(e: Event): void {
+				trace( this.currentBookID + " download items completed" );
+				//var fr: File = e.currentTarget as File;
+				
+				this.borderContainer.visible = false;
+				this.canExit = true;
+				
+				if ( this.selectedBooks.length ){
+					this.startDownload();
+				} else {
+					this.removeElement( this.borderContainer );
+				}
 			}
 			
 			private function isAlreadyInDisk( id: Number ): Boolean {
 				for each( var book: Book in this.booksInDisk) {
-					if( book.ID == id){
+					if( book.ID == id) {
 						return true;
 					}
 				}

@@ -51,6 +51,12 @@
 				var leftUpper: Point = new Point();
 				var rightBottom: Point = new Point();
 				
+				if( this.pointEnd == null || this.pointStart == null ){
+					FlexGlobals.topLevelApplication.dispatchEvent(new Event("error-crop-view"));
+					return;
+					
+				}
+				
 				if( this.pointEnd.x - this.pointStart.x > 0 
 					&& this.pointEnd.y - this.pointStart.y > 0){
 					

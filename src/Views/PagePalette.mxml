@@ -13,14 +13,17 @@
 			
 			protected function backPageClicked(e:MouseEvent): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
+				e.stopImmediatePropagation();
 			}
 			
 			protected function chaptersClicked(e:MouseEvent): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.CHAPTERS_CLICKED));
+				e.stopImmediatePropagation();
 			}
 			
 			protected function frontPageClicked(e:MouseEvent): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
+				e.stopImmediatePropagation();
 			}
 			
 		]]>

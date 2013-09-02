@@ -27,6 +27,7 @@
 			
 			public function onSelected(e: Event): void {
 				this.book.selected = !this.book.selected;
+				
 			}
 			
 		]]>
