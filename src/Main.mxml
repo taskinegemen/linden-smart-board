@@ -22,6 +22,7 @@
 			import Views.DrawingView;
 			import Views.DrawingsView;
 			import Views.SyncView;
+			import Views.LoadingView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -116,23 +117,38 @@
 				this.display.mainStack.selectedIndex = DisplayStackConstants.SEARCH_VIEW_INDEX;
 			}
 			
+			private var loadingView: LoadingView;
 			private function showBookView(e: BookClickEvent): void {
-				this.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
+				var self: Object = this;
 				
-				this.page = null;
-				this.bindBookPages(e.book);
-				if(this.display.tableOfContents == null){
-					this.addEventListener("tableofcontents-ready", this.bindBookChapters);
-				}else{
-					this.bindBookChapters(null);
-				}
+				self.page = null;
 				
-				if(this.display.pageView == null) {
-					this.addEventListener("page-view-ready", this.pageViewReady);
-				} else {
-					this.setFirstPage();
-				}
-			}			
+				self.bindBookPages(e.book);
+				
+				this.loadingView = new LoadingView();
+				this.addElement( this.loadingView );
+				
+				this.loadingView._width = this.display.FullWidth;
+				this.loadingView._height = this.display.FullHeight;
+				
+				setTimeout( function(): void {
+					self.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
+					
+					
+					if( self.display.pageView == null ) {
+						self.addEventListener("page-view-ready", self.pageViewReady);
+					} else {
+						self.setFirstPage();
+					}
+					
+					if( self.display.tableOfContents == null){
+						self.addEventListener("tableofcontents-ready", self.bindBookChapters);
+					}else{
+						self.bindBookChapters(null);
+					}
+				}, 500);
+				
+			}
 			
 			private function bindBookPages(book: Book): void {
 				this.book = book;
@@ -163,13 +179,19 @@
 					
 					this.display.tableOfContents.chapterArea.addElement(label);
 				}
+				
+				
 			}
 			
 			private function pageViewReady(e: Event): void {
+				
 				this.setFirstPage();
 			}
 			
-			private function setFirstPage(): void{
+			private function setFirstPage(): void {
+				
+				this.removeElement( this.loadingView );
+				
 				this.page = this.book.getFirstPage( this.pageResolution );
 				this.display.pageView.source = this.page.image;
 				
