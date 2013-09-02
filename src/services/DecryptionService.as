@@ -24,7 +24,7 @@ package services
 	
 	public class DecryptionService
 	{
-		private var password: String = "dontWorryBeHappy";
+		private var password: String = "kestimAkittimDamarlarimdakiKanimdaAkanOKirliSiyahYalanlari";
 		private var encryptedBooksPath: String = "C:/encryptedBooks/";
 		private var theSalt: ByteArray;
 		private var blowFish: BlowFishKey;
@@ -118,10 +118,13 @@ package services
 			}
 			
 			
-			for(var i: int = 0; i < numberOfBooks; i++)
+/*			for(var i: int = 0; i < numberOfBooks; i++)
 			{
 				metas.push(decryptMeta(i+1));
-			}
+			}*/
+			metas.push(decryptMeta(1));
+			metas.push(decryptMeta(2));
+			metas.push(decryptMeta(64));
 			return metas;
 		}
 		
