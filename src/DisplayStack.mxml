@@ -737,7 +737,7 @@
 		</mx:Canvas>
 		<mx:Canvas id="searchView">
 			<s:BorderContainer width="{this.FullWidth}" height="40" borderVisible="false" backgroundColor="#1b2630">
-				<s:Image source="/Assets/seviye-ust-logo.png" x="{(this.FullWidth-this.logo.width) / 2}" >
+				<s:Image source="/Assets/ust-logo.png" x="{(this.FullWidth-this.logo.width) / 2}" >
 					
 				</s:Image>
 				<s:Image source="/Assets/close.png" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
