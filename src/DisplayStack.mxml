@@ -386,218 +386,227 @@
 			
 			
 			public function itemViewReady(e: Event): void {
-				var itemViewRef: Object = this;
+				try {
 				
-				this.itemView._width = this.FullWidth;
-				this.itemView._height = this.FullHeight;
-				
-				this.itemView.item = this.item;
-				
-				switch(this.item.type) {
+					var itemViewRef: Object = this;
 					
-					case Item.ITEM_VIDEO_TYPE:
-						
-						var videoPlayer1: VideoPlayer = new VideoPlayer();
-						this.videoPlayer = videoPlayer1;
-						
-						var bytes1: ByteArray = this.item.getBytes();
-						
-						var path1: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
-						var file1: File = new File(path1);
-						var fileStream1: FileStream = new FileStream();
-						
-						fileStream1.open( file1, FileMode.WRITE );
-						fileStream1.writeBytes( bytes1, 0, bytes1.length );
-						fileStream1.close();
-						
-						videoPlayer1.source = path1;
-						
-						this.itemView.addElement( videoPlayer1 );
-						
-						var w1: Number = this.FullWidth * 0.7;
-						var h1: Number = this.FullHeight * 0.7;
-						var x1: Number = ( this.FullWidth - w1 ) / 2;
-						var y1: Number = ( this.FullHeight - h1 ) / 2;
-						
-						videoPlayer1.explicitWidth = w1;
-						videoPlayer1.explicitHeight = h1;
-						videoPlayer1.x = x1;
-						videoPlayer1.y = y1;
-						
-						videoPlayer1.fullScreenButton.enabled = false;
-						
-						break;
-					case Item.ITEM_AUDIO_TYPE:
-						
-						var bytes2: ByteArray = this.item.getBytes();
-						
-						var path2: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
-						var file2: File = new File(path2);
-						var fileStream2: FileStream = new FileStream();
-						
-						fileStream2.open( file2, FileMode.WRITE );
-						fileStream2.writeBytes( bytes2, 0, bytes2.length );
-						fileStream2.close();
-						
-						var mp3Player: Mp3Player = new Mp3Player();
-						this.itemView.addElement( mp3Player );
-						
-						mp3Player.source = path2;
-						mp3Player.autoPlay = true;
-						mp3Player.width = this.FullWidth * 0.5;
-						
-						this.mp3Player = mp3Player;
-						
-						mp3Player.x = ( this.FullWidth - mp3Player.width ) / 2;
-						mp3Player.y = ( this.FullHeight - 24 ) / 2;
-						
-						break;
+					this.itemView._width = this.FullWidth;
+					this.itemView._height = this.FullHeight;
 					
-					case Item.ITEM_FLASH_TYPE:
-						var bytes3: ByteArray = this.item.getBytes();
-						bytes3.position = 0;						
-						
-//						var netConnection: NetConnection = new NetConnection();
-//						netConnection.connect(null);
-//						
-//						var netStream: NetStream = new NetStream(netConnection);
-//						
-//						netStream.play(null);
-//						netStream.appendBytesAction(NetStreamAppendBytesAction.RESET_BEGIN);
-//						netStream.appendBytes(bytes3);
-//						
-//						var videoDisplay: VideoDisplay = new VideoDisplay();
-//						videoDisplay.width = 600;
-//						videoDisplay.height = 400;
-//						this.itemView.addElement( videoDisplay );
-//						
-//						videoDisplay.mx_internal::videoPlayer.attachNetStream(netStream);
-//						videoDisplay.mx_internal::videoPlayer.visible = true;
-//						
-//						break;
-						var videoPlayer3: VideoPlayer = new VideoPlayer();
-						this.videoPlayer = videoPlayer3;
-						
-						var path3: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
-						var file3: File = new File(path3);
-						var fileStream3: FileStream = new FileStream();
-						
-						fileStream3.open( file3, FileMode.WRITE );
-						fileStream3.writeBytes( bytes3, 0, bytes3.length );
-						fileStream3.close();
-						
-						videoPlayer3.source = path3;
-						
-						this.itemView.addElement( videoPlayer3 );
-						
-						var w3: Number = this.FullWidth * 0.7;
-						var h3: Number = this.FullHeight * 0.7;
-						var x3: Number = ( this.FullWidth - w3 ) / 2;
-						var y3: Number = ( this.FullHeight - h3 ) / 2;
-						
-						videoPlayer3.explicitWidth = w3;
-						videoPlayer3.explicitHeight = h3;
-						videoPlayer3.x = x3;
-						videoPlayer3.y = y3;
-						
-						videoPlayer3.fullScreenButton.enabled = false;
-						
-						break;
+					this.itemView.item = this.item;
 					
-					case Item.ITEM_LINK_TYPE:
+					switch(this.item.type) {
 						
-						break;
-					
-					case Item.ITEM_IMAGE_TYPE:
-						
-						this.imageItem = new Image();
-						
-						this.imageItem.visible = false;
-						
-						this.imageItem.source =  this.item.getBytes();
-						this.itemView.addElement( this.imageItem );
-						
-						var stackRef: Object = this;
-						
-						setTimeout(function(): void {
-							
-							stackRef.imageItem.x = ( stackRef.FullWidth - stackRef.imageItem.sourceWidth ) / 2;
-							stackRef.imageItem.y = ( stackRef.FullHeight - stackRef.imageItem.sourceHeight ) / 2;
-							
-							stackRef.imageItem.visible = true;
-						}, 100);
-						
-						break;
-					
-					default:
-						break;
-				}
-				
-				this.addElement( this.itemView );
-			}
-			
-			public function closeItem( ): void {
-				var path: String;
-				var file: File;
-				
-				if ( this.item != null) {
-					
-					switch( this.item.type ){
 						case Item.ITEM_VIDEO_TYPE:
 							
-							if( this.videoPlayer != null){
-								this.videoPlayer.source = null;
-							}
+							var videoPlayer1: VideoPlayer = new VideoPlayer();
+							this.videoPlayer = videoPlayer1;
 							
-							path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
-							file = new File(path);
-							file.deleteFile();
+							var bytes1: ByteArray = this.item.getBytes();
+							
+							var path1: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
+							var file1: File = new File(path1);
+							var fileStream1: FileStream = new FileStream();
+							
+							fileStream1.open( file1, FileMode.WRITE );
+							fileStream1.writeBytes( bytes1, 0, bytes1.length );
+							fileStream1.close();
+							
+							videoPlayer1.source = path1;
+							
+							this.itemView.addElement( videoPlayer1 );
+							
+							var w1: Number = this.FullWidth * 0.7;
+							var h1: Number = this.FullHeight * 0.7;
+							var x1: Number = ( this.FullWidth - w1 ) / 2;
+							var y1: Number = ( this.FullHeight - h1 ) / 2;
+							
+							videoPlayer1.explicitWidth = w1;
+							videoPlayer1.explicitHeight = h1;
+							videoPlayer1.x = x1;
+							videoPlayer1.y = y1;
+							
+							videoPlayer1.fullScreenButton.enabled = false;
 							
 							break;
 						case Item.ITEM_AUDIO_TYPE:
 							
-							if( this.mp3Player != null){
-								this.mp3Player.stop();
-							}
+							var bytes2: ByteArray = this.item.getBytes();
 							
-							try{
-								path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
-								file = new File(path);
-								file.deleteFile();
-							}
-							catch(e: Error) {
-								
-							}
+							var path2: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
+							var file2: File = new File(path2);
+							var fileStream2: FileStream = new FileStream();
+							
+							fileStream2.open( file2, FileMode.WRITE );
+							fileStream2.writeBytes( bytes2, 0, bytes2.length );
+							fileStream2.close();
+							
+							var mp3Player: Mp3Player = new Mp3Player();
+							this.itemView.addElement( mp3Player );
+							
+							mp3Player.source = path2;
+							mp3Player.autoPlay = true;
+							mp3Player.width = this.FullWidth * 0.5;
+							
+							this.mp3Player = mp3Player;
+							
+							mp3Player.x = ( this.FullWidth - mp3Player.width ) / 2;
+							mp3Player.y = ( this.FullHeight - 24 ) / 2;
+							
 							break;
+						
 						case Item.ITEM_FLASH_TYPE:
+							var bytes3: ByteArray = this.item.getBytes();
+							bytes3.position = 0;						
 							
-							if( this.videoPlayer != null){
-								this.videoPlayer.source = null;
-							}
+	//						var netConnection: NetConnection = new NetConnection();
+	//						netConnection.connect(null);
+	//						
+	//						var netStream: NetStream = new NetStream(netConnection);
+	//						
+	//						netStream.play(null);
+	//						netStream.appendBytesAction(NetStreamAppendBytesAction.RESET_BEGIN);
+	//						netStream.appendBytes(bytes3);
+	//						
+	//						var videoDisplay: VideoDisplay = new VideoDisplay();
+	//						videoDisplay.width = 600;
+	//						videoDisplay.height = 400;
+	//						this.itemView.addElement( videoDisplay );
+	//						
+	//						videoDisplay.mx_internal::videoPlayer.attachNetStream(netStream);
+	//						videoDisplay.mx_internal::videoPlayer.visible = true;
+	//						
+	//						break;
+							var videoPlayer3: VideoPlayer = new VideoPlayer();
+							this.videoPlayer = videoPlayer3;
 							
-							try {
-								path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
-								file = new File(path);
-								file.deleteFile();
-							}catch(e: Error) {
-								
-							}
-								
+							var path3: String = File.applicationDirectory.resolvePath("item-" + item.itemID + ".item").nativePath;
+							var file3: File = new File(path3);
+							var fileStream3: FileStream = new FileStream();
+							
+							fileStream3.open( file3, FileMode.WRITE );
+							fileStream3.writeBytes( bytes3, 0, bytes3.length );
+							fileStream3.close();
+							
+							videoPlayer3.source = path3;
+							
+							this.itemView.addElement( videoPlayer3 );
+							
+							var w3: Number = this.FullWidth * 0.7;
+							var h3: Number = this.FullHeight * 0.7;
+							var x3: Number = ( this.FullWidth - w3 ) / 2;
+							var y3: Number = ( this.FullHeight - h3 ) / 2;
+							
+							videoPlayer3.explicitWidth = w3;
+							videoPlayer3.explicitHeight = h3;
+							videoPlayer3.x = x3;
+							videoPlayer3.y = y3;
+							
+							videoPlayer3.fullScreenButton.enabled = false;
+							
 							break;
+						
 						case Item.ITEM_LINK_TYPE:
 							
 							break;
+						
 						case Item.ITEM_IMAGE_TYPE:
 							
-							if( this.imageItem ){
-								this.itemView.removeElement( this.imageItem );
-							}
+							this.imageItem = new Image();
+							
+							this.imageItem.visible = false;
+							
+							this.imageItem.source =  this.item.getBytes();
+							this.itemView.addElement( this.imageItem );
+							
+							var stackRef: Object = this;
+							
+							setTimeout(function(): void {
+								
+								stackRef.imageItem.x = ( stackRef.FullWidth - stackRef.imageItem.sourceWidth ) / 2;
+								stackRef.imageItem.y = ( stackRef.FullHeight - stackRef.imageItem.sourceHeight ) / 2;
+								
+								stackRef.imageItem.visible = true;
+							}, 100);
 							
 							break;
+						
 						default:
+							break;
 					}
+					
+					
+				}catch(e: *){
+					Alert.show("Hata oldu.");
 				}
-				
+				this.addElement( this.itemView );
+			}
+			
+			public function closeItem( ): void {
+				try {
+					var path: String;
+					var file: File;
+					
+					if ( this.item != null) {
+						
+						switch( this.item.type ){
+							case Item.ITEM_VIDEO_TYPE:
+								
+								if( this.videoPlayer != null){
+									this.videoPlayer.source = null;
+								}
+								
+								path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
+								file = new File(path);
+								file.deleteFile();
+								
+								break;
+							case Item.ITEM_AUDIO_TYPE:
+								
+								if( this.mp3Player != null){
+									this.mp3Player.stop();
+								}
+								
+								try{
+									path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
+									file = new File(path);
+									file.deleteFile();
+								}
+								catch(e: Error) {
+									
+								}
+								break;
+							case Item.ITEM_FLASH_TYPE:
+								
+								if( this.videoPlayer != null){
+									this.videoPlayer.source = null;
+								}
+								
+								try {
+									path = File.applicationDirectory.resolvePath("item-" + this.item.itemID + ".item").nativePath;
+									file = new File(path);
+									file.deleteFile();
+								}catch(e: Error) {
+									
+								}
+									
+								break;
+							case Item.ITEM_LINK_TYPE:
+								
+								break;
+							case Item.ITEM_IMAGE_TYPE:
+								
+								if( this.imageItem ){
+									this.itemView.removeElement( this.imageItem );
+								}
+								
+								break;
+							default:
+						}
+					}
+				}catch(e: *){
+					Alert.show("Hata oldu.");
+				}
 				this.removeElement( this.itemView );
 			}
 			

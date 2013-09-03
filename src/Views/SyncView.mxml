@@ -61,6 +61,7 @@
 			private var progressBar: ProgressBar = new ProgressBar();
 			
 			private var canExit: Boolean = true;
+			private var updated: Boolean = false;
 			
 			public function init(e: Event): void {
 				try {
@@ -156,12 +157,21 @@
 			
 			public function onCloseClick(e: Event): void {
 				if( this.canExit ) {
-					FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-close"));
+					if( this.updated ) {
+						FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-update"));
+					}else {
+						FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-close"));
+					}
 				}
 			}
 			
 			public function onStartDownload(e: MouseEvent): void {
 				e.stopImmediatePropagation();
+				
+				if( !this.canExit ) {
+					Alert.show("İndirme işlemi devam ediyor.");
+					return;
+				}
 				
 				this.selectedBooks = new Array();
 				
@@ -218,6 +228,7 @@
 					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
 					file.addEventListener(Event.CANCEL, onDownloadComplete);
 					
+					//request.url = "http://github.com/mozilla/pdf.js/zipball/master";
 					request.url = "http://download.linden.pro/encryptedBook." + this.currentBookID + ".dat";
 					request.method = URLRequestMethod.GET;
 					
@@ -253,6 +264,7 @@
 					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
 					file.addEventListener(Event.CANCEL, onDownloadItemsComplete);
 					
+					//request.url = "http://github.com/mozilla/pdf.js/zipball/master";
 					request.url = "http://download.linden.pro/encryptedItems." + this.currentBookID + ".dat";
 					request.method = URLRequestMethod.GET;
 					
@@ -324,6 +336,7 @@
 				
 				this.borderContainer.visible = false;
 				this.canExit = true;
+				this.updated = true;
 				
 				this.startDownloadItems();
 			}
@@ -334,7 +347,7 @@
 				
 				this.borderContainer.visible = false;
 				this.canExit = true;
-				
+				this.updated = true;
 				if ( this.selectedBooks.length ){
 					this.startDownload();
 				} else {

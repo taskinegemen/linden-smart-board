@@ -15,9 +15,9 @@
 			[Bindable]public var _width: Number = 400;
 			[Bindable]public var _height: Number = 300;
 			
-			[Bindable]public var checkboxWidth: Number = 49;
+			[Bindable]public var checkboxWidth: Number = 37;
 			[Bindable]public var bookCoverWidth: Number = 100;
-			[Bindable]public var bookTitleWidth: Number = 210;
+			[Bindable]public var bookTitleWidth: Number = 222;
 			
 			[Bindable]public var book: Object;
 			

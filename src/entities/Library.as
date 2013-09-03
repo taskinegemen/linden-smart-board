@@ -46,6 +46,22 @@ package entities
 			}
 		}
 		
+		public function updateBooks(): void {
+			this.books = new Array();
+			var i: Number = 0;
+			
+			for each( var bookBytes: ByteArray in this.libraryService.getBooks()){
+				var metajson: String = bookBytes.toString();
+				
+				var bookObj: Object = com.adobe.serialization.json.JSON.decode(metajson);
+				
+				var book: Book = new Book(bookObj);
+				
+				this.books[i] = book;
+				i++;
+			}
+		}
+		
 		public function getBooks(): Array {
 			if(this.books == null){
 				this.readBooks();

@@ -21,8 +21,8 @@
 			import Views.CropView;
 			import Views.DrawingView;
 			import Views.DrawingsView;
-			import Views.SyncView;
 			import Views.LoadingView;
+			import Views.SyncView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -82,6 +82,7 @@
 				
 				this.addEventListener("sync-clicked", this.openSyncView);
 				this.addEventListener("sync-close", this.closeSyncView);
+				this.addEventListener("sync-update", this.updateLibraryView);
 				
 				this.addEventListener("error-crop-view", this.errorCropView);
 				
@@ -335,6 +336,9 @@
 			}
 
 			private function fillLibrary(ev:Event): void {
+				
+				this.display.booksArea.removeAllElements();
+				
 				for each(var book: Book in this.books) {
 					var bookView: BookView = new BookView();
 					bookView.book = book;
@@ -582,6 +586,19 @@
 				this.syncView._height = this.display.FullHeight;
 				
 				this.display.addElement( this.syncView );
+			}
+			
+			public function updateLibraryView(e: Event): void {
+				this.display.removeElement( this.syncView );
+				
+				this.library.updateBooks();
+				
+				this.books = new Array(this.library.getBookCount());
+				this.books = this.library.getBooks();
+				
+				//this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
+				this.fillLibrary(null);
+				//this.addEventListener("library-ready", fillLibrary);
 			}
 			
 			public function closeSyncView(e: Event): void {
