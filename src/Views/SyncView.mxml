@@ -36,6 +36,8 @@
 			[Bindable]public var _width: Number = 400;
 			[Bindable]public var _height: Number = 300;
 			
+			[Bindable]public var applicationPath: String;
+			
 			[Bindable]private var containerWidth: Number = 359;
 			
 			private var player: GIFPlayer = new GIFPlayer();
@@ -77,7 +79,7 @@
 					this.loader.load( request );
 					
 				}catch(e: *){
-					
+					Alert.show("Hata oldu.");
 				}
 			}
 			
@@ -86,32 +88,41 @@
 			}
 			
 			private function onLoginComplete(e: Event): void {
-				var str: String = "";
-				var result: Object;
-				
-				str = HTTPURLLoader(e.target).data;
-				result = com.adobe.serialization.json.JSON.decode( str );
-				
-				this.token = result.token;
-				
-				var file: File = File.applicationDirectory;
-				var fileStream: FileStream = new FileStream();
-				
-				file = file.resolvePath( "organization.txt" );
-				
-				fileStream.open( file, FileMode.READ );
-				var organization: String = fileStream.readUTFBytes( file.size );
-				fileStream.close();
-				
-				var request: URLRequest = new URLRequest();
-				this.loader = new HTTPURLLoader();
-				
-				this.loader.addEventListener("complete", onComplete);
-				request = new URLRequest();
-				request.url = SyncView.API_URL + "/book?filter[publisherID]=" + organization + "&token="+this.token;
-				request.method = URLRequestMethod.GET;
-				
-				this.loader.load( request );
+				try {
+					var str: String = "";
+					var result: Object;
+					
+					str = HTTPURLLoader(e.target).data;
+					result = com.adobe.serialization.json.JSON.decode( str );
+					
+					this.token = result.token;
+					
+					if( this.token == null || this.token == "") {
+						Alert.show("Hata oldu");
+						return;
+					}
+					
+					var file: File = File.applicationDirectory;
+					var fileStream: FileStream = new FileStream();
+					
+					file = file.resolvePath( "organization.txt" );
+					
+					fileStream.open( file, FileMode.READ );
+					var organization: String = fileStream.readUTFBytes( file.size );
+					fileStream.close();
+					
+					var request: URLRequest = new URLRequest();
+					this.loader = new HTTPURLLoader();
+					
+					this.loader.addEventListener("complete", onComplete);
+					request = new URLRequest();
+					request.url = SyncView.API_URL + "/book?filter[publisherID]=" + organization + "&token="+this.token;
+					request.method = URLRequestMethod.GET;
+					
+					this.loader.load( request );
+				}catch(e: *) {
+					Alert.show("Hata oldu.");
+				}
 			}
 			
 			private function onComplete(e: Event): void {
@@ -399,7 +410,7 @@
 		<s:BorderContainer borderWeight="0" borderVisible="false" id="buttonContainer" 
 						   width="{ this.containerWidth }"
 						   x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.75 }">
-			<s:Image click="onStartDownload(event)" source="/Assets/downloadbuttons.png">
+			<s:Image click="onStartDownload(event)" source="{ this.applicationPath + '/Assets/downloadbuttons.png' }">
 				
 			</s:Image>
 		</s:BorderContainer>

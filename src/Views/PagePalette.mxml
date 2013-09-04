@@ -8,8 +8,11 @@
 	<fx:Script>
 		<![CDATA[
 			import Events.PagePaletteClickEvent;
+			
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			
+			[Bindable]public var applicationPath: String =  FlexGlobals.topLevelApplication.applicationPath;
 			
 			protected function backPageClicked(e:MouseEvent): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
@@ -28,13 +31,13 @@
 			
 		]]>
 	</fx:Script>
-	<s:Image width="76" height="36" source="/Assets/left.png" click="{backPageClicked(event)}">
+	<s:Image width="76" height="36" source="{ this.applicationPath + '/Assets/left.png' }" click="{backPageClicked(event)}">
 		
 	</s:Image>
-	<s:Image x="77" y="0" width="76" height="36" source="/Assets/center.png" click="{chaptersClicked(event)}">
+	<s:Image x="77" y="0" width="76" height="36" source="{ this.applicationPath + '/Assets/center.png' }" click="{chaptersClicked(event)}">
 		
 	</s:Image>
-	<s:Image x="154" y="0" width="76" height="36" source="/Assets/right.png" click="{frontPageClicked(event)}">
+	<s:Image x="154" y="0" width="76" height="36" source="{ this.applicationPath + '/Assets/right.png' }" click="{frontPageClicked(event)}">
 		
 	</s:Image>
 

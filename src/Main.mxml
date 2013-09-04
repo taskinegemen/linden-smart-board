@@ -58,6 +58,8 @@
 			
 			public var pageViewY: Number = 0;
 			
+			[Bindable]public var applicationPath: String;
+			
 			private function applicationCompleted(): void{
 				
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
@@ -65,6 +67,9 @@
 				this.display = new DisplayStack();
 				this.addElement(this.display);
 				this.library = new Library();
+				
+				this.applicationPath = File.applicationDirectory.nativePath;
+				this.display.applicationPath = this.applicationPath;
 				
 				// add event handlers
 				//this.addEventListener("book-reading-finished", fillLibrary);
@@ -131,6 +136,8 @@
 				
 				this.loadingView._width = this.display.FullWidth;
 				this.loadingView._height = this.display.FullHeight;
+				
+				this.loadingView.applicationPath = this.applicationPath;
 				
 				setTimeout( function(): void {
 					self.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
@@ -400,6 +407,8 @@
 				this.drawingView._width = this.display.FullWidth;
 				this.drawingView._height = this.display.FullHeight;
 				
+				this.drawingView.applicationPath = this.applicationPath;
+				
 				this.drawingView.croppedImageWidth = sourceRect.width;
 				this.drawingView.croppedImageHeight = sourceRect.height;
 				
@@ -474,6 +483,8 @@
 				
 				this.drawingsView._width = this.display.FullWidth;
 				this.drawingsView._height = this.display.FullHeight;
+				
+				this.drawingsView.applicationPath = this.applicationPath;
 				
 				this.addElement(this.drawingsView);
 			}
@@ -584,6 +595,7 @@
 				this.syncView.booksInDisk = this.books;
 				this.syncView._width = this.display.FullWidth;
 				this.syncView._height = this.display.FullHeight;
+				this.syncView.applicationPath = this.applicationPath;
 				
 				this.display.addElement( this.syncView );
 			}

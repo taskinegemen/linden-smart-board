@@ -14,6 +14,9 @@
 			
 			[Bindable]public var mainWidth: Number;
 			[Bindable]public var mainHeight: Number;
+			
+			[Bindable]public var applicationPath: String = FlexGlobals.topLevelApplication.applicationPath;
+			
 			public var _parent: DisplayStack;
 			
 			public function closeTableOfContents(e: Event): void {
@@ -40,7 +43,7 @@
 	<s:BorderContainer x="0" y="0" width="340" height="40" backgroundColor="#1B2630"
 					   borderColor="#1B2630">
 		<s:Label x="122" y="14" color="#FFFFFF" fontSize="21" text="İçindekiler"/>
-		<s:Image x="4" y="2" width="42" height="38" source="Assets/tableofcontents-icon.png"/>
+		<s:Image x="4" y="2" width="42" height="38" source="{ this.applicationPath + '/Assets/tableofcontents-icon.png' }"/>
 	</s:BorderContainer>
 	<s:Scroller x="340" width="170" verticalScrollPolicy="on">
 		<s:VGroup width="170"   height="{this.mainHeight}" id="thumbnailArea" horizontalAlign="center">

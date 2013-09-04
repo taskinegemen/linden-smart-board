@@ -55,6 +55,7 @@
 			[Bindable]public var gapSize: Number;
 			[Bindable]public var paddingTop: Number;
 			[Bindable]public var totalThumbnails: Number;
+			[Bindable]public var applicationPath: String;
 			
 			protected var up:Boolean = false;
 			protected var sPosY:Number;
@@ -301,7 +302,7 @@
 				this._pageMenu._y = e.stageY - (this._pageMenu.height / 2);
 				
 				this._pageMenu._parent = this;
-				
+				this._pageMenu.applicationPath = this.applicationPath;
 				this.addElement(this._pageMenu);
 				
 			}
@@ -670,7 +671,7 @@
 	
 	<mx:ViewStack id="mainStack"  width="{this.FullWidth}" height="{this.FullHeight}">
 		<mx:Canvas id="loading" width="{this.FullWidth}" height="{this.FullHeight}" x="0" y="0">
-			<s:Image id="loadingImage" source="/Assets/loading.png" x="{(this.FullWidth -  this.loadingImage.width) / 2}">
+			<s:Image id="loadingImage" source="{ this.applicationPath + '/Assets/loading.png' }" x="{(this.FullWidth -  this.loadingImage.width) / 2}">
 				
 			</s:Image>
 		</mx:Canvas>
@@ -687,18 +688,18 @@
 			</mx:Tile>
 			
 			<s:BorderContainer id="bottomLine" width="{this.FullWidth}" height="41" borderVisible="false" backgroundColor="#1b2630" y="{this.FullHeight - this.bottomLine.height}">
-				<s:Image source="/Assets/logoseviye.png" id="logo" x="{(this.FullWidth - this.logo.width)/2}">
+				<s:Image source="{ this.applicationPath + '/Assets/logoseviye.png' }" id="logo" x="{(this.FullWidth - this.logo.width)/2}">
 					
 				</s:Image>
-				<s:Image source="/Assets/close.png" id="closeImage" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
+				<s:Image source="{ this.applicationPath + '/Assets/close.png' }" id="closeImage" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
 					
 				</s:Image>
 				<!--
-				<s:Image source="/Assets/search.png" id="searchImage" x="0" click="onSearchClick(event)">
+				<s:Image source="{ this.applicationPath + '/Assets/search.png' }" id="searchImage" x="0" click="onSearchClick(event)">
 					
 				</s:Image>
 				-->
-				<s:Image source="/Assets/kitapindir.png" id="syncImage" x="{ 1 }" y="1" click="onSyncClick(event)">
+				<s:Image source="{ this.applicationPath + '/Assets/kitapindir.png' }" id="syncImage" x="{ 1 }" y="1" click="onSyncClick(event)">
 					
 				</s:Image>
 			</s:BorderContainer>
@@ -737,16 +738,17 @@
 		</mx:Canvas>
 		<mx:Canvas id="searchView">
 			<s:BorderContainer width="{this.FullWidth}" height="40" borderVisible="false" backgroundColor="#1b2630">
-				<s:Image source="/Assets/ust-logo.png" x="{(this.FullWidth-this.logo.width) / 2}" >
+				<s:Image source="{ this.applicationPath + '/Assets/ust-logo.png' }" x="{(this.FullWidth-this.logo.width) / 2}" >
 					
 				</s:Image>
-				<s:Image source="/Assets/close.png" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
+				<s:Image source="{ this.applicationPath + '/Assets/close.png' }" x="{(this.FullWidth - this.closeImage.width)}" click="onCloseClick(event)">
 					
 				</s:Image>
-				<s:Image source="/Assets/mybooks.png" x="10" click="onBackLibrary(event)">
+				<s:Image source="{ this.applicationPath + '/Assets/mybooks.png' }" x="10" click="onBackLibrary(event)">
 					
 				</s:Image>
 			</s:BorderContainer>
+			
 		</mx:Canvas>
 	</mx:ViewStack>
 	

@@ -14,6 +14,8 @@
 			[Bindable]public var _x: Number = 0;
 			[Bindable]public var _y: Number = 0;
 			
+			[Bindable]public var applicationPath: String;
+			
 			public var _parent: Group;
 			
 			private var zoominX: Number 	= 109;
@@ -88,7 +90,7 @@
 	</fx:Script>
 	
 	<s:BorderContainer borderVisible="false" backgroundAlpha="0" backgroundColor="#000000">
-		<s:Image source="/Assets/pagemenu.png" click="onPageMenuClick(event)">
+		<s:Image source="{ this.applicationPath + '/Assets/pagemenu.png' }" click="onPageMenuClick(event)">
 			
 		</s:Image>
 	</s:BorderContainer>

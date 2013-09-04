@@ -24,6 +24,8 @@
 			[Bindable]public var _width: Number = 500;
 			[Bindable]public var _height: Number = 300;
 			
+			[Bindable]public var applicationPath: String;
+			
 			[Bindable]public var book: Book = FlexGlobals.topLevelApplication.book;
 			
 			public function onCreationComplete(e: Event): void {
@@ -96,7 +98,7 @@
 		<s:BorderContainer x="0" y="0" width="300" height="40" backgroundColor="#1B2630"
 						   borderColor="#1B2630">
 			<s:Label x="122" y="14" color="#FFFFFF" fontSize="21" text="Çizimler"/>
-			<s:Image x="4" y="2" width="42" height="38" source="Assets/tableofcontents-icon.png"/>
+			<s:Image x="4" y="2" width="42" height="38" source="{ this.applicationPath + '/Assets/tableofcontents-icon.png' }"/>
 		</s:BorderContainer>
 		<s:VGroup id="chapters" width="300" height="{ this._height - 40}" y="40">
 			

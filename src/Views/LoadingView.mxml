@@ -9,10 +9,12 @@
 		<![CDATA[
 			[Bindable]public var _width: Number = 400;
 			[Bindable]public var _height: Number = 300;
+			
+			[Bindable]public var applicationPath: String;
 		]]>
 	</fx:Script>
 	<mx:Canvas id="loading" width="{this._width}" height="{this._height}" x="0" y="0" backgroundColor="#d6d8d8">
-		<s:Image id="loadingImage" source="/Assets/loading.png" x="{(this._width -  this.loadingImage.width) / 2}">
+		<s:Image id="loadingImage" source="{ this.applicationPath + '/Assets/loading.png' }" x="{(this._width -  this.loadingImage.width) / 2}">
 			
 		</s:Image>
 	</mx:Canvas>
