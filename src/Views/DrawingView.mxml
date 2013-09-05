@@ -92,7 +92,7 @@
 			private function eraserBytesLoaded(e: Event): void {
 				var bytes: * = loaderEraser.content;
 				
-				this.eraserBitmapData = new BitmapData(bytes.width, bytes.height, true, 0);
+				this.eraserBitmapData = new BitmapData(bytes.width, bytes.height, false, 0xD6D8D8);
 				var matrix: Matrix = new Matrix();
 				this.eraserBitmapData.draw(bytes, matrix, null, null, null, true);
 			}
@@ -138,7 +138,7 @@
 			}
 			
 			public function onSaveClick(e: MouseEvent): void {
-				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0);
+				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, false, 0xD6D8D8);
 				bitmapData.draw(this.transparentArea);
 				
 				if( this.croppedImage.bitmapData ){
@@ -154,7 +154,7 @@
 			
 			public function onShareClick(e: MouseEvent): void {
 				
-				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0);
+				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, false, 0xD6D8D8);
 				bitmapData.draw(this.transparentArea);
 				
 				if( this.croppedImage.bitmapData ){
@@ -168,7 +168,7 @@
 				this.point = new Point(this.contentMouseX, this.contentMouseY);
 	
 				// save bitmapdata for undo
-				var bitmap: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, true, 0x000000);
+				var bitmap: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, false, 0xD6D8D8);
 				bitmap.draw(this.transparentArea);
 				this.bitmaps.push(bitmap);
 				

@@ -571,6 +571,8 @@
 				this.drawingView._width = this.display.FullWidth;
 				this.drawingView._height = this.display.FullHeight;
 				
+				this.drawingView.applicationPath = this.applicationPath;
+				
 				this.addEventListener("bitmap read", this.drawingBitmapDataReady);
 				
 				var _page: Page = this.book.pages[pageNo - 1];

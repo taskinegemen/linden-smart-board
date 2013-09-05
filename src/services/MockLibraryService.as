@@ -125,10 +125,12 @@ package services {
 			return bytes;
 		}
 		
-		// fuck
 		public function getDrawings( bookId: Number, pageNo: Number ): Array {
+			var path: String = File.applicationDirectory.nativePath;
+			var dir: File = new File();
 			
-			var dir: File = File.documentsDirectory.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\"  + pageNo.toString());
+			dir = dir.resolvePath(path + "\\books\\" + bookId.toString() + "\\drawings\\"  + pageNo.toString());
+			
 			var fileStream: FileStream = new FileStream();
 			
 			if( !dir.exists ) throw Error("Drawing yok");
@@ -150,10 +152,11 @@ package services {
 		// fuck
 		public function getDrawing( bookId: Number, pageNo: Number, drawingNo: Number): ByteArray {
 			var bytes: ByteArray = new ByteArray();
-			var file: File = File.documentsDirectory;
+			var path: String = File.applicationDirectory.nativePath;
 			var fileStream: FileStream = new FileStream();
+			var file: File = new File();
 			
-			file = file.resolvePath( MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
+			file = file.resolvePath( path + "\\books\\" + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
 			fileStream.open( file, FileMode.READ );
 			fileStream.readBytes( bytes );
 			fileStream.close();
@@ -168,10 +171,11 @@ package services {
 			
 			try
 			{
-				var file: File = File.documentsDirectory;
+				var path: String = File.applicationDirectory.nativePath;
+				var file: File = new File();
 				var fileStream: FileStream = new FileStream();
 				
-				file = file.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + name + ".png");
+				file = file.resolvePath( path + "\\books\\" + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + name + ".png" );
 				fileStream.open(file, FileMode.WRITE);
 				bytes.position = 0;
 				fileStream.writeBytes(bytes, 0, bytes.length);
@@ -189,10 +193,11 @@ package services {
 		public function updateDrawing( bookId: Number, pageNo: Number, drawingNo:Number ,bytes: ByteArray ): Boolean {
 			var res: Boolean = true;
 			try{
-				var file: File = File.documentsDirectory;
+				var path: String = File.applicationDirectory.nativePath;
+				var file: File = new File();
 				var fileStream: FileStream = new FileStream();
 				
-				file = file.resolvePath( MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
+				file = file.resolvePath( path + "\\books\\" + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
 				
 				fileStream.open( file, FileMode.WRITE );
 				bytes.position = 0;
@@ -209,12 +214,17 @@ package services {
 		private function getNextDrawingName( bookId: Number, pageNo: Number ): String {
 			var name: String = (1).toString();
 			try{
-				var dir: File = File.documentsDirectory;
+				var path: String = File.applicationDirectory.nativePath;
+				var dir: File = new File();
 				
-				dir = dir.resolvePath(MockLibraryService.LibraryPath + bookId.toString() + "\\drawings\\" + pageNo.toString());
+				dir = dir.resolvePath(path + "\\books\\" + bookId.toString() + "\\drawings\\" + pageNo.toString());
 				
 				name = (dir.getDirectoryListing().length + 1).toString();
 			}catch(e: Error){
+				var file: File = new File();
+				file = file.resolvePath( path + "\\books\\" + bookId.toString() );
+				file.createDirectory();
+				
 				dir.createDirectory();
 			}finally{
 				return name;	

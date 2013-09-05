@@ -81,11 +81,11 @@
 				var image: spark.components.Image = new spark.components.Image();
 				
 				image.id = obj.id;
-				image.source = obj.image;
+				image.source = obj.image				
 				
 				image.width = 180;
 				image.height = 210;
-				image.setStyle("backgroundColor", "#FFFFFF");
+				image.setStyle("backgroundColor", "#D6D8D8");
 				
 				image.addEventListener(MouseEvent.CLICK, this.onDrawingClick);
 				
