@@ -22,6 +22,7 @@
 			import Views.DrawingView;
 			import Views.DrawingsView;
 			import Views.LoadingView;
+			import Views.MessageView;
 			import Views.SyncView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
@@ -102,6 +103,15 @@
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
 				
+				
+				if( this.stage.width < 1280 ) {
+					this.pageResolution = Page._640;
+				}else if( this.stage.width < 1920 ) {
+					this.pageResolution = Page._1280;
+				} else {
+					this.pageResolution = Page._1920;
+				}
+				
 				// get library
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -119,6 +129,11 @@
 				this.exit();
 			}
 			
+			private function onDisplayStateChanging(): void {
+				trace( "geldim ");
+				
+			}
+			
 			private function showSearchView(e: Event): void {
 				this.display.mainStack.selectedIndex = DisplayStackConstants.SEARCH_VIEW_INDEX;
 			}
@@ -132,12 +147,22 @@
 				self.bindBookPages(e.book);
 				
 				this.loadingView = new LoadingView();
+				
+				this.loadingView.visible = false;
+				
 				this.addElement( this.loadingView );
 				
 				this.loadingView._width = this.display.FullWidth;
 				this.loadingView._height = this.display.FullHeight;
 				
 				this.loadingView.applicationPath = this.applicationPath;
+				
+				setTimeout( function(): void {
+					self.loadingView.visible = true;
+					
+					self.loadingView.loadingImage.x = ( self.loadingView._width - self.loadingView.loadingImage.sourceWidth ) / 2;
+					self.loadingView.loadingImage.y = ( self.loadingView._height - self.loadingView.loadingImage.sourceHeight ) / 2;
+				}, 100);
 				
 				setTimeout( function(): void {
 					self.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
@@ -213,32 +238,47 @@
 			}
 			
 			private function nextPage(e: Event): void {				
-				var nextPageNumber: Number = this.page.pageNo + 1;
-				this.page = this.book.getPage( nextPageNumber, this.pageResolution );
 				
-				this.display.pageView.source = this.page.image;
+				this.createMessage( "Bir sonraki sayfa getiriliyor" );
 				
-				this.display.pageView.height = this.page.height;
-				this.display.pageView.width = this.display.FullWidth;
+				var self: Object = this;
+				setTimeout( function(): void {
+					var nextPageNumber: Number = self.page.pageNo + 1;
+					self.page = self.book.getPage( nextPageNumber, self.pageResolution );
+					
+					self.display.pageView.source = self.page.image;
+					
+					self.display.pageView.height = self.page.height;
+					self.display.pageView.width = self.display.FullWidth;
+					
+					self.adjustPage();
+					
+					// page items
+					self.bindPageItems();
+				}, 200);
 				
-				this.adjustPage();
-				
-				// page items
-				this.bindPageItems();
 			}
 			
 			private function previousPage(e: Event): void {
-				var previousPageNumber: Number = this.page.pageNo - 1;
-				this.page = this.book.getPage( previousPageNumber, this.pageResolution );
-				this.display.pageView.source = this.page.image;
+				this.createMessage( "Bir önceki sayfa getiriliyor" );
 				
-				this.display.pageView.height = this.page.height;
-				this.display.pageView.width = this.display.FullWidth;
+				var self: Object = this;
+				setTimeout( function(): void {
+					
+					var previousPageNumber: Number = self.page.pageNo - 1;
+					self.page = self.book.getPage( previousPageNumber, self.pageResolution );
+					self.display.pageView.source = self.page.image;
+					
+					self.display.pageView.height = self.page.height;
+					self.display.pageView.width = self.display.FullWidth;
+					
+					self.adjustPage();
+					
+					// page items
+					self.bindPageItems();
+				}, 200);
 				
-				this.adjustPage();
 				
-				// page items
-				this.bindPageItems();
 			}
 			
 			private function adjustPage(): void {
@@ -265,19 +305,25 @@
 			}
 			
 			private function chapterClicked(e: MouseEvent): void {
-				var label: Label = e.target as Label;
+				this.createMessage( "Sayfalar getiriliyor" );
 				
-				var children: Number = this.display.tableOfContents.chapterArea.numChildren;
-				for(var i: Number = 0; i < children; i++) {
-					var _label:Label = this.display.tableOfContents.chapterArea.getElementAt(i) as Label;
-					_label.setStyle("backgroundColor", "#1B2630");
-				}
+				var self: Object = this;
+				setTimeout( function(): void {
+					var label: Label = e.target as Label;
+					
+					var children: Number = self.display.tableOfContents.chapterArea.numChildren;
+					for(var i: Number = 0; i < children; i++) {
+						var _label:Label = self.display.tableOfContents.chapterArea.getElementAt(i) as Label;
+						_label.setStyle("backgroundColor", "#1B2630");
+					}
+					
+					label.setStyle("backgroundColor", "#B8BBD9");
+					
+					var id: Number = label.id.split('-')[1];
+					
+					self.setChapterPages(id);
+				}, 200);
 				
-				label.setStyle("backgroundColor", "#B8BBD9");
-				
-				var id: Number = label.id.split('-')[1];
-				
-				this.setChapterPages(id);
 			}
 			
 			private function setChapterPages(chapterId: Number): void {
@@ -326,20 +372,26 @@
 			}
 			
 			private function chapterPageClicked(e: MouseEvent): void {
-				var image: Image = e.target as Image;
-				var imageSkin: ImageSkin = e.target as ImageSkin;
+				this.createMessage( "Sayfa getiriliyor" );
 				
-				if(image == null){
-					image = imageSkin.parent as Image;
-				}
+				var self: Object = this;
+				setTimeout( function(): void {
+					var image: Image = e.target as Image;
+					var imageSkin: ImageSkin = e.target as ImageSkin;
+					
+					if(image == null){
+						image = imageSkin.parent as Image;
+					}
+					
+					var pageNo: Number = image.id.split('-')[2];
+					self.page = self.book.getPage(pageNo, self.pageResolution);
+					self.display.pageView.source = self.page.image;
+					
+					self.display.tableOfContents.visible = false;
+					
+					self.bindPageItems();
+				}, 200);
 				
-				var pageNo: Number = image.id.split('-')[2];
-				this.page = this.book.getPage(pageNo, this.pageResolution);
-				this.display.pageView.source = this.page.image;
-				
-				this.display.tableOfContents.visible = false;
-				
-				this.bindPageItems();
 			}
 
 			private function fillLibrary(ev:Event): void {
@@ -360,6 +412,8 @@
 			
 			public var cropView: CropView;
 			public function initializeCropView(e: Event): void {
+				this.createMessage( "Kesim yapabilirsiniz" );
+				
 				this.addEventListener("crop-view-ready", this.cropViewReady);
 				
 				this.pageScale();
@@ -425,6 +479,7 @@
 			}
 			
 			public function shareDrawing(e: DrawingSaveEvent): void {
+				
 				var bitmapDataCopy: BitmapData = e.bitmapData.clone();
 				
 				if ( this.page.saveDrawing(e.bitmapData) ){
@@ -438,40 +493,48 @@
 					gonulGozu.sendImage( this.page.bookID, this.page.pageNo, e.bitmapData );
 					
 				} else {
-					Alert.show("hata oldu!");
+					this.createMessage( "Hata oldu!" );
 				}			
 				
 			}
 			
 			public function saveDrawing(e: DrawingSaveEvent): void {
+				
 				if (this.page.saveDrawing(e.bitmapData) ){
-					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
+					
+					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorManager.currentCursorID );
+					
 					this.removeElement( this.drawingView );	
+					
+					this.createMessage( "Çizim kaydedildi" );
 				} else {
-					Alert.show("hata oldu!");
+					this.createMessage( "Hata oldu!" );
 				}
 			}
 			
 			private function uploadingComplete(e: UploadingComplete): void {
 				if( e.success ) {
-					Alert.show("paylaşıldı");
-					//this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
+					
+					this.createMessage( "Paylaşıldı!" );
+					
+					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorManager.currentCursorID );
+					
 					//this.removeElement( this.drawingView );	
 				} else {
-					Alert.show("Kaydedildi ama paylaşılamadı!");
+					this.createMessage( "Paylaşılamadı!" );
 				}
 			}
 			
 			private function uploadingIOError(e: UploadingComplete): void {
-				Alert.show("İnternet bağlantısı yok!");
+				this.createMessage( "İnternet Bağlantısı Yok" );
 			}
 			
 			public function updateDrawing(e: DrawingSaveEvent): void {	
 				if( this.page.updateDrawing(e.bitmapData, this.drawingView.editName) ){
-					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
+					//this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
 					this.removeElement( this.drawingView );
 				} else {
-					Alert.show("hata oldu!");
+					this.createMessage( "Hata oldu!" );
 				}
 			}
 
@@ -593,6 +656,9 @@
 			
 			public var syncView: SyncView;
 			public function openSyncView(e: Event): void {
+				
+				this.createMessage( "Güncelleme ekranı açılıyor" );
+				
 				this.syncView = new SyncView();
 				this.syncView.booksInDisk = this.books;
 				this.syncView._width = this.display.FullWidth;
@@ -603,16 +669,23 @@
 			}
 			
 			public function updateLibraryView(e: Event): void {
-				this.display.removeElement( this.syncView );
 				
-				this.library.updateBooks();
+				this.createMessage( "Kitap listesi yenileniyor" );
 				
-				this.books = new Array(this.library.getBookCount());
-				this.books = this.library.getBooks();
+				var self: Object = this;
+				setTimeout( function(): void {
+					self.display.removeElement( self.syncView );
+					
+					self.library.updateBooks();
+					
+					self.books = new Array(self.library.getBookCount());
+					self.books = self.library.getBooks();
+					
+					self.fillLibrary(null);
+					
+				}, 200);
 				
-				//this.display.mainStack.selectedIndex = DisplayStackConstants.LIBRARY_VIEW_INDEX;
-				this.fillLibrary(null);
-				//this.addEventListener("library-ready", fillLibrary);
+				
 			}
 			
 			public function closeSyncView(e: Event): void {
@@ -620,9 +693,35 @@
 			}
 			
 			private function errorCropView(e: Event): void {
-				Alert.show("hata oldu.");
+				this.createMessage( "Hata oldu" );
 				this.removeElement( this.cropView );
 			}
+			
+			private var messageView: MessageView;
+			public function createMessage( message: String, time: Number = 2000 ): void {
+				if( this.messageView != null) {
+					this.removeElement( this.messageView );
+					this.messageView = null;
+				}
+				this.messageView = new MessageView();
+				
+				this.messageView.message = message;
+				this.messageView.time = time;
+				
+				this.addElement( this.messageView );
+				
+				this.addEventListener("message view close", this.messageViewClose);
+			}
+			
+			public function messageViewClose(e: Event): void {
+				if( this.messageView == null ) {
+					return;
+				}
+				this.removeElement( this.messageView );
+				this.messageView = null;
+				this.removeEventListener("message view close", this.messageViewClose);
+			}
+			
 		]]>
 		
 		

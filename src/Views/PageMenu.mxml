@@ -79,11 +79,13 @@
 			}
 			
 			public function doZoomin(): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom in click"));
+				FlexGlobals.topLevelApplication.createMessage( "Zoom in", 1000 );
+				//FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom in click"));
 			}
 			
 			public function doZoomout(): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom out click"));	
+				FlexGlobals.topLevelApplication.createMessage( "Zoom out", 1000 );
+				//FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom out click"));	
 			}
 			
 		]]>

@@ -79,12 +79,12 @@
 					this.loader.load( request );
 					
 				}catch(e: *){
-					Alert.show("Hata oldu.");
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				}
 			}
 			
 			private function onIOError(e: Event): void {
-				Alert.show("İnternet bağlantısı yok!");
+				FlexGlobals.topLevelApplication.createMessage( "İnternet bağlantısı yok" );
 			}
 			
 			private function onLoginComplete(e: Event): void {
@@ -98,7 +98,7 @@
 					this.token = result.token;
 					
 					if( this.token == null || this.token == "") {
-						Alert.show("Hata oldu");
+						FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 						return;
 					}
 					
@@ -121,7 +121,7 @@
 					
 					this.loader.load( request );
 				}catch(e: *) {
-					Alert.show("Hata oldu.");
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				}
 			}
 			
@@ -180,7 +180,7 @@
 				e.stopImmediatePropagation();
 				
 				if( !this.canExit ) {
-					Alert.show("İndirme işlemi devam ediyor.");
+					FlexGlobals.topLevelApplication.createMessage( "İndirme işlemi devam ediyor" );
 					return;
 				}
 				
@@ -292,7 +292,7 @@
 					this.canExit = false;
 					
 				}catch(e: Error) {
-					Alert.show("Hata oldu.");
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				}
 			}
 			
@@ -321,7 +321,7 @@
 			
 			private function onDownloadIOError(e: IOErrorEvent): void {
 				//trace( "download io error: " + e.text );
-				Alert.show("Hata oldu.");
+				FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				this.borderContainer.visible = false;
 				
 				if( this.selectedBooks.length ) {
@@ -351,7 +351,7 @@
 					
 					this.startDownloadItems();
 				}catch(e: *) {
-					Alert.show("Hata oldu");
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				}
 			}
 			

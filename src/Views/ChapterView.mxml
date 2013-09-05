@@ -8,6 +8,9 @@
 	<fx:Script>
 		<![CDATA[
 			import Events.ChapterViewClickEvent;
+			
+			import mx.core.FlexGlobals;
+			
 			[Bindable]public var title:String;
 			public var page:Number;
 			
@@ -20,8 +23,10 @@
 				this.chapterArea.setStyle("backgroundColor","#1b2630");
 			}
 			
-			public function changePageToTableOfContents(): void{
+			public function changePageToTableOfContents(): void {
+				
 				dispatchEvent(new ChapterViewClickEvent(ChapterViewClickEvent.CHAPTER_CLICKED,this.page));
+				
 			}
 			
 			

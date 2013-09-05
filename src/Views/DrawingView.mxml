@@ -52,9 +52,10 @@
 			public var eraserBitmapData: BitmapData;
 			
 			public var cursorID: Number = 0;
-			
+			public var initCursorID: Number;
 			public function onCreationComplete(e: Event): void {
 				
+				this.initCursorID = this.cursorManager.currentCursorID;
 				// pen and eraser icons
 				var eraserBytes: ByteArray = this.getEraserBytes();
 				loaderEraser.contentLoaderInfo.addEventListener(Event.COMPLETE, this.eraserBytesLoaded);
@@ -132,36 +133,47 @@
 			
 			public function onCloseClick(e: MouseEvent): void {
 				
-				this.cursorManager.removeCursor( this.cursorID );
+				this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
 				
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-close"));
 			}
 			
 			public function onSaveClick(e: MouseEvent): void {
-				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, false, 0xD6D8D8);
-				bitmapData.draw(this.transparentArea);
+				FlexGlobals.topLevelApplication.createMessage( "Çizim kaydediliyor" );
 				
-				if( this.croppedImage.bitmapData ){
-					bitmapData.copyPixels(this.croppedImage.bitmapData, new Rectangle(0, 0, this.croppedImage.width, this.croppedImage.height), new Point(10, 10));
-				}
+				var self: Object = this;
+				setTimeout( function(): void {
+					
+					var bitmapData: BitmapData = new BitmapData(self.transparentArea.width, self.transparentArea.height, false, 0xD6D8D8);
+					bitmapData.draw(self.transparentArea);
+					
+					if( self.croppedImage.bitmapData ){
+						bitmapData.copyPixels(self.croppedImage.bitmapData, new Rectangle(0, 0, self.croppedImage.width, self.croppedImage.height), new Point(10, 10));
+					}
+					
+					if( self.edit ){
+						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_UPDATE, bitmapData))	
+					}else{
+						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SAVE, bitmapData))	
+					}
+				}, 200);
 				
-				if( this.edit ){
-					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_UPDATE, bitmapData))	
-				}else{
-					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SAVE, bitmapData))	
-				}
 			}
 			
 			public function onShareClick(e: MouseEvent): void {
+				FlexGlobals.topLevelApplication.createMessage( "Çizim paylaşılıyor", 3000 );
+				var self: Object = this;
+				setTimeout( function(): void {
+					var bitmapData: BitmapData = new BitmapData(self.transparentArea.width, self.transparentArea.height, false, 0xD6D8D8);
+					bitmapData.draw(self.transparentArea);
+					
+					if( self.croppedImage.bitmapData ){
+						bitmapData.copyPixels(self.croppedImage.bitmapData, new Rectangle(0, 0, self.croppedImage.width, self.croppedImage.height), new Point(10, 10));
+					}
+					
+					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData));
+				}, 200);
 				
-				var bitmapData: BitmapData = new BitmapData(this.transparentArea.width, this.transparentArea.height, false, 0xD6D8D8);
-				bitmapData.draw(this.transparentArea);
-				
-				if( this.croppedImage.bitmapData ){
-					bitmapData.copyPixels(this.croppedImage.bitmapData, new Rectangle(0, 0, this.croppedImage.width, this.croppedImage.height), new Point(10, 10));
-				}
-				
-				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData));
 			}
 			
 			public function onMouseDown(e: MouseEvent): void {
@@ -200,15 +212,38 @@
 						this.transparentArea.graphics.lineTo(this.point.x, this.point.y);
 					}
 				}
+				
+				if( this.cursorManager.currentCursorID == 0) {
+					if( this.erase ) {
+						
+						CursorBitmap.bitmapData = this.eraserBitmapData;	
+						
+						this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+						
+						this.cursorManager.currentCursorXOffset = 0;
+						this.cursorManager.currentCursorYOffset = -22;
+						
+					} else {
+						
+						CursorBitmap.bitmapData = this.penBitmapData;
+						
+						this.cursorID = this.cursorManager.setCursor( CursorBitmap  );
+						this.cursorManager.currentCursorXOffset = -12;
+						this.cursorManager.currentCursorYOffset = -15;
+						
+					}
+				}
 			}
 			
 			public function onEraseClick(e: MouseEvent): void {
 				
 				if( this.erase ) {
 					
+					FlexGlobals.topLevelApplication.createMessage( "Kalem seçildi" );
+					
 					CursorBitmap.bitmapData = this.penBitmapData;
 					
-					this.cursorManager.removeCursor( this.cursorID );
+					this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
 					
 					this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 					
@@ -219,10 +254,11 @@
 					
 					this.erase = false;
 				}else{
-
+					FlexGlobals.topLevelApplication.createMessage( "Silgi seçildi" );
+					
 					CursorBitmap.bitmapData = this.eraserBitmapData;
 					
-					this.cursorManager.removeCursor( this.cursorID );
+					this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
 					
 					this.cursorID = this.cursorManager.setCursor( CursorBitmap  );
 					this.cursorManager.currentCursorXOffset = -12;
@@ -239,10 +275,16 @@
 				this.transparentArea.graphics.clear();
 				if( this.bitmaps.length ){
 					var bitmap: BitmapData = this.bitmaps.pop();
+					
+					if( this.croppedImage.bitmapData ){
+						bitmap.copyPixels(this.croppedImage.bitmapData, new Rectangle(0, 0, this.croppedImage.width, this.croppedImage.height), new Point(10, 10));
+					}
+					
 					this.transparentArea.graphics.beginBitmapFill(bitmap, new Matrix());
 					this.transparentArea.graphics.drawRect(0, 0, bitmap.width, bitmap.height);
 					this.transparentArea.graphics.endFill();
 				}
+				
 			}
 			
 			public function onRefreshClick(e: MouseEvent): void {
@@ -260,18 +302,23 @@
 				switch( color ) {
 					case "black":
 						this.color = 0x000000;
+						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Siyah ", 1000 );
 						break;
 					case "yellow":
 						this.color = 0XFFFF00;
+						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Sarı", 1000 );
 						break;
 					case "red":
 						this.color = 0xFF0000;
+						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Kırmızı", 1000 );
 						break;
 					case "green":
 						this.color = 0x00FF00;
+						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Yeşil", 1000 );
 						break;
 					case "blue":
 						this.color = 0X0000FF;
+						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Mavi", 1000 );
 						break;
 					default:
 						this.color = 0x000000;
@@ -286,9 +333,16 @@
 				}
 				var thickness: String = image.id.split('_')[1];
 				
+				FlexGlobals.topLevelApplication.createMessage( "Kalınlık: " + thickness, 1000 );
+				
 				this.thickness = new Number(thickness);
 			}
 			
+			public function onMouseOver(e: MouseEvent): void {
+				this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
+				e.stopImmediatePropagation();
+			}
+
 		]]>
 	</fx:Script>
 	
@@ -310,7 +364,10 @@
 			   backgroundColor="#000000" backgroundAlpha="0" mouseDown="onMouseDown(event)" mouseMove="onMouseMove(event)" mouseUp="onMouseUp(event)">
 	</mx:Canvas>
 	
-	<s:BorderContainer textAlign="center" width="{this._width}" id="drawingViewBottom" height="37" x="0" y="{this.drawingViewDrawingArea.height}" backgroundColor="#1b2630">			
+	<s:BorderContainer 
+		textAlign="center" 
+		mouseOver="onMouseOver(event)"
+		width="{this._width}" id="drawingViewBottom" height="37" x="0" y="{this.drawingViewDrawingArea.height}" backgroundColor="#1b2630">			
 		<!-- close button -->
 		<s:Image id="backbutton" x="5" top="2" width="101" height="31" source="{ this.applicationPath + '/Assets/backbutton.png' }" click="onCloseClick(event)">
 			

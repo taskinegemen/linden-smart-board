@@ -72,6 +72,17 @@
 				this.addEventListener(ChangeViewToBitmapEvent.IMAGE_CROPPED, changeStackToCrop);
 				
 				this.mainStack.selectedIndex = DisplayStackConstants.LOADING_VIEW_INDEX;
+				this.addEventListener("loading view ready", this.loadingViewReady);
+				
+			}
+			
+			private function loadingViewReady(e: Event): void {
+				
+				this.loadingImage.x = ( this.FullWidth - this.loadingImage.sourceWidth ) / 2;
+				this.loadingImage.y = ( this.FullHeight - this.loadingImage.sourceHeight ) / 2;
+				
+				this.removeEventListener("loading view ready", this.loadingViewReady);
+				
 			}
 			
 //			protected function onMouseDown(e:MouseEvent): void{
@@ -309,6 +320,7 @@
 			
 			// on page click
 			public var clickPoint: Point;
+			public var wasScroll: Boolean = false;
 			protected function onPageClick(e: MouseEvent): void {
 				this.timer = new Timer(200, 1);
 				this.timer.addEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
@@ -345,11 +357,42 @@
 					
 					this.bottomMenu.visible = true;
 					
+				} else if ( this.wasScroll ) {
+					// do nothing
 				} else if( this.items  && this.items.length ){
+					
 					// check for click an item 
 					var item: Item = null;
 					if( (item =  isItemClicked(this.clickPoint)) != null ){
-						this.showItem( item );
+						var self: Object = this;
+						var itemType: String = "";
+						
+						switch( item.type ) {
+							case "video":
+								itemType = "Video";
+								break;
+							case "audio":
+								itemType = "Ses";
+								break;
+							case "image":
+								itemType = "Resim";
+								break;
+							case "flash":
+								itemType = "Flash";
+								break;
+							case "link":
+								itemType = "Link";
+								break;
+							default:
+								itemType = "Item";
+						}
+						
+						FlexGlobals.topLevelApplication.createMessage( itemType + " açılıyor", 1000 );
+						
+						setTimeout( function(): void {
+							self.showItem( item );	
+						}, 200 );
+						
 					}
 				}
 			}
@@ -460,24 +503,6 @@
 							var bytes3: ByteArray = this.item.getBytes();
 							bytes3.position = 0;						
 							
-	//						var netConnection: NetConnection = new NetConnection();
-	//						netConnection.connect(null);
-	//						
-	//						var netStream: NetStream = new NetStream(netConnection);
-	//						
-	//						netStream.play(null);
-	//						netStream.appendBytesAction(NetStreamAppendBytesAction.RESET_BEGIN);
-	//						netStream.appendBytes(bytes3);
-	//						
-	//						var videoDisplay: VideoDisplay = new VideoDisplay();
-	//						videoDisplay.width = 600;
-	//						videoDisplay.height = 400;
-	//						this.itemView.addElement( videoDisplay );
-	//						
-	//						videoDisplay.mx_internal::videoPlayer.attachNetStream(netStream);
-	//						videoDisplay.mx_internal::videoPlayer.visible = true;
-	//						
-	//						break;
 							var videoPlayer3: VideoPlayer = new VideoPlayer();
 							this.videoPlayer = videoPlayer3;
 							
@@ -538,7 +563,7 @@
 					
 					
 				}catch(e: *){
-					Alert.show("Hata oldu.");
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				}
 				this.addElement( this.itemView );
 			}
@@ -606,7 +631,7 @@
 						}
 					}
 				}catch(e: *){
-					Alert.show("Hata oldu.");
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
 				}
 				this.removeElement( this.itemView );
 			}
@@ -633,27 +658,41 @@
 			public function onMouseUp(e: MouseEvent): void {
 				var newPoint: Point = new Point( this.contentMouseX, this.contentMouseY );
 				
-				if( this.pageChangePoint.x - newPoint.x < -30) {
-					FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
-				}else if( this.pageChangePoint.x - newPoint.x > 30){
-					FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
-				}
+				//if( this.pageChangePoint.x - newPoint.x < -30) {
+				//	FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
+				//}else if( this.pageChangePoint.x - newPoint.x > 30){
+				//	FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
+				//}
 				
 				this.canScroll = false;
+				
+				var self: Object = this;
+				setTimeout( function(): void {
+					self.wasScroll = false;
+				}, 300);
 			}
 			
 			public function onMouseMove(e: MouseEvent): void {
 				if(this.canScroll){
-					if( this.pageChangePoint.y - this.contentMouseY > 0){
-						this.page.verticalScrollPosition -= (this.contentMouseY - this.pageChangePoint.y);
-					}else if( this.pageChangePoint.y - this.contentMouseY < 0){
-						this.page.verticalScrollPosition += (this.pageChangePoint.y - this.contentMouseY);
+					if( this.pageChangePoint.y - this.contentMouseY > 10){
+						this.wasScroll = true;
+						//this.page.verticalScrollPosition -= (this.contentMouseY - this.pageChangePoint.y);
+						this.page.verticalScrollPosition -= 5;
+					}else if( this.pageChangePoint.y - this.contentMouseY < -10){
+						//this.page.verticalScrollPosition += (this.pageChangePoint.y - this.contentMouseY);
+						this.page.verticalScrollPosition += 5;
+						this.wasScroll = true;
 					}
+					e.stopImmediatePropagation();
 				}
 			}
 			
 			public function onSyncClick(e: Event): void {
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("sync-clicked"));
+			}
+			
+			public function onLoadingViewComplete(e: Event): void {
+				this.dispatchEvent(new Event("loading view ready"));
 			}
 			
 		]]>
@@ -671,7 +710,7 @@
 	
 	<mx:ViewStack id="mainStack"  width="{this.FullWidth}" height="{this.FullHeight}">
 		<mx:Canvas id="loading" width="{this.FullWidth}" height="{this.FullHeight}" x="0" y="0">
-			<s:Image id="loadingImage" source="{ this.applicationPath + '/Assets/loading.png' }" x="{(this.FullWidth -  this.loadingImage.width) / 2}">
+			<s:Image id="loadingImage" creationComplete="onLoadingViewComplete(event)" source="{ this.applicationPath + '/Assets/loading.png' }" x="{(this.FullWidth -  this.loadingImage.width) / 2}">
 				
 			</s:Image>
 		</mx:Canvas>

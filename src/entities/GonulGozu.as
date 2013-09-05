@@ -115,8 +115,6 @@ package entities {
 			
 			var str: String = base64.toString();
 			
-			trace( this.token );
-			trace( str );
 			variables.file = str
 			//variables.bookID = this.bookID;
 			//variables.page = pageNo;

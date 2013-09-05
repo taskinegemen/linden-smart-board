@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="{ this._width }" height="{ this._height }" initialize="init()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			
+			[Bindable]public var _width: Number = 
+				FlexGlobals.topLevelApplication.display.FullWidth;
+			[Bindable]public var _height: Number = 50;
+			
+			[Bindable]public var _x: Number = 0;
+				//FexGlobals.topLevelApplication.display.FullWidth - 200;
+			
+			[Bindable]public var _y: Number = 0;
+				//( FlexGlobals.topLevelApplication.display.FullHeight - 100 ) / 2;
+			
+			[Bindable]public var message: String = "";
+			
+			public var time: Number = 5000;
+			
+			public function init(): void {
+				//this.container.x = FlexGlobals.topLevelApplication.display.FullWidth;
+				//this.fadeIn( this._width );
+				this.fadeInFinished();
+			}
+			
+			public function onClick(e: Event): void {
+				e.stopImmediatePropagation();
+				
+				FlexGlobals.topLevelApplication.dispatchEvent(new Event("message view close"));
+			}
+			
+			public function fadeIn(time: Number): void {
+				if( time == 0) {
+					this.fadeInFinished();
+				} else {
+					this.container.x -= 10;
+					var self: Object = this;
+					setTimeout( function(): void {
+						self.fadeIn( time - 10 );
+					}, 10);
+				}
+			}
+			
+			private function fadeInFinished(): void {
+				setTimeout( function(): void {
+					FlexGlobals.topLevelApplication.dispatchEvent(new Event("message view close"));
+				}, this.time);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<mx:Tile
+		id="container"
+		tileWidth="{ this._width }" tileHeight="{ this._height }"
+		x="{ this._x }" y="{ this._y }" z="-1"
+		horizontalAlign="center"
+		verticalAlign="middle"
+		backgroundColor="#1b2630"
+		click="onClick(event)">
+		<s:Label text="{ this.message }" color="#FFFFFF" fontWeight="bold" fontSize="14"> 
+			
+		</s:Label>
+	</mx:Tile>
+</s:Group>

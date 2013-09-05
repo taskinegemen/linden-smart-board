@@ -48,6 +48,8 @@
 			}
 			
 			public function onMouseUp(e: MouseEvent): void {
+				FlexGlobals.topLevelApplication.createMessage( "Çizim ekranı açılıyor" );
+				
 				var leftUpper: Point = new Point();
 				var rightBottom: Point = new Point();
 				
