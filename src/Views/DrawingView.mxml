@@ -139,7 +139,7 @@
 			}
 			
 			public function onSaveClick(e: MouseEvent): void {
-				FlexGlobals.topLevelApplication.createMessage( "Çizim kaydediliyor" );
+				FlexGlobals.topLevelApplication.createMessage( "Çizim kaydediliyor", MessageView.INFO );
 				
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -161,7 +161,7 @@
 			}
 			
 			public function onShareClick(e: MouseEvent): void {
-				FlexGlobals.topLevelApplication.createMessage( "Çizim paylaşılıyor", 3000 );
+				FlexGlobals.topLevelApplication.createMessage( "Çizim paylaşılıyor", MessageView.INFO );
 				var self: Object = this;
 				setTimeout( function(): void {
 					var bitmapData: BitmapData = new BitmapData(self.transparentArea.width, self.transparentArea.height, false, 0xD6D8D8);
@@ -239,7 +239,7 @@
 				
 				if( this.erase ) {
 					
-					FlexGlobals.topLevelApplication.createMessage( "Kalem seçildi" );
+					FlexGlobals.topLevelApplication.createMessage( "Kalem seçildi", MessageView.INFO );
 					
 					CursorBitmap.bitmapData = this.penBitmapData;
 					
@@ -254,7 +254,7 @@
 					
 					this.erase = false;
 				}else{
-					FlexGlobals.topLevelApplication.createMessage( "Silgi seçildi" );
+					FlexGlobals.topLevelApplication.createMessage( "Silgi seçildi", MessageView.INFO );
 					
 					CursorBitmap.bitmapData = this.eraserBitmapData;
 					
@@ -302,23 +302,23 @@
 				switch( color ) {
 					case "black":
 						this.color = 0x000000;
-						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Siyah ", 1000 );
+						//FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Siyah ", 1000 );
 						break;
 					case "yellow":
 						this.color = 0XFFFF00;
-						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Sarı", 1000 );
+						//FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Sarı", 1000 );
 						break;
 					case "red":
 						this.color = 0xFF0000;
-						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Kırmızı", 1000 );
+						//FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Kırmızı", 1000 );
 						break;
 					case "green":
 						this.color = 0x00FF00;
-						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Yeşil", 1000 );
+						//FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Yeşil", 1000 );
 						break;
 					case "blue":
 						this.color = 0X0000FF;
-						FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Mavi", 1000 );
+						//FlexGlobals.topLevelApplication.createMessage( "Kalem rengi: Mavi", 1000 );
 						break;
 					default:
 						this.color = 0x000000;
@@ -333,7 +333,7 @@
 				}
 				var thickness: String = image.id.split('_')[1];
 				
-				FlexGlobals.topLevelApplication.createMessage( "Kalınlık: " + thickness, 1000 );
+				//FlexGlobals.topLevelApplication.createMessage( "Kalınlık: " + thickness, 1000 );
 				
 				this.thickness = new Number(thickness);
 			}

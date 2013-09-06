@@ -8,6 +8,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import Events.ZoomClickEvent;
+			
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
 			
@@ -37,11 +39,16 @@
 			private var closeY: Number 		= 73;
 			
 			private var distance: Number 	= 25;
+			private var x1: Number;
+			private var y1: Number;
+			
+			public var xx: Number;
+			public var yy: Number;
 			
 			// on click page menu close
 			public function onPageMenuClick(e: MouseEvent): void {
-				var x1: Number = e.stageX - this._x;
-				var y1: Number = e.stageY - this._y;
+				x1 = e.stageX - this._x;
+				y1 = e.stageY - this._y;
 				
 				if(this.getDistance(x1, penX, y1, penY) <= this.distance) {
 					this.doPaint();
@@ -79,13 +86,13 @@
 			}
 			
 			public function doZoomin(): void {
-				FlexGlobals.topLevelApplication.createMessage( "Zoom in", 1000 );
-				//FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom in click"));
+				var point: Point = new Point( xx, yy );
+				FlexGlobals.topLevelApplication.dispatchEvent(new ZoomClickEvent(ZoomClickEvent.ZOOM_IN, point));
 			}
 			
 			public function doZoomout(): void {
-				FlexGlobals.topLevelApplication.createMessage( "Zoom out", 1000 );
-				//FlexGlobals.topLevelApplication.dispatchEvent(new Event("zoom out click"));	
+				var point: Point = new Point( xx, yy );
+				FlexGlobals.topLevelApplication.dispatchEvent(new ZoomClickEvent(ZoomClickEvent.ZOOM_OUT, point));	
 			}
 			
 		]]>

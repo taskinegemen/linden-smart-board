@@ -37,7 +37,7 @@
 			}
 			
 			public function onChapterClick(e: MouseEvent): void {
-				FlexGlobals.topLevelApplication.createMessage( "Çizimler getiriliyor" );
+				FlexGlobals.topLevelApplication.createMessage( "Çizimler getiriliyor", MessageView.INFO );
 				
 				
 				var label: spark.components.Label = e.target as spark.components.Label;

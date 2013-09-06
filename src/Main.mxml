@@ -4,7 +4,7 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   initialize="init()" 
 					   applicationComplete="applicationCompleted()"
-					   showStatusBar="false"
+					   showStatusBar="false"					   
 					   >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -24,6 +24,7 @@
 			import Views.LoadingView;
 			import Views.MessageView;
 			import Views.SyncView;
+			import Views.ZoomView;
 			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
@@ -37,6 +38,7 @@
 			import mx.controls.Alert;
 			
 			import spark.components.BorderContainer;
+			import spark.components.Group;
 			import spark.components.Image;
 			import spark.components.Label;
 			import spark.skins.spark.ImageSkin;
@@ -81,8 +83,8 @@
 				
 				this.addEventListener("crop-click", initializeCropView);
 				this.addEventListener("show drawings menu", this.showDrawingsMenu);
-				this.addEventListener("zoom in click", this.zoomInClick);
-				this.addEventListener("zoom out click", this.zoomOutClick);
+				this.addEventListener(ZoomClickEvent.ZOOM_IN, this.zoomInClick);
+				this.addEventListener(ZoomClickEvent.ZOOM_OUT, this.zoomOutClick);
 				this.addEventListener("item-view-close", this.itemViewClose);
 				this.addEventListener("item-view-ready", this.display.itemViewReady);
 				
@@ -129,11 +131,6 @@
 				this.exit();
 			}
 			
-			private function onDisplayStateChanging(): void {
-				trace( "geldim ");
-				
-			}
-			
 			private function showSearchView(e: Event): void {
 				this.display.mainStack.selectedIndex = DisplayStackConstants.SEARCH_VIEW_INDEX;
 			}
@@ -162,7 +159,7 @@
 					
 					self.loadingView.loadingImage.x = ( self.loadingView._width - self.loadingView.loadingImage.sourceWidth ) / 2;
 					self.loadingView.loadingImage.y = ( self.loadingView._height - self.loadingView.loadingImage.sourceHeight ) / 2;
-				}, 100);
+				}, 500);
 				
 				setTimeout( function(): void {
 					self.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
@@ -239,8 +236,6 @@
 			
 			private function nextPage(e: Event): void {				
 				
-				this.createMessage( "Bir sonraki sayfa getiriliyor" );
-				
 				var self: Object = this;
 				setTimeout( function(): void {
 					var nextPageNumber: Number = self.page.pageNo + 1;
@@ -260,7 +255,6 @@
 			}
 			
 			private function previousPage(e: Event): void {
-				this.createMessage( "Bir önceki sayfa getiriliyor" );
 				
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -305,7 +299,7 @@
 			}
 			
 			private function chapterClicked(e: MouseEvent): void {
-				this.createMessage( "Sayfalar getiriliyor" );
+				this.createMessage( "Sayfalar getiriliyor", MessageView.INFO );
 				
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -412,7 +406,7 @@
 			
 			public var cropView: CropView;
 			public function initializeCropView(e: Event): void {
-				this.createMessage( "Kesim yapabilirsiniz" );
+				this.createMessage( "Kesim yapabilirsiniz", MessageView.INFO );
 				
 				this.addEventListener("crop-view-ready", this.cropViewReady);
 				
@@ -493,7 +487,7 @@
 					gonulGozu.sendImage( this.page.bookID, this.page.pageNo, e.bitmapData );
 					
 				} else {
-					this.createMessage( "Hata oldu!" );
+					this.createMessage( "Hata oldu!", MessageView.ERROR );
 				}			
 				
 			}
@@ -506,27 +500,27 @@
 					
 					this.removeElement( this.drawingView );	
 					
-					this.createMessage( "Çizim kaydedildi" );
+					this.createMessage( "Çizim kaydedildi", MessageView.SUCCESS);
 				} else {
-					this.createMessage( "Hata oldu!" );
+					this.createMessage( "Hata oldu!", MessageView.ERROR );
 				}
 			}
 			
 			private function uploadingComplete(e: UploadingComplete): void {
 				if( e.success ) {
 					
-					this.createMessage( "Paylaşıldı!" );
+					this.createMessage( "Paylaşıldı!", MessageView.SUCCESS );
 					
 					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorManager.currentCursorID );
 					
 					//this.removeElement( this.drawingView );	
 				} else {
-					this.createMessage( "Paylaşılamadı!" );
+					this.createMessage( "Paylaşılamadı!", MessageView.ERROR );
 				}
 			}
 			
 			private function uploadingIOError(e: UploadingComplete): void {
-				this.createMessage( "İnternet Bağlantısı Yok" );
+				this.createMessage( "İnternet Bağlantısı Yok", MessageView.ERROR );
 			}
 			
 			public function updateDrawing(e: DrawingSaveEvent): void {	
@@ -534,7 +528,7 @@
 					//this.drawingView.cursorManager.removeCursor( this.drawingView.cursorID );
 					this.removeElement( this.drawingView );
 				} else {
-					this.createMessage( "Hata oldu!" );
+					this.createMessage( "Hata oldu!", MessageView.ERROR );
 				}
 			}
 
@@ -592,14 +586,122 @@
 				return label;
 			}
 			
-			public function zoomInClick(e: Event): void {
-				this.pageScale(0.1, 0.1);
-				this.pageCenter();
+			private var zoomView: ZoomView;
+			private var zoomOut: Boolean = false;
+			public function zoomInClick(e: ZoomClickEvent): void {
+				if( this.zoomOut ){
+					this.zoomOut = false;
+					var self: Object = this;
+					setTimeout( function(): void {
+						
+						self.page  = self.book.getPage( self.page.pageNo, self.pageResolution );
+						
+						self.display.pageView.source = self.page.image;
+						
+						self.display.pageView.height = self.page.height;
+						self.display.pageView.width = self.display.FullWidth;
+						
+						self.adjustPage();
+						
+						// page items
+						self.bindPageItems();
+					}, 200);
+					return;
+				}
+				var w: Number = 400;
+				var h: Number = 400;
+				var leftUp: Point = new Point();
+				var rightBottom: Point = new Point();
+				
+				e.point.x -= 50;
+				
+				if( e.point.x - ( w  / 2) < 0 ) {
+					
+					leftUp.x = 0;
+					rightBottom.x = w;
+					
+				} else if( e.point.x + ( w / 2 ) > this.display.FullWidth ) {
+					
+					leftUp.x = this.display.pageView.sourceWidth - w;
+					rightBottom.x = this.display.pageView.sourceWidth;
+					
+				} else {
+					
+					leftUp.x = e.point.x - ( w  / 2);
+					rightBottom.x = e.point.x + ( w / 2 );
+					
+				}
+				
+				if( e.point.y - ( h  / 2) < 0 ) {
+					
+					leftUp.y = 0;
+					rightBottom.y = h;
+					
+				} else if( e.point.y + ( h / 2 ) > this.display.FullHeight ) {
+					
+					leftUp.y = this.display.FullHeight - h;
+					rightBottom.y = this.display.FullHeight;
+					
+				} else {
+					
+					leftUp.y = e.point.y - ( h  / 2);
+					rightBottom.y = e.point.y + ( h / 2 );
+					
+				}
+				
+				var pageScrollPositionX: Number = this.display.page.horizontalScrollPosition;
+				var pageScrollPositionY: Number = this.display.page.verticalScrollPosition + this.pageViewY;
+				
+				var sourceRect: Rectangle = 
+					new Rectangle(leftUp.x + pageScrollPositionX, leftUp.y + pageScrollPositionY, rightBottom.x - leftUp.x, rightBottom.y - leftUp.y);
+				var image: BitmapData = new BitmapData(sourceRect.width, sourceRect.height, true);
+				
+				image.copyPixels(this.display.pageView.bitmapData, sourceRect, new Point(0, 0));
+				
+				this.addEventListener("zoom view close", this.zoomViewClose);
+				this.zoomView = new ZoomView();
+				
+				this.zoomView._width = this.display.FullWidth;
+				this.zoomView._height = this.display.FullHeight;				
+				
+				this.addElement( this.zoomView );
+				
+				this.zoomView.image.source = image;
+				
+				this.zoomView.image.width = w * 1.2;
+				this.zoomView.image.height = h * 1.2;
+				
+				this.zoomView.image.scaleX = 1.2;
+				this.zoomView.image.scaleY = 1.2;
+				
+				this.zoomView.image.x = ( this.zoomView._width - this.zoomView.image.width ) / 2;
+				this.zoomView.image.y = ( this.zoomView._height - this.zoomView.image.height ) / 2;
+
 			}
 			
-			public function zoomOutClick(e: Event): void {
-				this.pageScale(-0.1, -0.1);
-				this.pageCenter();
+			public function zoomViewClose(e: Event): void {
+				this.removeElement( this.zoomView );
+			}
+			
+			public function zoomOutClick(e: ZoomClickEvent): void {
+				//this.createMessage( e.point.x + " " + e.point.y, MessageView.SUCCESS );
+				this.zoomOut = true;
+				var self: Object = this;
+				setTimeout( function(): void {
+					
+					self.page  = self.book.getPage( self.page.pageNo, Page._640 );
+					
+					self.display.pageView.source = self.page.image;
+					
+					self.display.pageView.height = self.page.height;
+					self.display.pageView.width = self.display.FullWidth;
+					
+					self.adjustPage();
+					
+					// page items
+					self.bindPageItems();
+				}, 200);
+				
 			}
 			
 			public function pageScale(x: Number = 0, y: Number = 0): void {
@@ -657,7 +759,7 @@
 			public var syncView: SyncView;
 			public function openSyncView(e: Event): void {
 				
-				this.createMessage( "Güncelleme ekranı açılıyor" );
+				this.createMessage( "Güncelleme ekranı açılıyor", MessageView.INFO );
 				
 				this.syncView = new SyncView();
 				this.syncView.booksInDisk = this.books;
@@ -670,7 +772,7 @@
 			
 			public function updateLibraryView(e: Event): void {
 				
-				this.createMessage( "Kitap listesi yenileniyor" );
+				this.createMessage( "Kitap listesi yenileniyor", MessageView.INFO );
 				
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -693,12 +795,12 @@
 			}
 			
 			private function errorCropView(e: Event): void {
-				this.createMessage( "Hata oldu" );
+				this.createMessage( "Hata oldu", MessageView.ERROR );
 				this.removeElement( this.cropView );
 			}
 			
 			private var messageView: MessageView;
-			public function createMessage( message: String, time: Number = 2000 ): void {
+			public function createMessage( message: String, type: String = MessageView.SUCCESS, time: Number = 2000 ): void {
 				if( this.messageView != null) {
 					this.removeElement( this.messageView );
 					this.messageView = null;
@@ -707,8 +809,12 @@
 				
 				this.messageView.message = message;
 				this.messageView.time = time;
+				this.messageView.type = type;
 				
 				this.addElement( this.messageView );
+				
+				this.messageView.depth = 1000;
+				this.messageView.show();
 				
 				this.addEventListener("message view close", this.messageViewClose);
 			}

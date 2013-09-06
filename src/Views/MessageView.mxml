@@ -10,24 +10,54 @@
 		<![CDATA[
 			import mx.core.FlexGlobals;
 			
-			[Bindable]public var _width: Number = 
-				FlexGlobals.topLevelApplication.display.FullWidth;
+			[Bindable]public var _width: Number = 400;
 			[Bindable]public var _height: Number = 50;
 			
-			[Bindable]public var _x: Number = 0;
-				//FexGlobals.topLevelApplication.display.FullWidth - 200;
+			[Bindable]public var _x: Number =
+				( FlexGlobals.topLevelApplication.display.FullWidth - 400 ) / 2;
 			
-			[Bindable]public var _y: Number = 0;
+			[Bindable]public var _y: Number = -50;
 				//( FlexGlobals.topLevelApplication.display.FullHeight - 100 ) / 2;
 			
 			[Bindable]public var message: String = "";
+			[Bindable]public var type: String = "success";
 			
-			public var time: Number = 5000;
+			public static const SUCCESS: String = "success";
+			public static const ERROR: String = "error";
+			public static const INFO: String = "info";
+			
+			public var time: Number = 2000;
 			
 			public function init(): void {
-				//this.container.x = FlexGlobals.topLevelApplication.display.FullWidth;
-				//this.fadeIn( this._width );
-				this.fadeInFinished();
+				switch( this.type ) {
+					case MessageView.SUCCESS:
+						this.container.setStyle("backgroundColor", "#8DC63F");
+						break;
+					case MessageView.ERROR:
+						this.container.setStyle("backgroundColor", "#BE1E2D");
+						break;
+					case MessageView.INFO:
+						this.container.setStyle("backgroundColor", "#00AEEF");
+						break;
+					default:
+						this.container.setStyle("backgroundColor", "#555555");
+						break;
+				}
+			}
+			
+			public function show( fade: Boolean = false): void {
+				
+				if( fade ) {
+					this._y = -50;
+					this.container.visible = true;
+					this.fadeIn(500);	
+				} else {
+					this._y = 0;
+					this.container.visible = true;
+					this.fadeInFinished();
+				}
+				
+				//this.fadeInFinished();
 			}
 			
 			public function onClick(e: Event): void {
@@ -37,14 +67,14 @@
 			}
 			
 			public function fadeIn(time: Number): void {
-				if( time == 0) {
+				if( time == 0 ) {
 					this.fadeInFinished();
 				} else {
-					this.container.x -= 10;
+					this.container.y += 2;
 					var self: Object = this;
 					setTimeout( function(): void {
-						self.fadeIn( time - 10 );
-					}, 10);
+						self.fadeIn( time - 20 );
+					}, 20);
 				}
 			}
 			
@@ -59,13 +89,14 @@
 	
 	<mx:Tile
 		id="container"
+		visible="false"
 		tileWidth="{ this._width }" tileHeight="{ this._height }"
-		x="{ this._x }" y="{ this._y }" z="-1"
+		x="{ this._x }" y="{ this._y }"
 		horizontalAlign="center"
 		verticalAlign="middle"
-		backgroundColor="#1b2630"
+		backgroundAlpha="0.8"
 		click="onClick(event)">
-		<s:Label text="{ this.message }" color="#FFFFFF" fontWeight="bold" fontSize="14"> 
+		<s:Label text="{ this.message }" color="#FFFFFF" fontSize="20"> 
 			
 		</s:Label>
 	</mx:Tile>

@@ -22,6 +22,7 @@
 			import Views.PageMenu;
 			import Views.SwfView;
 			import Views.VideoView;
+			import Views.MessageView;
 			
 			import components.Mp3Player;
 			
@@ -312,6 +313,9 @@
 				this._pageMenu._x = e.stageX - (this._pageMenu.width / 2);
 				this._pageMenu._y = e.stageY - (this._pageMenu.height / 2);
 				
+				this._pageMenu.xx = e.stageX;
+				this._pageMenu.yy = e.stageY;
+				
 				this._pageMenu._parent = this;
 				this._pageMenu.applicationPath = this.applicationPath;
 				this.addElement(this._pageMenu);
@@ -387,7 +391,7 @@
 								itemType = "Item";
 						}
 						
-						FlexGlobals.topLevelApplication.createMessage( itemType + " açılıyor", 1000 );
+						FlexGlobals.topLevelApplication.createMessage( itemType + " açılıyor", MessageView.INFO, 1000 );
 						
 						setTimeout( function(): void {
 							self.showItem( item );	
@@ -563,7 +567,7 @@
 					
 					
 				}catch(e: *){
-					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu", MessageView.ERROR );
 				}
 				this.addElement( this.itemView );
 			}
@@ -631,7 +635,7 @@
 						}
 					}
 				}catch(e: *){
-					FlexGlobals.topLevelApplication.createMessage( "Hata oldu" );
+					FlexGlobals.topLevelApplication.createMessage( "Hata oldu", MessageView.ERROR );
 				}
 				this.removeElement( this.itemView );
 			}
