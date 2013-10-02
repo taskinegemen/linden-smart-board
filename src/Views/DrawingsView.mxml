@@ -73,6 +73,11 @@
 			private function bindChapterDrawings ( drawings: Array ): void {
 				this.drawings.removeAllElements();
 				
+				if( !drawings.length ) {
+					FlexGlobals.topLevelApplication.createMessage( "Çizim bulunamadı.", MessageView.INFO );
+					return;
+				}
+				
 				for each( var obj: Object in drawings ) {
 					
 					var image: spark.components.Image = this.getDrawingImage( obj );

@@ -42,7 +42,7 @@
 			
 			private var player: GIFPlayer = new GIFPlayer();
 			
-			private static const API_URL: String = "http://api.linden.pro";
+			private static const API_URL: String = "http://api.seviye.com.tr";
 			private var email: String = "kurtulus@linden-tech.com";
 			private var password: String = "123456";
 			
@@ -142,7 +142,7 @@
 						obj.id = resObj.ID;
 						obj.title = resObj.title;
 						obj.publisher = "Seviye yayıncılık";
-						obj.image = "http://api.linden.pro/book-cover/" + resObj.ID +"?width=92";
+						obj.image = "http://api.seviye.com.tr/book-cover/" + resObj.ID +"?width=92";
 						
 						if( this.isAlreadyInDisk( obj.id ) ) {
 							continue;
@@ -240,7 +240,7 @@
 					file.addEventListener(Event.CANCEL, onDownloadComplete);
 					
 					//request.url = "http://github.com/mozilla/pdf.js/zipball/master";
-					request.url = "http://download.linden.pro/encryptedBook." + this.currentBookID + ".dat";
+					request.url = "http://download.seviye.com.tr/encryptedBook." + this.currentBookID + ".dat";
 					request.method = URLRequestMethod.GET;
 					
 					//trace( this.currentBookID + " download started." );
@@ -276,7 +276,7 @@
 					file.addEventListener(Event.CANCEL, onDownloadItemsComplete);
 					
 					//request.url = "http://github.com/mozilla/pdf.js/zipball/master";
-					request.url = "http://download.linden.pro/encryptedItems." + this.currentBookID + ".dat";
+					request.url = "http://download.seviye.com.tr/encryptedItems." + this.currentBookID + ".dat";
 					request.method = URLRequestMethod.GET;
 					
 					//trace( this.currentBookID + " download items started." );

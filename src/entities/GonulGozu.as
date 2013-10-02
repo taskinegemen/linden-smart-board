@@ -33,7 +33,7 @@ package entities {
 		private var urlLoader: URLLoader;
 		private var variables: URLVariables;
 		
-		private static const API_URL: String = "http://api.linden.pro";
+		private static const API_URL: String = "http://api.seviye.com.tr";
 		
 		private var email: String = "kurtulus@linden-tech.com";
 		private var password: String = "123456";

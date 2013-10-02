@@ -77,15 +77,11 @@
 				CursorBitmap.bitmapData = this.penBitmapData;
 				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 				
-				this.cursorManager.removeCursor( this.cursorID );
-				CursorBitmap.bitmapData = this.eraserBitmapData;
-				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
-				
-				this.cursorManager.removeCursor( this.cursorID );
-				CursorBitmap.bitmapData = this.penBitmapData;
-				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
-				this.cursorManager.currentCursorXOffset = 0;
-				this.cursorManager.currentCursorYOffset = -22;
+				var self: Object = this;
+				setTimeout( function(): void {
+					self.cursorManager.currentCursorXOffset = 0;
+					self.cursorManager.currentCursorYOffset = -22;	
+				}, 200 );
 				
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawing-view-ready"));
 			}
@@ -214,23 +210,30 @@
 				}
 				
 				if( this.cursorManager.currentCursorID == 0) {
+					
 					if( this.erase ) {
 						
 						CursorBitmap.bitmapData = this.eraserBitmapData;	
 						
 						this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 						
-						this.cursorManager.currentCursorXOffset = 0;
-						this.cursorManager.currentCursorYOffset = -22;
+						var self: Object = this;
+						setTimeout( function(): void {
+							self.cursorManager.currentCursorXOffset = -12;
+							self.cursorManager.currentCursorYOffset = -15;	
+						}, 200 );
 						
 					} else {
 						
 						CursorBitmap.bitmapData = this.penBitmapData;
 						
-						this.cursorID = this.cursorManager.setCursor( CursorBitmap  );
-						this.cursorManager.currentCursorXOffset = -12;
-						this.cursorManager.currentCursorYOffset = -15;
+						this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 						
+						var self_: Object = this;
+						setTimeout( function(): void {
+							self_.cursorManager.currentCursorXOffset = 0;
+							self_.cursorManager.currentCursorYOffset = -22;	
+						}, 200 );
 					}
 				}
 			}
@@ -246,11 +249,13 @@
 					this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
 					
 					this.cursorID = this.cursorManager.setCursor( CursorBitmap );
-					
-					this.cursorManager.currentCursorXOffset = 0;
-					this.cursorManager.currentCursorYOffset = -22;
-					
 					this.eraserButton.source = this.applicationPath + "\\Assets\\eraser.png";
+					
+					var self: Object = this;
+					setTimeout( function(): void {
+						self.cursorManager.currentCursorXOffset = -12;
+						self.cursorManager.currentCursorYOffset = -15;	
+					}, 200 );
 					
 					this.erase = false;
 				}else{
@@ -261,9 +266,6 @@
 					this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
 					
 					this.cursorID = this.cursorManager.setCursor( CursorBitmap  );
-					this.cursorManager.currentCursorXOffset = -12;
-					this.cursorManager.currentCursorYOffset = -15;
-					
 					this.eraserButton.source = this.applicationPath + "\\Assets\\pen.png";
 					
 					this.erase = true;

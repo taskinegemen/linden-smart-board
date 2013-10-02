@@ -294,6 +294,9 @@
 			
 			// show circular menu on page
 			protected function onPageDoubleClick(e: MouseEvent): void {
+				if( this._pageMenu != null && this._pageMenu.visible && this.FullHeight - this.clickPoint.y <= 50 ) {
+					return;
+				}
 				this.timer.removeEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
 				if(this.timer.running){
 					this.timer.stop();
@@ -326,11 +329,13 @@
 			public var clickPoint: Point;
 			public var wasScroll: Boolean = false;
 			protected function onPageClick(e: MouseEvent): void {
+				
 				this.timer = new Timer(200, 1);
 				this.timer.addEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
 				this.timer.start();
-				
+					
 				this.clickPoint = new Point(this.contentMouseX, this.contentMouseY);
+				
 			}
 			
 			protected function singleClick(e: TimerEvent): void {

@@ -159,11 +159,12 @@
 					
 					self.loadingView.loadingImage.x = ( self.loadingView._width - self.loadingView.loadingImage.sourceWidth ) / 2;
 					self.loadingView.loadingImage.y = ( self.loadingView._height - self.loadingView.loadingImage.sourceHeight ) / 2;
+					
+					
 				}, 500);
 				
 				setTimeout( function(): void {
 					self.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
-					
 					
 					if( self.display.pageView == null ) {
 						self.addEventListener("page-view-ready", self.pageViewReady);
@@ -209,8 +210,47 @@
 					
 					this.display.tableOfContents.chapterArea.addElement(label);
 				}
-				
-				
+				this.book.getPages();
+				// thumbnails
+				this.display.tableOfContents.thumbnailArea.removeAllElements();
+				for each(var page: Object in this.book.pages) {
+					var border: BorderContainer = new BorderContainer();
+					
+					var img: Image = new Image();
+					
+					img.source = page.thumbnailImage;
+					
+					img.height = 210;
+					img.width = 150;
+					
+					img.setStyle("paddingTop", 2);
+					img.setStyle("paddingBottom", 2);
+					
+					img.id = "chapter-page-" + page.pageNo;
+					
+					img.addEventListener(MouseEvent.CLICK, this.chapterPageClicked);
+					
+					border.addElement(img);
+					
+					var label: Label = new Label();
+					
+					label.x = img.width - 40;
+					label.y = img.height - 20;
+					label.height = 20;
+					label.width = 40;
+					label.text = page.pageNo;
+					
+					label.setStyle("backgroundColor", "#1b2630");
+					label.setStyle("color", "#FFFFFF");
+					label.setStyle("paddingLeft", 5);
+					label.setStyle("paddingTop", 5);
+					label.setStyle("textAlign", "center");
+					
+					border.addElement(label);
+					
+					this.display.tableOfContents.thumbnailArea.addElement(border);
+				}
+				this.display.tableOfContents.thumbnailArea.verticalScrollPosition = 0;
 			}
 			
 			private function pageViewReady(e: Event): void {
@@ -321,47 +361,11 @@
 			}
 			
 			private function setChapterPages(chapterId: Number): void {
-				var arr: Array = this.book.getChapterPages(chapterId);
+				//var arr: Array = this.book.getChapterPages(chapterId);
 				
-				this.display.tableOfContents.thumbnailArea.removeAllElements();
-				
-				for each(var page: Object in arr) {
-					var border: BorderContainer = new BorderContainer();
-					
-					var img: Image = new Image();
-					
-					img.source = page.image;
-					
-					img.height = 210;
-					img.width = 150;
-					
-					img.setStyle("paddingTop", 2);
-					img.setStyle("paddingBottom", 2);
-					
-					img.id = "chapter-page-" + page.pageNo;
-					
-					img.addEventListener(MouseEvent.CLICK, this.chapterPageClicked);
-					
-					border.addElement(img);
-					
-					var label: Label = new Label();
-					
-					label.x = img.width - 40;
-					label.y = img.height - 20;
-					label.height = 20;
-					label.width = 40;
-					label.text = page.pageNo;
-					
-					label.setStyle("backgroundColor", "#1b2630");
-					label.setStyle("color", "#FFFFFF");
-					label.setStyle("paddingLeft", 5);
-					label.setStyle("paddingTop", 5);
-					label.setStyle("textAlign", "center");
-					
-					border.addElement(label);
-					
-					this.display.tableOfContents.thumbnailArea.addElement(border);
-				}
+				var startPage: Number = this.book.getChapterPage( chapterId );
+				if( startPage == 0 ) startPage = 1;
+				this.display.tableOfContents.thumbnailArea.verticalScrollPosition = ( 210 * (startPage - 1) ); 
 				
 			}
 			

@@ -15,18 +15,18 @@
 			[Bindable]public var applicationPath: String =  FlexGlobals.topLevelApplication.applicationPath;
 			
 			protected function backPageClicked(e:MouseEvent): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
 				e.stopImmediatePropagation();
+				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.LEFT_CLICKED));
 			}
 			
 			protected function chaptersClicked(e:MouseEvent): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.CHAPTERS_CLICKED));
 				e.stopImmediatePropagation();
+				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.CHAPTERS_CLICKED));
 			}
 			
 			protected function frontPageClicked(e:MouseEvent): void {
-				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
 				e.stopImmediatePropagation();
+				FlexGlobals.topLevelApplication.dispatchEvent(new PagePaletteClickEvent(PagePaletteClickEvent.RIGHT_CLICKED));
 			}
 			
 		]]>

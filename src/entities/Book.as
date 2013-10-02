@@ -25,6 +25,8 @@ package entities {
 		
 		public var image: ByteArray;
 		
+		public var thumbnails: ByteArray;
+		
 		//private var mockService: MockLibraryService = new MockLibraryService();
 		private var libraryService: LibraryService = new LibraryService();
 		//private var libraryService: MockLibraryService = new MockLibraryService();
@@ -42,13 +44,16 @@ package entities {
 			this.image = this.libraryService.getBookCover( this.ID );
 			
 			// ********************
-			for(var i: Number = 0; i < obj.outlines.length; i++){
+			for(var i: Number = 0; i < obj.outlines.length; i++) {
 				
-				if( obj.outlines.pages != null) continue;
+				var start: Number = obj.outlines[i].page;
+				var end: Number = this.totalPageNumber;
+				if( (i + 1) != obj.outlines.length ) {
+					end = obj.outlines[i + 1].page - 1;
+				}
 				
-				var n: Number = 40;
 				var fuckPages: Array = new Array();
-				for (var j: Number = 1; j <= n; j++) {
+				for (var j: Number = start; j <= end; j++) {
 					fuckPages.push( j );
 				}
 				obj.outlines[i].pages = fuckPages;
@@ -59,12 +64,13 @@ package entities {
 				var chapter: Chapter = new Chapter(chapterObj);
 				this.addChapter(chapter);
 			}
+			
 		}
 	
 		public function getFirstPage(resolution: Number): Page {
-			if(this.pages == null) {
-				this.readPages();
-			}
+			//if(this.pages == null) {
+			//	this.readPages();
+			//}
 			if(this.pages.length == 0){
 				return null;
 			}
@@ -163,6 +169,11 @@ package entities {
 			}
 			
 			return arr;
+		}
+		
+		public function getChapterPage( chapterId: Number ): Number {
+			var chapter: Chapter = this.getChapter( chapterId );
+			return chapter.page;
 		}
 		
 		private function getChapter( chapterId: Number ): Chapter {
