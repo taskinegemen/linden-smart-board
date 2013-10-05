@@ -108,7 +108,6 @@ package entities {
 			var pngEncoder: PNGEncoder = new PNGEncoder();
 			var base64: Base64Encoder = new Base64Encoder();
 			
-			
 			var bytes: ByteArray = pngEncoder.encode( bitmapData );
 			
 			base64.encodeBytes(bytes);

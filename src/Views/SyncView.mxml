@@ -116,7 +116,7 @@
 					
 					this.loader.addEventListener("complete", onComplete);
 					request = new URLRequest();
-					request.url = SyncView.API_URL + "/book?filter[publisherID]=" + organization + "&token="+this.token;
+					request.url = SyncView.API_URL + "/book?filter[publisherID]=1&token="+this.token+"&isPublished=1";
 					request.method = URLRequestMethod.GET;
 					
 					this.loader.load( request );
@@ -132,23 +132,24 @@
 					
 					str = HTTPURLLoader(e.target).data;
 					result = com.adobe.serialization.json.JSON.decode( str );
-					
+
 					this.books = new Array();
 					// download organization books
+					var numberOfBooks: Number  = 0;
 					for(var i: Number = 0; i < result.books.length; i++) {
 						var resObj: Object = result.books[i];
 						var obj: Object = new Object();
 						
 						obj.id = resObj.ID;
 						obj.title = resObj.title;
-						obj.publisher = "Seviye yayıncılık";
-						obj.image = "http://api.seviye.com.tr/book-cover/" + resObj.ID +"?width=92";
+						obj.publisher = resObj.publisher;
+						obj.image = resObj.image;
 						
 						if( this.isAlreadyInDisk( obj.id ) ) {
 							continue;
 						}
 						obj.selected = false;
-						
+						numberOfBooks++;
 						var syncBookView: SyncBookView = new SyncBookView();
 						this.container.addElement( syncBookView );
 						
@@ -160,6 +161,10 @@
 						syncBookView._height = 130;
 					}
 					this.body.visible = true;
+					
+					if ( !numberOfBooks ){
+						FlexGlobals.topLevelApplication.createMessage( "Yayınlanmış kitap bulunamadı." , MessageView.INFO );		
+					}
 					
 				}catch(e: Error) {
 					

@@ -8,20 +8,18 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import Events.DrawingSaveEvent;
-			
-			import components.CursorBitmap;
-			
-			import flash.filesystem.*;
-			
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
-			import mx.graphics.*;
 			import mx.graphics.codec.PNGEncoder;
 			import mx.managers.CursorManager;
 			
 			import spark.primitives.Rect;
 			import spark.skins.spark.ImageSkin;
+			
+			import Events.DrawingDeleteEvent;
+			import Events.DrawingSaveEvent;
+			
+			import components.CursorBitmap;
 			
 			[Bindable]public var _width: Number 				= 400;
 			[Bindable]public var _height: Number 				= 300;
@@ -30,6 +28,8 @@
 			
 			[Bindable]public var croppedImageWidth: Number 		= 0;
 			[Bindable]public var croppedImageHeight: Number 	= 0;
+			
+			[Bindable]public var edit: Boolean = false;
 			
 			public var bitmaps: Vector.<BitmapData> = new Vector.<BitmapData>();
 			
@@ -42,7 +42,7 @@
 			public var erase: Boolean = false;
 			
 			private var goErase: Boolean = false;
-			public var edit: Boolean = false;
+			
 			public var editName: String;
 			
 			private var loaderPen: Loader = new Loader();
@@ -53,6 +53,13 @@
 			
 			public var cursorID: Number = 0;
 			public var initCursorID: Number;
+			
+			public var savedBefore: Boolean = false;
+			
+			public var bookId: Number = 0;
+			public var pageNo: Number = 0;
+			public var drawingId: Number = 0;
+			
 			public function onCreationComplete(e: Event): void {
 				
 				this.initCursorID = this.cursorManager.currentCursorID;
@@ -148,9 +155,9 @@
 					}
 					
 					if( self.edit ){
-						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_UPDATE, bitmapData))	
+						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_UPDATE, bitmapData, self.edit))	
 					}else{
-						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SAVE, bitmapData))	
+						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SAVE, bitmapData, self.edit))	
 					}
 				}, 200);
 				
@@ -167,9 +174,13 @@
 						bitmapData.copyPixels(self.croppedImage.bitmapData, new Rectangle(0, 0, self.croppedImage.width, self.croppedImage.height), new Point(10, 10));
 					}
 					
-					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData));
+					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData, self.edit));
 				}, 200);
 				
+			}
+			
+			public function onDeleteClick(e: MouseEvent): void {
+				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingDeleteEvent(DrawingDeleteEvent.DRAWING_DELETE, this.bookId, this.pageNo, this.drawingId));
 			}
 			
 			public function onMouseDown(e: MouseEvent): void {
@@ -380,6 +391,10 @@
 		</s:Image>
 		<!-- share button -->
 		<s:Image  x="217" width="101" top="2" height="31" source="{ this.applicationPath + '/Assets/sharebutton.png' }" click="onShareClick(event)">
+			
+		</s:Image>
+		<!-- delete button -->
+		<s:Image x="323" width="101" top="2" height="31" source="{ this.applicationPath + '/Assets/silbuton.png' }" click="onDeleteClick(event)" visible="{ this.edit }">
 			
 		</s:Image>
 		

@@ -36,6 +36,7 @@
 				FlexGlobals.topLevelApplication.dispatchEvent(new Event("drawings view close"));
 			}
 			
+			private var lastClickedChapter: Number = 0;
 			public function onChapterClick(e: MouseEvent): void {
 				FlexGlobals.topLevelApplication.createMessage( "Çizimler getiriliyor", MessageView.INFO );
 				
@@ -51,9 +52,11 @@
 				label.setStyle("backgroundColor", "#B8BBD9");
 				
 				if(label.id == "all"){
+					this.lastClickedChapter = 0;
 					drawings = this.book.getChapterDrawings( 0 );
 				}else{
 					var id: Number = int( label.id.split('_')[1] );
+					this.lastClickedChapter = id;
 					drawings = this.book.getChapterDrawings( id );
 				}
 				
@@ -68,6 +71,12 @@
 				}
 				
 				FlexGlobals.topLevelApplication.dispatchEvent(new DrawingsClickEvent(DrawingsClickEvent.DRAWINGS_CLICK, image.id));
+			}
+			
+			public function refresh(): void {
+				var drawings: Array = new Array();
+				drawings = this.book.getChapterDrawings( this.lastClickedChapter );
+				this.bindChapterDrawings(drawings);
 			}
 			
 			private function bindChapterDrawings ( drawings: Array ): void {

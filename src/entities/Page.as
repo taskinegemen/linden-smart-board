@@ -4,7 +4,6 @@ package entities {
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
 	import flash.events.Event;
-	import flash.filesystem.*;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
@@ -17,9 +16,9 @@ package entities {
 	import mx.graphics.codec.PNGEncoder;
 	import mx.utils.Base64Decoder;
 	
-	import services.MockLibraryService;
-	
 	import spark.components.Image;
+	
+	import services.MockLibraryService;
 	
 	public class Page{
 		public var pageNo: Number;
@@ -54,16 +53,21 @@ package entities {
 			return this.service.updateDrawing( this.bookID, this.pageNo, int(no), encoder.encode(bitmapData) );
 		}
 
+		// this function can delete any drawing belongs to any page in which specified by bookId
+		public function deleteDrawing( bookId: Number, pageNo: Number, drawingId: Number ): Boolean {
+			return this.service.deleteDrawing( bookId, pageNo, drawingId );
+		}
+		
 		public function getDrawings(): Array {
 			var arr: Array = new Array();
 			
 			try {
-				var i: Number = 0;
 				for each( var drawing: Object in this.service.getDrawings( this.bookID, this.pageNo )) {
 					var obj: Object = new Object();
-					obj.image = drawing;
-					obj.id = "drawing_" + pageNo.toString() + "_" + (i + 1).toString();
-					i++;
+					obj.image = drawing.bytes;
+					obj.id = "drawing_" + pageNo.toString() + "_" + drawing.id.toString();
+					
+					arr.push(obj);
 				}
 			} catch(e: Error) {
 				
@@ -100,15 +104,13 @@ package entities {
 			
 			try
 			{
-				var i: Number = 0;
-				for each( var image: ByteArray in this.service.getDrawings( this.bookID, this.pageNo )) {
+				for each( var drawing: Object in this.service.getDrawings( this.bookID, this.pageNo )) {
 					var obj: Object = new Object();
 					
-					obj.id = "drawing_" + pageNo.toString() + "_" + (i + 1).toString();
-					obj.image = image;
+					obj.id = "drawing_" + pageNo.toString() + "_" + drawing.id.toString();
+					obj.image = drawing.bytes;
 					
 					arr.push( obj );
-					i++;					
 				}
 			}catch(e: Error) {
 				

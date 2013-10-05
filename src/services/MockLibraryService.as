@@ -143,7 +143,11 @@ package services {
 				fileStream.readBytes( bytes );
 				fileStream.close();
 				
-				arr.push( bytes );
+				var obj: Object = new Object();
+				obj.bytes = bytes;
+				obj.id = file.name.split('.')[0];
+				
+				arr.push( obj );
 			}
 			
 			return arr;
@@ -211,6 +215,24 @@ package services {
 			}
 		}
 		
+		public function deleteDrawing( bookId: Number, pageNo: Number, drawingNo: Number ): Boolean  {
+			var res: Boolean = true;
+			try {
+				var path: String = File.applicationDirectory.nativePath;
+				var file: File = new File();
+				var fileStream: FileStream = new FileStream();
+				
+				file = file.resolvePath( path + "\\books\\" + bookId.toString() + "\\drawings\\" + pageNo.toString() + "\\" + drawingNo.toString() + ".png");
+				file.deleteFile();
+				
+			}catch(	e: Error ){
+				res = false;
+			}finally {
+				return res;
+			}
+			return false;
+		}
+		
 		private function getNextDrawingName( bookId: Number, pageNo: Number ): String {
 			var name: String = (1).toString();
 			try{
@@ -219,7 +241,17 @@ package services {
 				
 				dir = dir.resolvePath(path + "\\books\\" + bookId.toString() + "\\drawings\\" + pageNo.toString());
 				
-				name = (dir.getDirectoryListing().length + 1).toString();
+				var len: Number = dir.getDirectoryListing().length;
+				if( len ) {
+					
+					var lastFile: File = dir.getDirectoryListing()[len -1 ];
+					var lastFileName: Number = lastFile.name.split('.')[0];
+					
+					name = (int(lastFileName) + 1).toString();
+				} else {
+					name = "1";
+				}
+				
 			}catch(e: Error){
 				var file: File = new File();
 				file = file.resolvePath( path + "\\books\\" + bookId.toString() );

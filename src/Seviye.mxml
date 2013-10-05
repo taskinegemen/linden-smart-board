@@ -4,7 +4,8 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   initialize="init()" 
 					   applicationComplete="applicationCompleted()"
-					   showStatusBar="false"					   
+					   showStatusBar="false"	
+					   preinitialize="onPreinitialize(event)"
 					   >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -12,36 +13,24 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import Basic.Api;
-			
-			import Events.*;
-			
-			import Views.BookView;
-			import Views.ChapterView;
-			import Views.CropView;
-			import Views.DrawingView;
-			import Views.DrawingsView;
-			import Views.LoadingView;
-			import Views.MessageView;
-			import Views.SyncView;
-			import Views.ZoomView;
-			
 			import com.nocircleno.graffiti.tools.FillBucketTool;
 			
-			import entities.*;
-			import entities.DisplayStackConstants;
-			import entities.Library;
-			
 			import flash.display.Stage;
-			import flash.utils.*;
 			
 			import mx.controls.Alert;
+			import mx.events.FlexEvent;
 			
 			import spark.components.BorderContainer;
 			import spark.components.Group;
 			import spark.components.Image;
 			import spark.components.Label;
 			import spark.skins.spark.ImageSkin;
+			
+			import Basic.Api;
+			
+			import Events.*;
+			import entities.*;
+			import Views.*;
 			
 			// variables
 			public var display:DisplayStack;
@@ -63,8 +52,18 @@
 			
 			[Bindable]public var applicationPath: String;
 			
+			protected function onPreinitialize(event: FlexEvent): void {
+				nativeWindow.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+				nativeWindow.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+			}
+			
+			protected function onKeyDown(event:KeyboardEvent): void {
+				if (event.keyCode == 27) {
+					event.preventDefault();
+				}
+			}
+			
 			private function applicationCompleted(): void{
-				
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				
 				this.display = new DisplayStack();
@@ -101,6 +100,7 @@
 				this.addEventListener(DrawingSaveEvent.DRAWING_SAVE, this.saveDrawing);
 				this.addEventListener(DrawingSaveEvent.DRAWING_UPDATE, this.updateDrawing);
 				this.addEventListener(DrawingSaveEvent.DRAWING_SHARE, this.shareDrawing);
+				this.addEventListener(DrawingDeleteEvent.DRAWING_DELETE, this.deleteDrawing);
 				
 				this.display.FullHeight = this.stage.height;
 				this.display.FullWidth = this.stage.width;
@@ -193,9 +193,9 @@
 				}
 				
 				this.display.tableOfContents.chapterArea.removeAllElements();
-				
+				var label: Label = new spark.components.Label();
 				for each(var chapter: Chapter in this.chapters) {
-					var label: Label = new spark.components.Label();
+					
 					
 					label.text = chapter.title.length > 30 ? chapter.title.substr(0, 30) + ' ...' : chapter.title;
 					label.setStyle("color", "#FFFFFF");
@@ -232,7 +232,6 @@
 					
 					border.addElement(img);
 					
-					var label: Label = new Label();
 					
 					label.x = img.width - 40;
 					label.y = img.height - 20;
@@ -338,13 +337,14 @@
 				this.display.tableOfContents.visible = true;
 			}
 			
+			private var lastClickedChapter: Number = 0;
 			private function chapterClicked(e: MouseEvent): void {
 				this.createMessage( "Sayfalar getiriliyor", MessageView.INFO );
 				
 				var self: Object = this;
 				setTimeout( function(): void {
 					var label: Label = e.target as Label;
-					
+				
 					var children: Number = self.display.tableOfContents.chapterArea.numChildren;
 					for(var i: Number = 0; i < children; i++) {
 						var _label:Label = self.display.tableOfContents.chapterArea.getElementAt(i) as Label;
@@ -354,7 +354,7 @@
 					label.setStyle("backgroundColor", "#B8BBD9");
 					
 					var id: Number = label.id.split('-')[1];
-					
+					this.lastClickedChapter = id;
 					self.setChapterPages(id);
 				}, 200);
 				
@@ -477,12 +477,10 @@
 			}
 			
 			public function shareDrawing(e: DrawingSaveEvent): void {
-				
 				var bitmapDataCopy: BitmapData = e.bitmapData.clone();
 				
-				if ( this.page.saveDrawing(e.bitmapData) ){
-					
-					var gonulGozu: GonulGozu = new GonulGozu();
+				var gonulGozu: GonulGozu = new GonulGozu();
+				if( e.savedBefore ) {
 					
 					gonulGozu.addEventListener(UploadingComplete.COMPLETE, this.uploadingComplete);
 					gonulGozu.addEventListener(UploadingComplete.IOERROR, this.uploadingIOError);
@@ -490,9 +488,17 @@
 					gonulGozu.container = this.drawingView;
 					gonulGozu.sendImage( this.page.bookID, this.page.pageNo, e.bitmapData );
 					
+				} else if ( this.page.saveDrawing(e.bitmapData) ){
+					
+					gonulGozu.addEventListener(UploadingComplete.COMPLETE, this.uploadingComplete);
+					gonulGozu.addEventListener(UploadingComplete.IOERROR, this.uploadingIOError);
+				
+					gonulGozu.container = this.drawingView;
+					gonulGozu.sendImage( this.page.bookID, this.page.pageNo, e.bitmapData );
+					
 				} else {
 					this.createMessage( "Hata oldu!", MessageView.ERROR );
-				}			
+				}	
 				
 			}
 			
@@ -505,6 +511,19 @@
 					this.removeElement( this.drawingView );	
 					
 					this.createMessage( "Çizim kaydedildi", MessageView.SUCCESS);
+					
+				} else {
+					this.createMessage( "Hata oldu!", MessageView.ERROR );
+				}
+			}
+			
+			public function deleteDrawing(e: DrawingDeleteEvent): void {
+				if( this.page.deleteDrawing(e.bookId, e.pageNo, e.drawingId) ) {
+					this.drawingView.cursorManager.removeCursor( this.drawingView.cursorManager.currentCursorID );
+					this.removeElement( this.drawingView );
+					this.createMessage( "Çizim silindi", MessageView.SUCCESS );
+					this.drawingsView.refresh();
+					
 				} else {
 					this.createMessage( "Hata oldu!", MessageView.ERROR );
 				}
@@ -741,6 +760,10 @@
 				this.drawingView._height = this.display.FullHeight;
 				
 				this.drawingView.applicationPath = this.applicationPath;
+				
+				this.drawingView.bookId = this.book.ID;
+				this.drawingView.pageNo = pageNo;
+				this.drawingView.drawingId = drawingNo;
 				
 				this.addEventListener("bitmap read", this.drawingBitmapDataReady);
 				
