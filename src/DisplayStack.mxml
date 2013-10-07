@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" initialize="init()" xmlns:imagecropper="com.flexblocks.imagecropper.*" xmlns:Views="Views.*" xmlns:containers="com.acj.containers.*"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" initialize="init()" xmlns:imagecropper="com.flexblocks.imagecropper.*" xmlns:Views="Views.*" xmlns:containers="com.acj.containers.*" xmlns:components="components.*"
 		 >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -39,6 +39,7 @@
 			import Views.VideoView;
 			
 			import components.Mp3Player;
+			import components.StageWebViewUIComponent;
 			
 			import entities.DisplayStackConstants;
 			import entities.Item;
@@ -436,10 +437,12 @@
 				this.addElement(this.itemView);
 			}
 			
-			
+			private var webView: StageWebViewUIComponent;
 			public function itemViewReady(e: Event): void {
 				try {
 				
+					
+					
 					var itemViewRef: Object = this;
 					
 					this.itemView._width = this.FullWidth;
@@ -542,6 +545,20 @@
 						
 						case Item.ITEM_LINK_TYPE:
 							
+							this.webView = new StageWebViewUIComponent();
+							
+							
+							this.webView.url = this.item.filename;
+							
+							
+							this.webView._width = this.FullWidth * 0.8;
+							this.webView._height = this.FullHeight * 0.8;
+							
+							this.webView.startX = ( this.FullWidth - this.webView._width ) / 2;
+							this.webView.startY = ( this.FullHeight - this.webView._height ) / 2;
+							
+							this.itemView.addElement( webView );
+							
 							break;
 						
 						case Item.ITEM_IMAGE_TYPE:
@@ -626,6 +643,10 @@
 									
 								break;
 							case Item.ITEM_LINK_TYPE:
+								
+								if( this.webView ){
+									this.webView.dispose();
+								}
 								
 								break;
 							case Item.ITEM_IMAGE_TYPE:
@@ -798,5 +819,4 @@
 			
 		</mx:Canvas>
 	</mx:ViewStack>
-	
 </s:Group>
