@@ -7,17 +7,6 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import Events.DownloaderToMainEvent;
-			
-			import air.net.URLMonitor;
-			
-			import com.adobe.serialization.json.*;
-			
-			import components.gif.player.GIFPlayer;
-			
-			import entities.Book;
-			import entities.HTTPURLLoader;
-			
 			import flash.events.StatusEvent;
 			import flash.net.URLRequest;
 			import flash.system.MessageChannel;
@@ -32,6 +21,17 @@
 			import mx.controls.ProgressBarMode;
 			import mx.core.FlexGlobals;
 			import mx.core.UIComponent;
+			
+			import Events.DownloaderToMainEvent;
+			import Events.VirtualKeyboardEvent;
+			
+			import air.net.URLMonitor;
+			
+			import components.gif.player.GIFPlayer;
+			import com.adobe.serialization.json.*;
+			
+			import entities.Book;
+			import entities.HTTPURLLoader;
 			
 			[Bindable]public var _width: Number = 400;
 			[Bindable]public var _height: Number = 300;
@@ -81,6 +81,11 @@
 				}catch(e: *){
 					FlexGlobals.topLevelApplication.createMessage( "Hata oldu", MessageView.ERROR );
 				}
+				
+				this.virtualKeyboard.visible = false;
+				FlexGlobals.topLevelApplication.addEventListener("KeyClicked", this.onKeyClicked);
+				
+				this.addElement( this.virtualKeyboard );
 			}
 			
 			private function onIOError(e: Event): void {
@@ -387,6 +392,69 @@
 				e.stopImmediatePropagation();
 			}
 			
+			private var virtualKeyboard: VirtualKeyboard = new VirtualKeyboard();
+			private function onFocusIn(e: Event): void {
+				if( !this.virtualKeyboard.visible ) { 
+					this.virtualKeyboard.x = ( this._width - this.virtualKeyboard.width ) / 2;
+					this.virtualKeyboard.y = this.searchContainer.y + this.searchInput.y + this.searchInput.height + 20;
+				
+					this.virtualKeyboard.visible = true;
+				}
+			}
+			
+			private function onSearchClick(e: MouseEvent): void {
+				this.virtualKeyboard.visible = false;
+				
+				this.container.removeAllElements();
+				for(var i: Number = 0; i < this.books.length; i++){
+					var resObj: Object = this.books[i];
+					var title: String = resObj.title;
+					if( title.toLowerCase().search( this.searchInput.text.toLowerCase() ) < 0) {
+						continue;
+					}
+					
+					var obj: Object = new Object();
+					
+					obj.id = resObj.ID;
+					obj.title = resObj.title;
+					obj.publisher = resObj.publisher;
+					obj.image = resObj.image;
+					
+					var syncBookView: SyncBookView = new SyncBookView();
+					this.container.addElement( syncBookView );
+					
+					syncBookView.book = obj;
+					
+					syncBookView._width = this.containerWidth - this.scroller.verticalScrollBar.width;
+					syncBookView._height = 130;
+				}
+			}
+			
+			public function onKeyClicked(e: VirtualKeyboardEvent): void {
+				var char:String = "";
+				switch ( e.keyLabel ) {
+					case "Space":
+						char = " ";
+						break;
+					case "Tab":
+						char = "    ";
+						break;
+					case "Delete":
+						this.searchInput.text = "";
+						break;
+					case "Enter":
+						this.onSearchClick(null);
+						break;
+					case "Esc":
+						this.virtualKeyboard.visible = false;
+						break;
+					default:
+						char = e.keyLabel;
+				}
+				
+				this.searchInput.text += char;
+			}
+			
 		]]>
 	</fx:Script>
 	<s:BorderContainer id="body" visible="false" width="{ this._width }" click="onCloseClick(event)" height="{ this._height }" backgroundColor="#000000" backgroundAlpha="0.5">
@@ -396,11 +464,19 @@
 						   x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.25 - this.topLine.height }">
 		</s:BorderContainer>
 		
+		<s:BorderContainer click="stopPropagation(event)" borderWeight="0" borderVisible="false" id="searchContainer" backgroundColor="#000000" 
+						   width="{ this.containerWidth }" height="30" 
+						   x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this.topLine.y + this.topLine.height }">
+			<s:TextInput needsSoftKeyboard="true" id="searchInput" width="{ this.containerWidth }" height="{ this.searchContainer.height }" focusIn="onFocusIn(event)" click="onFocusIn(event)">
+			</s:TextInput>
+			
+		</s:BorderContainer>
+	
 		<s:Scroller id="scroller" verticalScrollPolicy="on" click="stopPropagation(event)"
-					width="{ this.containerWidth }" height="{ this._height * 0.5 }" 
-					x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.25 }">
-			<s:Group id="group" width="{ this.containerWidth }" height="{ this._height * 0.5 }"
-					 x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this._height * 0.25 }">
+					width="{ this.containerWidth }" height="{ this._height * 0.5 - this.searchContainer.height }" 
+					x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this.searchContainer.y + this.searchContainer.height }">
+			<s:Group id="group" width="{ this.containerWidth }" height="{ this._height * 0.5 - this.searchContainer.height }"
+					 x="{ ( this._width - this.containerWidth ) / 2 }" y="{ this.searchContainer.y +  this.searchContainer.height }">
 				<!--
 				<s:Rect id="rect" width="{ this.containerWidth - this.scroller.verticalScrollBar.width }" height="{ this._height * 0.5 }" x="{ 0 }" y="0">
 					<s:fill><s:SolidColor color="#E2E2E2" /></s:fill>

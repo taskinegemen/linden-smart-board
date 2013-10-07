@@ -855,6 +855,10 @@
 				this.removeEventListener("message view close", this.messageViewClose);
 			}
 			
+			public function onKeyClicked(e: VirtualKeyboardEvent): void {
+				this.syncView.onKeyClicked(e);
+			}
+			
 		]]>
 		
 		
