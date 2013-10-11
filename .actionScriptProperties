@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="Seviye.mxml" projectUUID="107df4e3-eb0a-4839-89e9-7ccd9cab908f" version="11">
+<actionScriptProperties analytics="false" mainApplicationPath="Main.mxml" projectUUID="107df4e3-eb0a-4839-89e9-7ccd9cab908f" version="11">
   <compiler additionalCompilerArguments="-locale en_US -swf-version=17" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="true" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="0">
@@ -14,10 +14,10 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
-    <application path="Seviye.mxml">
+    <application path="Main.mxml">
       <airExcludes/>
     </application>
-    <application path="Main.mxml">
+    <application path="Seviye.mxml">
       <airExcludes/>
     </application>
   </applications>

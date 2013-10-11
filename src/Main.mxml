@@ -28,9 +28,31 @@
 			
 			import Basic.Api;
 			
-			import Events.*;
-			import entities.*;
-			import Views.*;
+			import Events.BookClickEvent;
+			import Events.CropRectangleEvent;
+			import Events.DrawingDeleteEvent;
+			import Events.DrawingSaveEvent;
+			import Events.DrawingsClickEvent;
+			import Events.PagePaletteClickEvent;
+			import Events.UploadingComplete;
+			import Events.VirtualKeyboardEvent;
+			import Events.ZoomClickEvent;
+			
+			import Views.BookView;
+			import Views.CropView;
+			import Views.DrawingView;
+			import Views.DrawingsView;
+			import Views.LoadingView;
+			import Views.MessageView;
+			import Views.SyncView;
+			import Views.ZoomView;
+			
+			import entities.Book;
+			import entities.Chapter;
+			import entities.DisplayStackConstants;
+			import entities.GonulGozu;
+			import entities.Library;
+			import entities.Page;
 			
 			// variables
 			public var display:DisplayStack;
@@ -47,7 +69,7 @@
 			public var items: Array;
 
 			private var pageResolution: Number = Page._640;
-			
+			private var _pageResolution: Number = Page._640;
 			public var pageViewY: Number = 0;
 			
 			[Bindable]public var applicationPath: String;
@@ -108,10 +130,13 @@
 				
 				if( this.stage.width < 1280 ) {
 					this.pageResolution = Page._640;
+					this._pageResolution = Page._640;
 				}else if( this.stage.width < 1920 ) {
 					this.pageResolution = Page._1280;
+					this._pageResolution = Page._1280;
 				} else {
 					this.pageResolution = Page._1920;
+					this._pageResolution = Page._1920;
 				}
 				
 				// get library
@@ -163,6 +188,8 @@
 					
 				}, 500);
 				
+				for(var i: Number = 0; i < 10000000; i++);
+				
 				setTimeout( function(): void {
 					self.display.mainStack.selectedIndex = DisplayStackConstants.PAGE_VIEW_INDEX;
 					
@@ -193,10 +220,10 @@
 				}
 				
 				this.display.tableOfContents.chapterArea.removeAllElements();
-				var label: Label = new spark.components.Label();
+				
+			
 				for each(var chapter: Chapter in this.chapters) {
-					
-					
+					var label: Label = new spark.components.Label();	
 					label.text = chapter.title.length > 30 ? chapter.title.substr(0, 30) + ' ...' : chapter.title;
 					label.setStyle("color", "#FFFFFF");
 					label.setStyle("fontSize", 20);
@@ -210,6 +237,8 @@
 					
 					this.display.tableOfContents.chapterArea.addElement(label);
 				}
+			
+				
 				this.book.getPages();
 				// thumbnails
 				this.display.tableOfContents.thumbnailArea.removeAllElements();
@@ -232,20 +261,20 @@
 					
 					border.addElement(img);
 					
+					var label_: Label = new spark.components.Label();
+					label_.x = img.width - 40;
+					label_.y = img.height - 20;
+					label_.height = 20;
+					label_.width = 40;
+					label_.text = page.pageNo;
 					
-					label.x = img.width - 40;
-					label.y = img.height - 20;
-					label.height = 20;
-					label.width = 40;
-					label.text = page.pageNo;
+					label_.setStyle("backgroundColor", "#1b2630");
+					label_.setStyle("color", "#FFFFFF");
+					label_.setStyle("paddingLeft", 5);
+					label_.setStyle("paddingTop", 5);
+					label_.setStyle("textAlign", "center");
 					
-					label.setStyle("backgroundColor", "#1b2630");
-					label.setStyle("color", "#FFFFFF");
-					label.setStyle("paddingLeft", 5);
-					label.setStyle("paddingTop", 5);
-					label.setStyle("textAlign", "center");
-					
-					border.addElement(label);
+					border.addElement(label_);
 					
 					this.display.tableOfContents.thumbnailArea.addElement(border);
 				}
@@ -259,9 +288,14 @@
 			
 			private function setFirstPage(): void {
 				
-				this.removeElement( this.loadingView );
+				
 				
 				this.page = this.book.getFirstPage( this.pageResolution );
+				if( this.page == null) {
+					this.book.getPages();
+					this.page = this.book.getFirstPage( this.pageResolution );
+				}
+				this.removeElement( this.loadingView );
 				this.display.pageView.source = this.page.image;
 				
 				this.display.pageView.height = this.page.height;
@@ -575,13 +609,14 @@
 				// bind chapters
 				if( !this.chapters.length ) return;
 				
-				var label: Label = this.getDrawingsChapterLabel("all", "Hepsi");
+				this.drawingsView.chapters.removeAllElements();
 				
+				var label: Label = this.getDrawingsChapterLabel("all", "Hepsi");
 				this.drawingsView.chapters.addElement(label);
 				
 				for each( var obj: Object in this.chapters ){
-					label = this.getDrawingsChapterLabel("chapter_" + obj.ID, obj.title);
-					this.drawingsView.chapters.addElement(label);
+					var label_: Label = this.getDrawingsChapterLabel("chapter_" + obj.ID, obj.title);
+					this.drawingsView.chapters.addElement(label_);
 				}
 			}
 			
@@ -616,7 +651,7 @@
 					this.zoomOut = false;
 					var self: Object = this;
 					setTimeout( function(): void {
-						
+						self.pageResolution = self._pageResolution;
 						self.page  = self.book.getPage( self.page.pageNo, self.pageResolution );
 						
 						self.display.pageView.source = self.page.image;
@@ -711,8 +746,8 @@
 				this.zoomOut = true;
 				var self: Object = this;
 				setTimeout( function(): void {
-					
-					self.page  = self.book.getPage( self.page.pageNo, Page._640 );
+					self.pageResolution = Page._640;
+					self.page  = self.book.getPage( self.page.pageNo, this.pageResolution );
 					
 					self.display.pageView.source = self.page.image;
 					

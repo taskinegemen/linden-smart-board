@@ -52,11 +52,11 @@ package entities {
 					end = obj.outlines[i + 1].page - 1;
 				}
 				
-				var fuckPages: Array = new Array();
+				var fPages: Array = new Array();
 				for (var j: Number = start; j <= end; j++) {
-					fuckPages.push( j );
+					fPages.push( j );
 				}
-				obj.outlines[i].pages = fuckPages;
+				obj.outlines[i].pages = fPages;
 			}
 			// ********************
 			
@@ -71,7 +71,7 @@ package entities {
 			//if(this.pages == null) {
 			//	this.readPages();
 			//}
-			if(this.pages.length == 0){
+			if( this.pages == null || this.pages.length == 0){
 				return null;
 			}
 			

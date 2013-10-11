@@ -146,13 +146,12 @@
 				
 				var self: Object = this;
 				setTimeout( function(): void {
-					
 					var bitmapData: BitmapData = new BitmapData(self.transparentArea.width, self.transparentArea.height, false, 0xD6D8D8);
-					bitmapData.draw(self.transparentArea);
 					
 					if( self.croppedImage.bitmapData ){
 						bitmapData.copyPixels(self.croppedImage.bitmapData, new Rectangle(0, 0, self.croppedImage.width, self.croppedImage.height), new Point(10, 10));
 					}
+					bitmapData.draw(self.transparentArea);
 					
 					if( self.edit ){
 						FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_UPDATE, bitmapData, self.edit))	
@@ -168,11 +167,11 @@
 				var self: Object = this;
 				setTimeout( function(): void {
 					var bitmapData: BitmapData = new BitmapData(self.transparentArea.width, self.transparentArea.height, false, 0xD6D8D8);
-					bitmapData.draw(self.transparentArea);
 					
 					if( self.croppedImage.bitmapData ){
 						bitmapData.copyPixels(self.croppedImage.bitmapData, new Rectangle(0, 0, self.croppedImage.width, self.croppedImage.height), new Point(10, 10));
 					}
+					bitmapData.draw(self.transparentArea);
 					
 					FlexGlobals.topLevelApplication.dispatchEvent(new DrawingSaveEvent(DrawingSaveEvent.DRAWING_SHARE, bitmapData, self.edit));
 				}, 200);

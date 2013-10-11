@@ -153,7 +153,7 @@ package services {
 			return arr;
 		}
 		
-		// fuck
+		// ***
 		public function getDrawing( bookId: Number, pageNo: Number, drawingNo: Number): ByteArray {
 			var bytes: ByteArray = new ByteArray();
 			var path: String = File.applicationDirectory.nativePath;
@@ -168,7 +168,7 @@ package services {
 			return bytes;
 		}
 		
-		// fuck
+		// ***
 		public function saveDrawing( bookId: Number, pageNo: Number, bytes: ByteArray ): Boolean {
 			var name: String = this.getNextDrawingName(bookId, pageNo);
 			var result: Boolean = true;
@@ -193,7 +193,7 @@ package services {
 			}
 		}
 		
-		// fuck
+		// ***
 		public function updateDrawing( bookId: Number, pageNo: Number, drawingNo:Number ,bytes: ByteArray ): Boolean {
 			var res: Boolean = true;
 			try{
