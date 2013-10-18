@@ -82,7 +82,7 @@
 				this.penBitmapData.draw(bytes, matrix, null, null, null, true);
 				
 				CursorBitmap.bitmapData = this.penBitmapData;
-				this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+				//this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 				
 				var self: Object = this;
 				setTimeout( function(): void {
@@ -237,7 +237,7 @@
 						
 						CursorBitmap.bitmapData = this.penBitmapData;
 						
-						this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+						//this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 						
 						var self_: Object = this;
 						setTimeout( function(): void {
@@ -258,7 +258,7 @@
 					
 					this.cursorManager.removeCursor( this.cursorManager.currentCursorID );
 					
-					this.cursorID = this.cursorManager.setCursor( CursorBitmap );
+					//this.cursorID = this.cursorManager.setCursor( CursorBitmap );
 					this.eraserButton.source = this.applicationPath + "\\Assets\\eraser.png";
 					
 					var self: Object = this;

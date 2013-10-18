@@ -32,6 +32,7 @@
 			
 			import Views.ChapterView;
 			import Views.ItemView;
+			import Views.LoadingView;
 			import Views.MessageView;
 			import Views.Mp3PlayerSkin;
 			import Views.PageMenu;
@@ -293,7 +294,7 @@
 			}
 			
 			// show circular menu on page
-			protected function onPageDoubleClick(e: MouseEvent): void {
+			public function onPageDoubleClick(e: MouseEvent): void {
 				if( this._pageMenu != null && this._pageMenu.visible && this.FullHeight - this.clickPoint.y <= 50 ) {
 					return;
 				}
@@ -328,7 +329,7 @@
 			// on page click
 			public var clickPoint: Point;
 			public var wasScroll: Boolean = false;
-			protected function onPageClick(e: MouseEvent): void {
+			public function onPageClick(e: MouseEvent): void {
 				
 				this.timer = new Timer(200, 1);
 				this.timer.addEventListener(TimerEvent.TIMER_COMPLETE, singleClick);
@@ -569,7 +570,8 @@
 							
 							this.imageItem.source =  this.item.getBytes();
 							this.itemView.addElement( this.imageItem );
-							
+							this.imageItem.maxHeight = this.FullHeight * 0.8;
+							this.imageItem.maxWidth = this.FullWidth * 0.8;
 							var stackRef: Object = this;
 							
 							setTimeout(function(): void {
@@ -722,6 +724,10 @@
 			
 			public function onLoadingViewComplete(e: Event): void {
 				this.dispatchEvent(new Event("loading view ready"));
+			}
+			
+			public function displayStackStopPropagation(e: Event): void {
+				e.stopImmediatePropagation();
 			}
 			
 		]]>

@@ -168,6 +168,8 @@
 				
 				self.bindBookPages(e.book);
 				
+				
+				
 				this.loadingView = new LoadingView();
 				
 				this.loadingView.visible = false;
@@ -207,7 +209,9 @@
 				}, 500);
 				
 			}
-			
+			private function loadingViewClick(e: Event): void {
+				Alert.show("click");
+			}
 			private function bindBookPages(book: Book): void {
 				this.book = book;
 			}
@@ -287,15 +291,14 @@
 			}
 			
 			private function setFirstPage(): void {
-				
-				
-				
+
 				this.page = this.book.getFirstPage( this.pageResolution );
 				if( this.page == null) {
 					this.book.getPages();
 					this.page = this.book.getFirstPage( this.pageResolution );
 				}
 				this.removeElement( this.loadingView );
+				
 				this.display.pageView.source = this.page.image;
 				
 				this.display.pageView.height = this.page.height;

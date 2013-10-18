@@ -17,6 +17,7 @@
 			import flash.utils.ByteArray;
 			
 			import mx.controls.Alert;
+			import mx.controls.Button;
 			import mx.controls.ProgressBar;
 			import mx.controls.ProgressBarMode;
 			import mx.core.FlexGlobals;
@@ -26,9 +27,8 @@
 			import Events.VirtualKeyboardEvent;
 			
 			import air.net.URLMonitor;
-			
-			import components.gif.player.GIFPlayer;
 			import com.adobe.serialization.json.*;
+			import components.gif.player.GIFPlayer;
 			
 			import entities.Book;
 			import entities.HTTPURLLoader;
@@ -61,6 +61,7 @@
 			
 			private var borderContainer: BorderContainer = new BorderContainer();
 			private var progressBar: ProgressBar = new ProgressBar();
+			private var cancelButton: Button = new Button();
 			
 			private var canExit: Boolean = true;
 			private var updated: Boolean = false;
@@ -217,6 +218,15 @@
 					
 					this.borderContainer.addElement( this.progressBar );
 					
+					// cancel button
+					this.cancelButton.label = "İptal";
+					this.cancelButton.x = this.borderContainer.width - 80;
+					this.cancelButton.y = this.borderContainer.height - 30;
+					this.cancelButton.addEventListener(MouseEvent.CLICK, this.buttonClick);
+					
+					this.borderContainer.addElement( this.cancelButton );
+					
+					// progress bar
 					this.progressBar.mode = ProgressBarMode.MANUAL;
 					this.progressBar.minimum = 0;
 					this.progressBar.maximum = 100;
@@ -231,6 +241,7 @@
 				}
 			}
 			
+			public var file: File;
 			private function startDownload(): void {
 				
 				try {
@@ -242,7 +253,7 @@
 					
 					var fileRef1: FileReference = new FileReference();
 					
-					var file: File = new File(File.applicationDirectory.nativePath + "/books" );
+					file = new File(File.applicationDirectory.nativePath + "/books" );
 					
 					file.addEventListener(Event.COMPLETE, onDownloadComplete);
 					file.addEventListener(IOErrorEvent.IO_ERROR, onDownloadIOError);
@@ -303,6 +314,18 @@
 					
 				}catch(e: Error) {
 					FlexGlobals.topLevelApplication.createMessage( "Hata oldu", MessageView.ERROR );
+				}
+			}
+			
+			private function buttonClick(e: MouseEvent): void {
+				this.borderContainer.visible = false;
+				this.canExit = true;
+				this.updated = true;
+				this.file.cancel();
+				if ( this.selectedBooks.length ){
+					this.startDownload();
+				} else {
+					this.removeElement( this.borderContainer );
 				}
 			}
 			
